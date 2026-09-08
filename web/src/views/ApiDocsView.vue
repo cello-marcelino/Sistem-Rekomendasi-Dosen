@@ -92,17 +92,20 @@ const scrollToSection = (id) => {
           </div>
         </section>
 
-        <!-- Auth -->
         <section id="auth">
           <h2>Autentikasi</h2>
           <p>
-            Saat ini API SiReDo <strong>tidak memerlukan autentikasi</strong> dan dirancang untuk
-            digunakan di lingkungan jaringan internal kampus. Untuk deployment produksi,
-            sangat direkomendasikan untuk menambahkan API key atau token JWT di layer reverse proxy (Nginx/Caddy).
+            Semua endpoint API SiReDo (kecuali <code>/health</code> dan <code>/status</code>) dilindungi dan memerlukan autentikasi menggunakan API Key.
+            API Key harus disertakan di setiap request melalui HTTP header <code>X-API-Key</code>.
           </p>
-          <blockquote>
-            ⚠️ Jangan expose endpoint ini ke internet publik tanpa proteksi autentikasi.
-          </blockquote>
+          <pre><code><span class="tok-comment">// Contoh penyertaan Header API Key</span>
+<span class="tok-key">GET</span> /api/dosen
+<span class="tok-key">X-API-Key</span>: srd_live_xxxxxxxxxxxxxxxxxxxxxxxx</code></pre>
+          <div class="note note-warn">
+            <strong>Catatan Keamanan:</strong>
+            Jangan pernah mempublikasikan API Key Anda di frontend publik (seperti di client-side React/Vue tanpa perlindungan).
+            Jika aplikasi Anda adalah web publik, simpan API key di backend Anda.
+          </div>
         </section>
 
         <!-- Single -->

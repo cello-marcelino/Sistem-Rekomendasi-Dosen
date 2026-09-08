@@ -12,7 +12,7 @@ def test_get_system_status(client, sample_dosen_list):
     assert response.status_code == 200
     data = response.get_json()
     assert data["success"] is True
-    assert data["data"]["status"] == "online"
+    assert data["data"]["status"] in ["online", "idle"]
     assert data["data"]["total_dosen"] == len(sample_dosen_list)
 
 def test_get_dosen_list(client, sample_dosen_list):

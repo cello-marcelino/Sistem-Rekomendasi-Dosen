@@ -16,8 +16,17 @@ def require_admin_key(f):
                 api_key = auth_header
                 
         expected_key = current_app.config.get('ADMIN_API_KEY', Config.ADMIN_API_KEY) if has_app_context() else Config.ADMIN_API_KEY
-        if not api_key or api_key != expected_key:
-            raise AuthenticationError("Akses ditolak: API Key admin tidak valid atau tidak disertakan")
+        if api_key == expected_key:
+            return f(*args, **kwargs)
             
-        return f(*args, **kwargs)
+        # Fallback to check if it's a registered client API key
+        try:
+            from server.src.repositories.client.client_repository import ClientRepository
+            client = ClientRepository().get_by_api_key(api_key)
+            if client and client.is_active:
+                return f(*args, **kwargs)
+        except Exception:
+            pass
+            
+        raise AuthenticationError("Akses ditolak: API Key tidak valid atau tidak terdaftar")
     return decorated_function

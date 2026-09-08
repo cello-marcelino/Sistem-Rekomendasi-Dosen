@@ -21,10 +21,10 @@ const sections = [
     ]
   },
   {
-    label: 'Sistem',
+    label: 'Developer',
     items: [
-      { name: 'Instalasi & Setup', path: '/install', icon: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-      { name: 'SiReDo Admin Portal', path: '/admin/login', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', badge: 'Admin' }
+      { name: 'Quickstart', path: '/quickstart', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+      { name: 'Daftar & API Key', path: '/register', icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' }
     ]
   },
 ]

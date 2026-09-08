@@ -1,26 +1,18 @@
-<script setup>
+﻿<script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import AppSidebar from './components/layout/AppSidebar.vue'
-import AdminSidebar from './components/layout/AdminSidebar.vue'
 
 const route = useRoute()
 
 const isNoneLayout = computed(() => {
-  return route.path === '/' || route.path === '/admin/login' || route.meta.layout === 'none'
-})
-
-const isAdminLayout = computed(() => {
-  return route.path.startsWith('/admin') && route.path !== '/admin/login'
+  return route.path === '/' || route.meta.layout === 'none'
 })
 </script>
 
 <template>
   <div class="app-shell" :class="{ 'has-sidebar': !isNoneLayout }">
-    <!-- Admin Sidebar for Admin Portal -->
-    <AdminSidebar v-if="isAdminLayout" />
-    <!-- Public Sidebar for Public Portal -->
-    <AppSidebar v-else-if="!isNoneLayout" />
+    <AppSidebar v-if="!isNoneLayout" />
 
     <div class="app-content" :class="{ 'full-width': isNoneLayout }">
       <router-view v-slot="{ Component }">
@@ -57,3 +49,4 @@ const isAdminLayout = computed(() => {
   }
 }
 </style>
+

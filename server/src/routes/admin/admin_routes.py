@@ -25,10 +25,26 @@ def require_admin_auth(f):
             
         payload = AdminAuthService.verify_token(token)
         if not payload:
-            # Fallback check for system ADMIN_API_KEY
             from server.src.config.config import Config
-            if token != Config.ADMIN_API_KEY:
-                raise AuthenticationError("Akses ditolak: Sesi atau API Key admin tidak valid / kadaluarsa")
+            if token == Config.ADMIN_API_KEY:
+                return f(*args, **kwargs)
+                
+            try:
+                from server.src.repositories.client.client_repository import ClientRepository
+                from server.src.services.client.client_auth_service import ClientAuthService
+                
+                # Check if it's a client API key
+                client = ClientRepository().get_by_api_key(token)
+                if client and client.is_active:
+                    return f(*args, **kwargs)
+                    
+                # Check if it's a client session token
+                if ClientAuthService().verify_token(token):
+                    return f(*args, **kwargs)
+            except Exception:
+                pass
+                
+            raise AuthenticationError("Akses ditolak: Sesi atau API Key admin tidak valid / kadaluarsa")
                 
         return f(*args, **kwargs)
     return decorated_function
@@ -89,4 +105,5 @@ def delete_dosen(dosen_id):
 @admin_bp.route('/recommendation/batch', methods=['POST'])
 @require_admin_auth
 def batch_recommendation():
-    return RecommendationController.get_batch_recommendations()
+    return RecommendationController.batch_recommendation()
+

@@ -35,11 +35,13 @@ def create_app(config_class=Config) -> Flask:
     from server.src.routes.dosen.dosen_routes import dosen_bp
     from server.src.routes.recommendation.recommendation_routes import recommendation_bp
     from server.src.routes.admin.admin_routes import admin_bp
+    from server.src.routes.client.client_routes import client_bp
     
     app.register_blueprint(system_bp, url_prefix='/api')
     app.register_blueprint(dosen_bp, url_prefix='/api')
     app.register_blueprint(recommendation_bp, url_prefix='/api')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(client_bp, url_prefix='/api/clients')
     
     # Root health check endpoint
     @app.route('/health', methods=['GET'])

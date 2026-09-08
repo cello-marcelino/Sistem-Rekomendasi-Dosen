@@ -1,100 +1,46 @@
-import { createRouter, createWebHistory } from 'vue-router'
-
-const routes = [
-  // --- Public Portal Routes ---
-  { 
-    path: '/', 
-    name: 'Home',
-    component: () => import('../views/HomeView.vue') 
-  },
-  { path: '/single', redirect: '/' },
-  { 
-    path: '/preprocessing', 
-    name: 'Preprocessing',
-    component: () => import('../views/PreprocessingView.vue') 
-  },
-  { 
-    path: '/docs', 
-    name: 'Docs',
-    component: () => import('../views/ApiDocsView.vue') 
-  },
-  {
-    path: '/install',
-    name: 'InstallSetup',
-    component: () => import('../views/InstallSetupView.vue')
-  },
-
-  // --- SiReDo Admin Portal Routes ---
-  {
-    path: '/admin/login',
-    name: 'AdminLogin',
-    component: () => import('../views/admin/AdminLoginView.vue'),
-    meta: { layout: 'none' }
-  },
-  {
-    path: '/admin/dashboard',
-    name: 'AdminDashboard',
-    component: () => import('../views/admin/AdminDashboardView.vue'),
-    meta: { requiresAdmin: true, layout: 'admin' }
-  },
-  {
-    path: '/admin/dosen',
-    name: 'AdminDosen',
-    component: () => import('../views/admin/AdminDosenView.vue'),
-    meta: { requiresAdmin: true, layout: 'admin' }
-  },
-  {
-    path: '/admin/dosen/create',
-    name: 'AdminDosenCreate',
-    component: () => import('../views/admin/AdminDosenFormView.vue'),
-    meta: { requiresAdmin: true, layout: 'admin' }
-  },
-  {
-    path: '/admin/dosen/:id',
-    name: 'AdminDosenDetail',
-    component: () => import('../views/admin/AdminDosenDetailView.vue'),
-    meta: { requiresAdmin: true, layout: 'admin' }
-  },
-  {
-    path: '/admin/dosen/:id/edit',
-    name: 'AdminDosenEdit',
-    component: () => import('../views/admin/AdminDosenFormView.vue'),
-    meta: { requiresAdmin: true, layout: 'admin' }
-  },
-  {
-    path: '/admin/batch',
-    name: 'AdminBatch',
-    component: () => import('../views/admin/AdminBatchView.vue'),
-    meta: { requiresAdmin: true, layout: 'admin' }
-  },
-  {
-    path: '/admin/config',
-    name: 'AdminConfig',
-    component: () => import('../views/admin/AdminConfigView.vue'),
-    meta: { requiresAdmin: true, layout: 'admin' }
-  },
-
-  // Redirect legacy routes to admin equivalents or home
-  { path: '/batch', redirect: '/admin/batch' },
-  { path: '/dosen', redirect: '/admin/dosen' },
-  { path: '/config', redirect: '/admin/config' },
-  { path: '/admin', redirect: '/admin/dashboard' }
-]
+﻿import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
+import PreprocessingView from '../views/PreprocessingView.vue'
+import ApiDocsView from '../views/ApiDocsView.vue'
+import QuickstartView from '../views/QuickstartView.vue'
+import ClientRegisterView from '../views/ClientRegisterView.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
-
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('siredo_admin_token')
-  if (to.meta.requiresAdmin && !token) {
-    next('/admin/login')
-  } else if (to.path === '/admin/login' && token) {
-    next('/admin/dashboard')
-  } else {
-    next()
-  }
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'Home',
+      component: HomeView,
+      meta: { layout: 'none' }
+    },
+    {
+      path: '/preprocessing',
+      name: 'Pipeline',
+      component: PreprocessingView
+    },
+    {
+      path: '/docs',
+      name: 'ApiDocs',
+      component: ApiDocsView
+    },
+    {
+      path: '/quickstart',
+      name: 'Quickstart',
+      component: QuickstartView
+    },
+    {
+      path: '/register',
+      name: 'ClientRegister',
+      component: ClientRegisterView
+    },
+    // Redirects for old routes
+    { path: '/install', redirect: '/quickstart' },
+    { path: '/single', redirect: '/' },
+    { path: '/clients', redirect: '/register' },
+    { path: '/client/register', redirect: '/register' }
+  ]
 })
 
 export default router
+
