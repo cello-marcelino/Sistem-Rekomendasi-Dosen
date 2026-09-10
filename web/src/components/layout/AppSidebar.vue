@@ -1,27 +1,108 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import ServerStatusBadge from './ServerStatusBadge.vue'
 
 const route = useRoute()
+const router = useRouter()
 const mobileOpen = ref(false)
 
 // State dropdown dokumentasi
 const docsDropdownOpen = ref(true)
+const activeAnchor = ref('')
 
-// Daftar menu dokumentasi berurutan sesuai instruksi
+// Daftar menu dokumentasi berurutan sesuai instruksi dengan sub-sections
 const docItems = [
-  { name: 'Quickstart', path: '/docs/quickstart' },
-  { name: 'Dokumentasi API', path: '/docs/api' },
-  { name: 'Pipeline NLP', path: '/docs/pipeline' },
-  { name: 'Caching & Indexing Method', path: '/docs/caching' },
-  { name: 'API Key', path: '/docs/api-key' },
+  {
+    name: 'Quickstart',
+    path: '/docs/quickstart',
+    sections: []
+  },
+  {
+    name: 'Dokumentasi API',
+    path: '/docs/api',
+    sections: [
+      { id: 'overview', label: 'Overview' },
+      { id: 'auth', label: 'Autentikasi' },
+      { id: 'single', label: 'POST /rekomendasi/single' },
+      { id: 'batch', label: 'POST /rekomendasi/batch' },
+      { id: 'batch-upload', label: 'POST /batch/upload' },
+      { id: 'config-get', label: 'GET & PATCH /config' },
+      { id: 'status', label: 'GET /status' },
+      { id: 'errors', label: 'Error Handling' },
+    ]
+  },
+  {
+    name: 'Pipeline NLP',
+    path: '/docs/pipeline',
+    sections: [
+      { id: 'arsitektur', label: 'Arsitektur Sistem' },
+      { id: 'preprocessing', label: '1. Preprocessing' },
+      { id: 'ekspansi', label: '2. Ekspansi Sinonim' },
+      { id: 'bm25', label: '3. BM25 Scoring' },
+      { id: 'sbert', label: '4. SBERT Semantic' },
+      { id: 'hybrid', label: '5. Hybrid Ranking' },
+      { id: 'xai', label: '6. Explainability (XAI)' },
+      { id: 'skenario', label: 'Skenario Mitigasi' },
+    ]
+  },
+  {
+    name: 'Caching & Indexing Method',
+    path: '/docs/caching',
+    sections: [
+      { id: 'masalah', label: '1. Permasalahan' },
+      { id: 'alasan', label: '2. Alasan Metode' },
+      { id: 'solusi', label: '3. Solusi Dihasilkan' },
+      { id: 'efisiensi', label: '4. Ringkasan Dampak' },
+    ]
+  },
+  {
+    name: 'API Key',
+    path: '/docs/api-key',
+    sections: []
+  },
 ]
 
 // Cek apakah route saat ini ada di dalam grup dokumentasi
 const isDocsActive = computed(() => {
   return docItems.some(item => route.path === item.path) || route.path.startsWith('/docs')
 })
+
+let observer = null
+
+const setupObserver = () => {
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+
+  const currentDoc = docItems.find(item => item.path === route.path)
+  if (!currentDoc || !currentDoc.sections || currentDoc.sections.length === 0) {
+    activeAnchor.value = ''
+    return
+  }
+
+  // Set default initial anchor
+  if (window.location.hash) {
+    activeAnchor.value = window.location.hash.replace('#', '')
+  } else if (currentDoc.sections.length > 0) {
+    activeAnchor.value = currentDoc.sections[0].id
+  }
+
+  observer = new IntersectionObserver((entries) => {
+    const visibleEntries = entries.filter(e => e.isIntersecting)
+    if (visibleEntries.length > 0) {
+      activeAnchor.value = visibleEntries[0].target.id
+    }
+  }, {
+    rootMargin: '-10% 0px -70% 0px'
+  })
+
+  currentDoc.sections.forEach(sec => {
+    const el = document.getElementById(sec.id)
+    if (el) observer.observe(el)
+  })
+}
 
 // Auto buka dropdown jika route aktif berada di dokumentasi
 watch(
@@ -30,9 +111,32 @@ watch(
     if (isDocsActive.value) {
       docsDropdownOpen.value = true
     }
+    setTimeout(() => {
+      setupObserver()
+    }, 150)
   },
   { immediate: true }
 )
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
+})
+
+const navigateToSection = (itemPath, sectionId) => {
+  mobileOpen.value = false
+  activeAnchor.value = sectionId
+
+  if (route.path === itemPath) {
+    const el = document.getElementById(sectionId)
+    if (el) {
+      const yOffset = -70
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+  } else {
+    router.push({ path: itemPath, hash: `#${sectionId}` })
+  }
+}
 </script>
 
 <template>
@@ -81,16 +185,38 @@ watch(
 
         <!-- Nested Dropdown Menu Items (Teks Saja, Urutan Sesuai Spesifikasi) -->
         <div v-show="docsDropdownOpen" class="nav-nested-list">
-          <router-link
+          <div
             v-for="item in docItems"
             :key="item.path"
-            :to="item.path"
-            class="nav-nested-item"
-            :class="{ active: route.path === item.path }"
-            @click="mobileOpen = false"
+            class="nav-group-item-wrap"
           >
-            <span class="nav-item-text">{{ item.name }}</span>
-          </router-link>
+            <!-- Level 1 Item Link -->
+            <router-link
+              :to="item.path"
+              class="nav-nested-item"
+              :class="{ active: route.path === item.path }"
+              @click="mobileOpen = false"
+            >
+              <span class="nav-item-text">{{ item.name }}</span>
+            </router-link>
+
+            <!-- Level 2 Sub-Sections (Teks Saja Minimalis, Muncul Saat Halaman Aktif) -->
+            <div
+              v-if="route.path === item.path && item.sections && item.sections.length > 0"
+              class="nav-sub-list"
+            >
+              <button
+                v-for="sec in item.sections"
+                :key="sec.id"
+                type="button"
+                class="nav-sub-item"
+                :class="{ active: activeAnchor === sec.id }"
+                @click="navigateToSection(item.path, sec.id)"
+              >
+                <span class="nav-sub-text">{{ sec.label }}</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
@@ -274,6 +400,59 @@ watch(
   color: var(--brand);
   font-weight: 600;
   border-left-color: var(--brand);
+}
+
+.nav-group-item-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Level 2 Sub-Sections (Teks Saja Minimalis) */
+.nav-sub-list {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0.65rem;
+  padding-left: 0.55rem;
+  border-left: 1.5px solid var(--border);
+  margin-top: 0.15rem;
+  margin-bottom: 0.35rem;
+  gap: 1px;
+}
+
+.nav-sub-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0.28rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.35;
+  transition: all 0.12s ease;
+  border-left: 2px solid transparent;
+}
+
+.nav-sub-item:hover {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.nav-sub-item.active {
+  background: var(--brand-light);
+  color: var(--brand);
+  font-weight: 600;
+  border-left-color: var(--brand);
+}
+
+.nav-sub-text {
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-item-text {

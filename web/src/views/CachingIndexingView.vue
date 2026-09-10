@@ -1,212 +1,145 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import api from '../services/api'
-
-const serverStatus = ref('checking')
-const cacheReady = ref(false)
-const checkTime = ref('')
-
-const checkHealth = async () => {
-  try {
-    const res = await api.get('/status')
-    serverStatus.value = 'online'
-    cacheReady.value = res.data.data.cache_ready
-    checkTime.value = new Date().toLocaleTimeString('id-ID')
-  } catch {
-    serverStatus.value = 'offline'
-    cacheReady.value = false
-    checkTime.value = new Date().toLocaleTimeString('id-ID')
-  }
-}
-
-onMounted(checkHealth)
-</script>
-
 <template>
   <div class="caching-page animate-in">
     <div class="prose docs-prose">
       <!-- Header -->
       <div class="page-header">
-        <span class="page-badge">Architecture & Performance</span>
+        <span class="page-badge">Arsitektur & Konsep</span>
         <h1 class="page-title">Caching & Indexing Method</h1>
         <p class="page-lead">
-          Arsitektur <strong>Multi-Tier Caching</strong> dan <strong>Hybrid Incremental Indexing</strong> 
-          yang memungkinkan SiReDo v3 menghasilkan rekomendasi dosen berkecepatan tinggi (&lt; 50ms) dengan ketersediaan tinggi (Zero Downtime).
+          Penjelasan mengenai motivasi, permasalahan yang dihadapi, serta solusi yang dihasilkan melalui metode caching dan indexing pada SiReDo.
         </p>
       </div>
 
-      <!-- Live Status Card -->
-      <div class="status-card">
-        <div class="status-card__left">
-          <div class="status-indicator">
-            <span :class="['dot', serverStatus === 'online' && cacheReady ? 'dot--green' : serverStatus === 'online' ? 'dot--amber' : 'dot--red']"></span>
-            <span class="status-text">
-              Status Cache Memory: 
-              <strong>{{ serverStatus === 'online' && cacheReady ? 'Ready & In-Memory' : serverStatus === 'online' ? 'Warming Up' : 'Offline' }}</strong>
-            </span>
+      <!-- Section 1: Masalah yang Dihadapi -->
+      <section id="masalah">
+        <h2>1. Permasalahan yang Dihadapi</h2>
+        <p>
+          Dalam membangun sistem rekomendasi cerdas berbasis kecerdasan buatan (*AI & NLP*), model pencocokan semantik (Sentence-BERT) memerlukan komputasi yang intensif untuk mengubah teks judul, abstrak, dan keahlian dosen menjadi representasi vektor numerik berdimensi tinggi.
+        </p>
+        <p>
+          Tanpa perancangan arsitektur penyimpanan dan indeks yang tepat, sistem menghadapi kendala kritis berikut:
+        </p>
+        <div class="problem-card">
+          <div class="problem-item">
+            <strong>Latensi Tinggi pada Pencarian Real-Time</strong>
+            <p>
+              Jika vektor kecerdasan buatan harus dihitung ulang setiap kali mahasiswa atau admin mengirimkan judul penelitian, waktu tunggu pencarian akan melonjak hingga beberapa detik. Hal ini membuat pengalaman pengguna terasa lambat dan tidak memenuhi standar respon sistem informasi modern.
+            </p>
           </div>
-          <p class="status-desc">
-            Model BM25 Okapi dan tensor Sentence-BERT termuat penuh di RAM. Terakhir dicek: {{ checkTime || 'memeriksa...' }}
-          </p>
+          <div class="problem-item">
+            <strong>Ketergantungan Query Database yang Berulang</strong>
+            <p>
+              Membaca ribuan data publikasi dan riwayat bimbingan dosen dari database relasional secara terus-menerus pada setiap permintaan akan membebani database kampus secara berlebihan.
+            </p>
+          </div>
+          <div class="problem-item">
+            <strong>Gangguan Layanan Saat Data Diperbarui (Downtime)</strong>
+            <p>
+              Pada pendekatan konvensional, setiap kali ada satu profil dosen baru yang didaftarkan atau diubah keahliannya, sistem harus mengulang perhitungan seluruh dosen dari awal (*Full Re-indexing*). Selama proses berulang tersebut, layanan rekomendasi harus dimatikan atau dikunci sementara, sehingga sistem kampus lain tidak dapat terhubung.
+            </p>
+          </div>
         </div>
-        <button @click="checkHealth" class="status-refresh-btn">
-          Periksa Ulang
-        </button>
-      </div>
+      </section>
 
-      <!-- Section 1: Motivasi -->
-      <section>
-        <h2>1. Motivasi & Latar Belakang</h2>
+      <!-- Section 2: Kenapa Metode Ini Dilakukan -->
+      <section id="alasan">
+        <h2>2. Mengapa Metode Ini Dilakukan?</h2>
         <p>
-          Dalam sistem rekomendasi berbasis NLP modern, komputasi embedding dense berdimensi 768 dari model 
-          Transformer (Sentence-BERT) membutuhkan waktu komputasi yang tinggi jika dieksekusi dari awal (*from scratch*) 
-          pada setiap permintaan. Jika terdapat puluhan hingga ratusan profil dosen, proses forward pass berulang akan membebani CPU dan meningkatkan latensi sistem.
+          Metode caching dan indexing diterapkan untuk memisahkan antara **proses komputasi berat** dengan **proses pelayanan pencarian langsung** (*Decoupling Heavy Computation from Query Serving*).
         </p>
         <p>
-          Untuk memecahkan kendala tersebut, SiReDo mengadopsi prinsip <strong>Multi-Tier Caching Layer</strong>:
+          Prinsip utama di balik penerapan metode ini:
         </p>
         <ul>
-          <li><strong>Pre-Computed Embeddings</strong>: Ekstraksi fitur teks korpus dosen hanya dihitung sekali saat sistem *warm-up* dan disimpan ke disk (*persistent storage*).</li>
-          <li><strong>In-Memory Tensor Lookup</strong>: Menghitung Cosine Similarity secara instan menggunakan operasi matriks tensor SIMD berkecepatan tinggi.</li>
-          <li><strong>Zero Database Overhead</strong>: Metadata dosen, daftar istilah leksikal, dan inverted index BM25 berada di memori siap saji tanpa query SQL berulang.</li>
+          <li>
+            <strong>Hitung Sekali, Gunakan Selamanya (*Pre-Computation*)</strong>:
+            Vektor pemahaman semantik untuk seluruh dosen cukup diekstraksi satu kali saja saat sistem pertama kali dinyalakan. Hasil pemahaman tersebut disimpan di tempat penyimpanan cepat agar dapat digunakan berkali-kali tanpa komputasi ulang.
+          </li>
+          <li>
+            <strong>Pencarian Langsung di Memori Siap Saji (*In-Memory Retrieval*)</strong>:
+            Dengan meletakkan indeks leksikal dan matriks vektor dosen langsung di memori kerja (RAM), proses pencarian hanya membutuhkan operasi pencocokan matematis sederhana yang berlangsung dalam hitungan milidetik.
+          </li>
+          <li>
+            <strong>Pembaruan Terisolasi (*Incremental Indexing*)</strong>:
+            Ketika data seorang dosen diperbarui, sistem hanya memproses perubahan dosen tersebut saja secara lokal tanpa perlu menyentuh atau menghitung ulang data dosen lainnya yang tidak berubah.
+          </li>
         </ul>
       </section>
 
-      <!-- Section 2: Arsitektur Multi-Tier -->
-      <section>
-        <h2>2. Arsitektur Multi-Tier Caching</h2>
+      <!-- Section 3: Apa yang Diselesaikan -->
+      <section id="solusi">
+        <h2>3. Apa yang Diselesaikan oleh Metode Ini?</h2>
         <p>
-          Sistem pembagian lapisan memori dirancang secara berjenjang antara RAM (Tier 1) dan Disk Storage (Tier 2):
+          Penerapan metode ini memberikan dampak signifikan terhadap performa, efisiensi, dan keandalan sistem SiReDo:
         </p>
 
-        <div class="tier-grid">
-          <!-- Tier 1 -->
-          <div class="tier-card tier-card--tier1">
-            <div class="tier-badge">Tier 1: RAM (In-Memory)</div>
-            <h3>Singleton CacheService</h3>
-            <p class="tier-desc">Dikelola di memori utama runtime Python dengan proteksi thread-safe <code>threading.RLock</code>.</p>
-            <ul class="tier-list">
-              <li><code>dosen_list</code>: Seluruh entitas profil dosen lengkap.</li>
-              <li><code>bm25.bm25</code>: Inverted index BM25Okapi siap query.</li>
-              <li><code>corpus_embeddings</code>: Matriks tensor NumPy (N × 768 dense).</li>
-              <li><code>keybert_data</code>: Cache frasa topik dosen untuk XAI.</li>
-            </ul>
+        <div class="solution-grid">
+          <div class="solution-card">
+            <div class="solution-num">1</div>
+            <h3>Pencarian Rekomendasi Instan</h3>
+            <p>
+              Waktu yang dibutuhkan untuk menemukan rekomendasi dosen terpangkas dari hitungan detik menjadi kurang dari 50 milidetik, memberikan respon instan bagi sistem akademik (SIAKAD) maupun pengguna portal.
+            </p>
           </div>
 
-          <!-- Tier 2 -->
-          <div class="tier-card tier-card--tier2">
-            <div class="tier-badge">Tier 2: Persistent Disk</div>
-            <h3>File Cache Storage</h3>
-            <p class="tier-desc">Disimpan di direktori <code>server/storage/cache/</code> untuk pemulihan startup instan (&lt; 0.5s).</p>
-            <ul class="tier-list">
-              <li><code>sbert_embeddings.npy</code>: Format biner NumPy memory-mapped.</li>
-              <li><code>keybert_dosen.json</code>: Serialisasi kata kunci topik XAI.</li>
-              <li><code>dosen_data.pkl</code>: Snapshot struktur model Python.</li>
-            </ul>
+          <div class="solution-card">
+            <div class="solution-num">2</div>
+            <h3>Layanan Tanpa Henti (Zero Downtime)</h3>
+            <p>
+              Penambahan, pengeditan, atau penghapusan data dosen dapat dilakukan kapan saja oleh staf akademik. Sistem memperbarui indeks secara langsung di latar belakang tanpa perlu mematikan aplikasi atau mengganggu pengguna yang sedang aktif.
+            </p>
+          </div>
+
+          <div class="solution-card">
+            <div class="solution-num">3</div>
+            <h3>Penghematan Beban Komputasi Server</h3>
+            <p>
+              Beban kerja prosesor (CPU) berkurang drastis karena server tidak lagi melakukan inferensi neural network berulang untuk data yang sama, sehingga konsumsi daya dan biaya infrastruktur server menjadi jauh lebih hemat.
+            </p>
+          </div>
+
+          <div class="solution-card">
+            <div class="solution-num">4</div>
+            <h3>Kesiapan Sistem yang Terjamin</h3>
+            <p>
+              Sistem dilengkapi indikator kesiapan otomatis yang memastikan setiap permintaan rekomendasi hanya akan diproses setelah struktur pencarian benar-benar siap dan konsisten, mencegah risiko hasil kosong atau kegagalan sistem.
+            </p>
           </div>
         </div>
       </section>
 
-      <!-- Section 3: Hybrid Incremental Indexing -->
-      <section>
-        <h2>3. Hybrid Incremental Indexing</h2>
-        <p>
-          Salah satu inovasi penting pada versi v3 adalah <strong>Hybrid Incremental Indexing</strong>. Pada arsitektur sebelumnya, setiap kali ada perubahan data dosen (tambah, edit, hapus), sistem harus melakukan inisialisasi ulang penuh yang memakan waktu dan mengunci layanan.
-        </p>
-        <p>
-          Dengan metode inkremental terpadu:
-        </p>
-        <div class="feature-box">
-          <div class="feature-title">Mekanisme Update Parsial On-The-Fly:</div>
-          <ol>
-            <li><strong>Operasi Tambah Dosen</strong>: Hanya menghitung vektor embedding untuk 1 dosen baru, lalu melakukan <code>np.vstack()</code> ke matriks tensor yang ada.</li>
-            <li><strong>Operasi Edit Dosen</strong>: Mengganti baris vektor spesifik pada indeks yang bersangkutan di dalam memori tanpa menyentuh dosen lainnya.</li>
-            <li><strong>Operasi Hapus Dosen</strong>: Menghapus baris vektor terkait menggunakan <code>np.delete()</code> secara instan.</li>
-            <li><strong>Rebuild BM25 Cepat</strong>: Rekonstruksi token table BM25Okapi berlangsung dalam hitungan milidetik (&lt; 10ms) karena korpus teks sudah terstruktur di RAM.</li>
-          </ol>
-        </div>
-        <blockquote>
-          <strong>Zero Downtime:</strong> Flag <code>is_ready</code> tetap bernilai <code>true</code> selama pembaruan inkremental berlangsung, sehingga endpoint rekomendasi tidak pernah mengalami *downtime* bagi client SIAKAD.
-        </blockquote>
-      </section>
-
-      <!-- Section 4: Lifecycle & Warm-up Flow -->
-      <section>
-        <h2>4. Alur Siklus Hidup Cache (Lifecycle)</h2>
-        <p>
-          Ketika server dijalankan via CLI (<code>python siredo serve</code>), sistem menjalankan prosedur warm-up 5 tahap:
-        </p>
-
-        <div class="timeline">
-          <div class="timeline-step">
-            <div class="timeline-num">1</div>
-            <div class="timeline-content">
-              <strong>Pemuatan Data Relasional</strong>
-              <p>Membaca entitas dosen, riwayat bimbingan, dan publikasi dari database SQLite/MySQL.</p>
-            </div>
-          </div>
-          <div class="timeline-step">
-            <div class="timeline-num">2</div>
-            <div class="timeline-content">
-              <strong>Penyusunan Korpus Terbobot</strong>
-              <p>Menggabungkan bidang keahlian (bobot 5×), riwayat bimbingan (1×), dan judul jurnal (2×) menjadi dokumen komprehensif.</p>
-            </div>
-          </div>
-          <div class="timeline-step">
-            <div class="timeline-num">3</div>
-            <div class="timeline-content">
-              <strong>Fitting BM25 Inverted Index</strong>
-              <p>Tokenisasi teks korpus dan perhitungan Term Frequency (TF) serta Inverse Document Frequency (IDF).</p>
-            </div>
-          </div>
-          <div class="timeline-step">
-            <div class="timeline-num">4</div>
-            <div class="timeline-content">
-              <strong>Pemuatan Vektor SBERT & KeyBERT</strong>
-              <p>Mengecek keberadaan file <code>.npy</code> di disk. Jika ada, dimuat instan (&lt; 0.1s). Jika belum ada, proses encoding neural network dijalankan.</p>
-            </div>
-          </div>
-          <div class="timeline-step">
-            <div class="timeline-num">5</div>
-            <div class="timeline-content">
-              <strong>Pemberian Sinyal Kesiapan (Ready Flag)</strong>
-              <p>Status <code>is_ready = true</code> diaktifkan. Sistem siap melayani rekomendasi sub-50ms.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 5: Benchmark Performa -->
-      <section>
-        <h2>5. Tolok Ukur Kecepatan (Performance Benchmark)</h2>
-        <div class="benchmark-table">
-          <table>
+      <!-- Section 4: Ringkasan Efisiensi -->
+      <section id="efisiensi">
+        <h2>4. Ringkasan Dampak Efisiensi</h2>
+        <div class="comparison-wrap">
+          <table class="comparison-table">
             <thead>
               <tr>
-                <th>Tahap Eksekusi</th>
-                <th>Tanpa Caching</th>
-                <th>Dengan Multi-Tier Cache</th>
-                <th>Efisiensi</th>
+                <th>Aspek</th>
+                <th>Pendekatan Tradisional</th>
+                <th>Metode Caching & Indexing SiReDo</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Startup & Cold Boot</td>
-                <td>~12.5 detik</td>
-                <td>~0.45 detik</td>
-                <td><strong>27× Lebih Cepat</strong></td>
+                <td><strong>Waktu Respon Pencarian</strong></td>
+                <td>Lambat (harus encode ulang seluruh dosen)</td>
+                <td><span class="badge-fast">Instan (&lt; 50ms)</span> menggunakan vektor siap saji</td>
               </tr>
               <tr>
-                <td>Query Rekomendasi (Single)</td>
-                <td>~850 ms</td>
-                <td>~28 ms</td>
-                <td><strong>30× Lebih Cepat</strong></td>
+                <td><strong>Penambahan Dosen Baru</strong></td>
+                <td>Layanan terkunci (Full Re-indexing)</td>
+                <td><span class="badge-fast">Berjalan Otomatis</span> hanya memproses data dosen baru</td>
               </tr>
               <tr>
-                <td>Update Dosen (CRUD)</td>
-                <td>~8.2 detik (Full Rebuild)</td>
-                <td>~45 ms (Incremental)</td>
-                <td><strong>180× Lebih Cepat</strong></td>
+                <td><strong>Beban Database Kampus</strong></td>
+                <td>Tinggi (query berulang setiap request)</td>
+                <td><span class="badge-fast">Sangat Rendah</span> data terstruktur tersimpan di memori cepat</td>
+              </tr>
+              <tr>
+                <td><strong>Ketersediaan Sistem</strong></td>
+                <td>Sering terputus saat pemeliharaan data</td>
+                <td><span class="badge-fast">100% Selalu Siaga</span> siap melayani integrasi API kampus</td>
               </tr>
             </tbody>
           </table>
@@ -254,204 +187,121 @@ onMounted(checkHealth)
   margin: 0;
 }
 
-/* Status card */
-.status-card {
+/* Problem card */
+.problem-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 1rem;
-  background: var(--bg-base);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--brand);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin: 1.25rem 0 2rem;
 }
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.35rem;
+.problem-item {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
 }
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
+.problem-item strong {
+  color: var(--red);
+  font-size: 0.92rem;
+  display: block;
+  margin-bottom: 0.25rem;
 }
-.dot--green { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
-.dot--amber { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
-.dot--red   { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
-
-.status-text {
-  font-size: 0.88rem;
-  color: var(--text-primary);
-}
-.status-desc {
-  font-size: 0.8rem;
+.problem-item p {
+  font-size: 0.84rem;
   color: var(--text-secondary);
   margin: 0;
-}
-.status-refresh-btn {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--brand);
-  background: var(--brand-light);
-  border: 1px solid var(--brand-border);
-  border-radius: var(--radius-sm);
-  padding: 0.4rem 0.85rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-.status-refresh-btn:hover {
-  background: var(--brand);
-  color: white;
+  line-height: 1.6;
 }
 
-/* Tier grid */
-.tier-grid {
+/* Solution grid */
+.solution-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
   margin: 1.5rem 0 2rem;
 }
-.tier-card {
+.solution-card {
   background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
-}
-.tier-badge {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--brand);
-  margin-bottom: 0.5rem;
-}
-.tier-card h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-  color: var(--text-primary);
-}
-.tier-desc {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-.tier-list {
-  padding-left: 1.25rem;
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-/* Feature box */
-.feature-box {
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem 1.5rem;
-  margin: 1.25rem 0;
-}
-.feature-title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
-}
-.feature-box ol {
-  padding-left: 1.25rem;
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-/* Timeline */
-.timeline {
+  padding: 1.4rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin: 1.5rem 0;
+  gap: 0.5rem;
+  position: relative;
+  transition: border-color 0.15s;
 }
-.timeline-step {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  background: var(--bg-base);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
+.solution-card:hover {
+  border-color: var(--brand-border);
 }
-.timeline-num {
-  width: 28px;
-  height: 28px;
+.solution-num {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--brand-light);
   color: var(--brand);
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   border: 1px solid var(--brand-border);
 }
-.timeline-content strong {
-  font-size: 0.9rem;
+.solution-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text-primary);
-  display: block;
-  margin-bottom: 0.25rem;
+  margin: 0;
 }
-.timeline-content p {
-  font-size: 0.82rem;
+.solution-card p {
+  font-size: 0.825rem;
   color: var(--text-secondary);
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-/* Benchmark table */
-.benchmark-table {
+/* Comparison table */
+.comparison-wrap {
   overflow-x: auto;
-  margin: 1.25rem 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  margin: 1.5rem 0;
 }
-.benchmark-table table {
+.comparison-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
 }
-.benchmark-table th {
+.comparison-table th {
   background: var(--bg-subtle);
   border-bottom: 1px solid var(--border);
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
   text-align: left;
   font-weight: 700;
   color: var(--text-primary);
 }
-.benchmark-table td {
-  padding: 0.75rem 1rem;
+.comparison-table td {
+  padding: 0.85rem 1.1rem;
   border-bottom: 1px solid var(--border);
   color: var(--text-secondary);
+  vertical-align: middle;
 }
-.benchmark-table tr:last-child td {
+.comparison-table tr:last-child td {
   border-bottom: none;
 }
-.benchmark-table strong {
+.badge-fast {
+  font-weight: 600;
   color: var(--brand);
+  background: var(--brand-light);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-border);
 }
 
 @media (max-width: 768px) {
   .caching-page { padding: 2rem 1.25rem 4rem; }
-  .tier-grid { grid-template-columns: 1fr; }
-  .status-card { flex-direction: column; align-items: flex-start; }
+  .solution-grid { grid-template-columns: 1fr; }
 }
 </style>

@@ -1,24 +1,6 @@
 <template>
-  <div class="docs-layout">
-    <!-- TOC Sidebar -->
-    <aside class="toc-sidebar">
-      <div class="toc-title">Pipeline NLP</div>
-      <nav class="toc-nav">
-        <a href="#intro" class="toc-link">Pengantar</a>
-        <a href="#arsitektur" class="toc-link">Arsitektur Sistem</a>
-        <a href="#preprocessing" class="toc-link">1. Preprocessing</a>
-        <a href="#ekspansi" class="toc-link">2. Ekspansi Sinonim</a>
-        <a href="#bm25" class="toc-link">3. BM25 Scoring</a>
-        <a href="#sbert" class="toc-link">4. SBERT Semantic</a>
-        <a href="#hybrid" class="toc-link">5. Hybrid Ranking</a>
-        <a href="#xai" class="toc-link">6. Explainability (XAI)</a>
-        <a href="#skenario" class="toc-link">Skenario Mitigasi</a>
-      </nav>
-    </aside>
-
-    <!-- Main article -->
-    <main class="docs-main">
-      <div class="prose docs-prose">
+  <div class="docs-page animate-in">
+    <div class="prose docs-prose">
 
         <div class="page-header">
           <span class="page-badge">Technical Deep Dive</span>
@@ -378,35 +360,17 @@
           </p>
         </section>
 
-      </div>
-    </main>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.docs-layout {
-  display: flex;
-  min-height: 100svh;
+.docs-page {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 3rem 2.5rem 5rem;
 }
-.toc-sidebar {
-  width: 200px;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow-y: auto;
-  border-right: 1px solid var(--border);
-  padding: 2rem 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.toc-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); padding: 0 0.5rem; margin-bottom: 0.5rem; }
-.toc-nav { display: flex; flex-direction: column; gap: 1px; }
-.toc-link { font-size: 0.825rem; color: var(--text-secondary); text-decoration: none; padding: 0.35rem 0.6rem; border-radius: var(--radius-sm); transition: background 0.12s, color 0.12s; }
-.toc-link:hover { background: var(--bg-muted); color: var(--text-primary); }
 
-.docs-main { flex: 1; min-width: 0; padding: 3rem 2.5rem 5rem; }
 .docs-prose { max-width: var(--content-max); }
 
 .page-header { margin-bottom: 0; }
@@ -496,8 +460,7 @@
 .sc-impact { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
 
 @media (max-width: 768px) {
-  .toc-sidebar { display: none; }
-  .docs-main { padding: 2rem 1.25rem 4rem; }
+  .docs-page { padding: 2rem 1.25rem 4rem; }
   .pipeline-flow { flex-direction: column; }
   .pf-arrow { transform: rotate(90deg); }
 }
