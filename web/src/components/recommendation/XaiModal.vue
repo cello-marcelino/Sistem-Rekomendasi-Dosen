@@ -322,8 +322,8 @@ const displayUjiList = computed(() => {
   display: flex; flex-direction: column; gap: 0.5rem;
 }
 .xai-card--brand {
-  background: #fcfaff;
-  border-color: #ddd6fe;
+  background: var(--brand-light);
+  border-color: var(--brand-border);
 }
 
 .xai-header-flex {
@@ -333,7 +333,7 @@ const displayUjiList = computed(() => {
 .filter-toggle-btn {
   font-size: 0.72rem; font-weight: 600;
   color: var(--brand); background: var(--bg);
-  border: 1px solid #c4b5fd; border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-border); border-radius: var(--radius-sm);
   padding: 0.25rem 0.6rem; cursor: pointer; transition: all 0.15s;
 }
 .filter-toggle-btn:hover {

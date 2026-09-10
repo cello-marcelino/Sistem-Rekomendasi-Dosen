@@ -410,7 +410,7 @@
 .docs-prose { max-width: var(--content-max); }
 
 .page-header { margin-bottom: 0; }
-.page-badge { display: inline-block; font-size: 0.7rem; font-weight: 700; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); background: var(--brand-light); border: 1px solid #c4b5fd; padding: 3px 10px; border-radius: 99px; margin-bottom: 1rem; }
+.page-badge { display: inline-block; font-size: 0.7rem; font-weight: 700; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); background: var(--brand-light); border: 1px solid var(--brand-border); padding: 3px 10px; border-radius: 99px; margin-bottom: 1rem; }
 .page-lead { font-size: 1.05rem; color: var(--text-secondary); line-height: 1.75; margin-bottom: 0.5rem !important; }
 
 /* Pipeline flow diagram */

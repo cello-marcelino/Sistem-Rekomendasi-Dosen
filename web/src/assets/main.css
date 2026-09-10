@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  /* Primary — Teal/Biru-Hijau */
-  --color-primary-50: #f0fdfa;
-  --color-primary-500: #14b8a6;
-  --color-primary-600: #0d9488;
-  --color-primary-700: #0f766e;
+  /* Primary / Accent — Violet oklch(49.1% 0.27 292.581) */
+  --color-primary-50: oklch(96.5% 0.025 292.581);
+  --color-primary-500: oklch(58% 0.24 292.581);
+  --color-primary-600: oklch(49.1% 0.27 292.581);
+  --color-primary-700: oklch(42% 0.24 292.581);
 
   /* Surface — Slate */
   --color-surface-50: #f8fafc;

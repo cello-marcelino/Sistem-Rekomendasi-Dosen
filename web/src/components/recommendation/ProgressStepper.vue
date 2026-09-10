@@ -90,7 +90,7 @@ defineProps({
 
 .stepper-item--running {
   border-color: var(--brand-dim);
-  box-shadow: 0 4px 12px rgba(91, 75, 219, 0.12);
+  box-shadow: 0 4px 12px oklch(49.1% 0.27 292.581 / 0.12);
   transform: scale(1.01);
   opacity: 1;
 }

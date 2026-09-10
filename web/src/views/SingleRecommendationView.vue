@@ -409,7 +409,7 @@ const closeXai = () => {
 }
 .plog-formula-blue { color: #60a5fa; font-weight: 700; }
 .plog-formula-fuchsia { color: #e879f9; font-weight: 700; }
-.plog-formula-brand { color: #a78bfa; font-weight: 700; }
+.plog-formula-brand { color: var(--brand); font-weight: 700; }
 
 .plog-mode-badge {
   font-size: 0.8rem; font-weight: 600;
@@ -427,7 +427,7 @@ const closeXai = () => {
 .res-meta-badge {
   font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600;
   background: var(--brand-light); color: var(--brand);
-  border: 1px solid #c4b5fd; padding: 3px 10px; border-radius: 99px;
+  border: 1px solid var(--brand-border); padding: 3px 10px; border-radius: 99px;
 }
 .res-table-wrap { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
 .res-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }

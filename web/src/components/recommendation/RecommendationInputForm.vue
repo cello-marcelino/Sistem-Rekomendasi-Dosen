@@ -192,7 +192,7 @@ const loadPreset = (preset) => {
   outline: none;
   border-color: var(--brand);
   background: var(--bg);
-  box-shadow: 0 0 0 3px rgba(91, 75, 219, 0.12);
+  box-shadow: 0 0 0 3px var(--brand-ring);
 }
 
 .ic-k-row { display: flex; align-items: center; justify-content: space-between; }

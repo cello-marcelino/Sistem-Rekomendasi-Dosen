@@ -171,6 +171,7 @@ const sections = [
   background: var(--brand-light);
   color: var(--brand);
   font-weight: 600;
+  border-left: 3px solid var(--brand);
 }
 .nav-icon {
   width: 16px; height: 16px;
@@ -188,7 +189,7 @@ const sections = [
   letter-spacing: 0.04em;
 }
 .badge-live { background: #dcfce7; color: #16a34a; }
-.badge-rest { background: var(--blue-bg); color: var(--blue); }
+.badge-rest { background: var(--brand-light); color: var(--brand); border: 1px solid var(--brand-border); }
 
 /* Footer */
 .sidebar-footer {
@@ -208,7 +209,7 @@ const sections = [
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(91,75,219,0.35);
+  box-shadow: 0 4px 16px oklch(49.1% 0.27 292.581 / 0.3);
   align-items: center; justify-content: center;
 }
 .mobile-toggle svg { width: 20px; height: 20px; }

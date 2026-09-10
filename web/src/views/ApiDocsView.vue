@@ -396,7 +396,12 @@ curl -X POST http://localhost:5000/api/rekomendasi/single \
   line-height: 1.4;
 }
 .toc-link:hover { background: var(--bg-muted); color: var(--text-primary); }
-.toc-link.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
+.toc-link.active {
+  background: var(--brand-light);
+  color: var(--brand);
+  font-weight: 600;
+  border-left: 2.5px solid var(--brand);
+}
 
 /* Main content */
 .docs-main {
@@ -409,9 +414,7 @@ curl -X POST http://localhost:5000/api/rekomendasi/single \
 }
 
 /* Page header */
-.page-header {
-  margin-bottom: 0;
-}
+.page-header { margin-bottom: 2rem; }
 .page-badge {
   display: inline-block;
   font-size: 0.7rem;
@@ -421,7 +424,7 @@ curl -X POST http://localhost:5000/api/rekomendasi/single \
   letter-spacing: 0.08em;
   color: var(--brand);
   background: var(--brand-light);
-  border: 1px solid #c4b5fd;
+  border: 1px solid var(--brand-border);
   padding: 3px 10px;
   border-radius: 99px;
   margin-bottom: 1rem;

@@ -59,7 +59,7 @@ defineProps({
 .dc-tr:last-child { border-bottom: none; }
 .dc-tr:hover { background: var(--bg-muted); }
 .dc-tr--top { background: var(--brand-light); }
-.dc-tr--top:hover { background: #e0d8ff; }
+.dc-tr--top:hover { background: var(--brand-subtle); }
 
 .dc-td {
   padding: 0.85rem 0.75rem;
@@ -106,7 +106,7 @@ defineProps({
 
 .dc-bar-wrap {
   width: 100%; height: 4px;
-  background: rgba(91, 75, 219, 0.2);
+  background: oklch(49.1% 0.27 292.581 / 0.15);
   border-radius: 99px; overflow: hidden;
   margin-top: 4px;
 }

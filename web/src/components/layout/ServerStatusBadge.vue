@@ -111,13 +111,13 @@ const handleFileUpload = async (e) => {
 }
 .badge-online { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
 .badge-warming { background: #fffbe6; border-color: #fde68a; color: #b45309; }
-.badge-excel { background: #f0fdfa; border-color: #99f6e4; color: #0f766e; }
+.badge-excel { background: var(--brand-light); border-color: var(--brand-border); color: var(--brand); }
 .badge-offline { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
 
 .status-dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 1.5s infinite; flex-shrink: 0; }
 .dot-online { background: #10b981; }
 .dot-warming { background: #f59e0b; }
-.dot-excel { background: #0d9488; }
+.dot-excel { background: var(--brand); }
 .dot-offline { background: #ef4444; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
@@ -141,8 +141,8 @@ const handleFileUpload = async (e) => {
 .error-msg { background: #fef2f2; color: #991b1b; padding: 0.5rem; border-radius: 6px; font-size: 0.8rem; text-align: center; }
 
 .drop-area { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 1.75rem 1rem; text-align: center; background: #f8fafc; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: background 0.15s; }
-.drop-area:hover { background: #f1f5f9; border-color: #0d9488; }
-.drop-text { font-size: 0.825rem; font-weight: 600; color: #0d9488; }
+.drop-area:hover { background: var(--brand-light); border-color: var(--brand); }
+.drop-text { font-size: 0.825rem; font-weight: 600; color: var(--brand); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 
 .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; }

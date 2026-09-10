@@ -204,7 +204,7 @@ onMounted(checkStatus)
 /* Hero */
 .hero-section {
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(160deg, #faf9ff 0%, #ffffff 60%);
+  background: linear-gradient(160deg, oklch(97.8% 0.018 292.581) 0%, #ffffff 60%);
 }
 .hero-inner {
   max-width: 760px;
@@ -271,10 +271,11 @@ onMounted(checkStatus)
   padding: 0.65rem 1.5rem;
   border-radius: var(--radius);
   text-decoration: none;
-  transition: background 0.15s, transform 0.1s;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
   border: 1px solid var(--brand);
+  box-shadow: 0 4px 14px oklch(49.1% 0.27 292.581 / 0.22);
 }
-.btn-primary:hover { background: var(--brand-dim); transform: translateY(-1px); }
+.btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 6px 18px oklch(49.1% 0.27 292.581 / 0.3); }
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
@@ -337,19 +338,23 @@ onMounted(checkStatus)
   gap: 0.5rem;
 }
 .doc-card:hover {
-  border-color: var(--border-strong);
+  border-color: var(--brand-border);
+  box-shadow: 0 8px 24px oklch(49.1% 0.27 292.581 / 0.08);
   transform: translateY(-2px);
 }
 .doc-card-feature {
   grid-column: span 2;
-  background: var(--bg);
-  border-color: var(--border-strong);
+  background: linear-gradient(150deg, var(--bg) 0%, oklch(98.5% 0.01 292.581) 100%);
+  border-color: var(--brand-border);
 }
 .card-icon {
   width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 0.25rem;
   color: var(--text-primary);
+}
+.doc-card:hover .card-icon {
+  color: var(--brand);
 }
 .card-icon svg { width: 20px; height: 20px; }
 .doc-card h3 {

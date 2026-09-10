@@ -2,11 +2,13 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand Palette (Changed from Purple to Teal/Primary) */
-  --color-brand: #0d9488;
-  --color-brand-light: #f0fdfa;
-  --color-brand-dim: #14b8a6;
-  --color-brand-dark: #0f766e;
+  /* Brand Accent: Violet oklch(49.1% 0.27 292.581) */
+  --color-brand: oklch(49.1% 0.27 292.581);
+  --color-brand-light: oklch(96.5% 0.025 292.581);
+  --color-brand-subtle: oklch(93.5% 0.05 292.581);
+  --color-brand-dim: oklch(58% 0.24 292.581);
+  --color-brand-dark: oklch(42% 0.24 292.581);
+  --color-brand-border: oklch(88% 0.08 292.581);
 
   /* Neutrals & Surfaces */
   --color-bg-base: #ffffff;
@@ -64,8 +66,11 @@ html { scroll-behavior: smooth; }
   /* Mapping legacy variables so existing custom CSS blocks in .vue files don't break */
   --brand: var(--color-brand);
   --brand-light: var(--color-brand-light);
+  --brand-subtle: var(--color-brand-subtle);
+  --brand-border: var(--color-brand-border);
   --brand-dim: var(--color-brand-dim);
   --brand-dark: var(--color-brand-dark);
+  --brand-ring: oklch(49.1% 0.27 292.581 / 0.16);
 
   --bg: var(--color-bg-base);
   --bg-subtle: var(--color-bg-subtle);
