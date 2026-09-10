@@ -33,92 +33,133 @@ const regenerate = async () => {
 }
 
 const copyToClipboard = () => {
-  navigator.clipboard.writeText(session.apiKey)
-  alert("API Key disalin!")
+  if (session.apiKey) {
+    navigator.clipboard.writeText(session.apiKey)
+    alert("API Key berhasil disalin!")
+  }
 }
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto py-8">
+  <div class="max-w-[700px] mx-auto py-10 px-6">
     
     <!-- DASHBOARD MODE -->
-    <div v-if="session.isAuthenticated" class="space-y-8 animate-fade-in">
-      <div class="bg-white dark:bg-gray-900 rounded-xl p-6 sm:p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
+    <div v-if="session.isAuthenticated" class="space-y-8 animate-in">
+      <div class="bg-bg-base rounded-[14px] p-6 sm:p-8 border border-border shadow-sm">
         <div class="flex justify-between items-start mb-6">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Developer</h1>
-            <p class="text-gray-600 dark:text-gray-400">Selamat datang, {{ session.client.name }}</p>
+            <h1 class="text-2xl font-bold text-text-primary mb-1 tracking-tight">Dashboard Developer</h1>
+            <p class="text-text-secondary">Selamat datang, <strong class="text-text-primary">{{ session.client.name }}</strong> ({{ session.client.organization }})</p>
           </div>
-          <button @click="session.logout()" class="text-sm px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 rounded-lg transition-colors font-medium">Logout</button>
+          <button @click="session.logout()" class="text-sm px-4 py-2 bg-red-bg text-red hover:bg-red-border rounded-[6px] transition-colors font-medium">Logout</button>
         </div>
 
-        <div class="bg-gray-50 dark:bg-gray-950 rounded-lg p-6 border border-gray-200 dark:border-gray-800">
-          <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">API Key Anda</h2>
+        <div class="bg-bg-subtle rounded-[10px] p-6 border border-border">
+          <h2 class="text-[0.75rem] font-bold text-text-muted uppercase tracking-wider mb-3">API Key Anda</h2>
           
           <div class="flex items-center gap-3">
             <input 
               :type="showKey ? 'text' : 'password'" 
               :value="session.apiKey" 
               readonly
-              class="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 font-mono text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+              class="flex-1 bg-bg-base border border-border-strong rounded-[6px] px-4 py-2.5 font-mono text-sm text-text-primary focus:outline-none focus:border-brand"
             />
-            <button @click="showKey = !showKey" class="p-2.5 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg" :title="showKey ? 'Sembunyikan' : 'Tampilkan'">
+            <button @click="showKey = !showKey" class="p-2.5 text-text-muted hover:bg-bg-muted rounded-[6px]" :title="showKey ? 'Sembunyikan' : 'Tampilkan'">
               <svg v-if="!showKey" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
               <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.978 9.978 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
             </button>
-            <button @click="copyToClipboard" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+            <button @click="copyToClipboard" class="px-5 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-[6px] font-medium transition-colors">
               Salin
             </button>
           </div>
           
-          <div class="mt-4 flex items-center justify-between">
-            <p class="text-sm text-gray-500 dark:text-gray-400">Gunakan key ini di <code>X-API-Key</code> header Anda.</p>
-            <button @click="regenerate" class="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-500 font-medium">Generate Ulang Key</button>
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+            <p class="text-[0.85rem] text-text-secondary">Gendengkan API Key ini pada header <code class="font-mono text-[0.8rem] bg-border px-1.5 py-0.5 rounded text-text-primary">X-API-Key</code> untuk setiap request.</p>
+            <button @click="regenerate" class="text-[0.85rem] text-amber hover:text-amber-bg bg-amber-bg border border-amber-border px-3 py-1.5 rounded-[6px] font-medium transition-colors">
+              Generate Ulang
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- LOGIN/REGISTER MODE -->
-    <div v-else class="bg-white dark:bg-gray-900 rounded-xl p-6 sm:p-8 border border-gray-100 dark:border-gray-800 shadow-sm animate-fade-in">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        {{ mode === 'register' ? 'Daftar Developer' : 'Login Developer' }}
-      </h1>
+    <div v-else class="bg-bg-base rounded-[14px] p-8 border border-border shadow-sm animate-in">
+      <div class="mb-8">
+        <h1 class="text-[1.75rem] font-bold text-text-primary tracking-tight mb-2">
+          {{ mode === 'register' ? 'Daftar Developer' : 'Login Developer' }}
+        </h1>
+        <p class="text-text-secondary">
+          Dapatkan akses ke API SiReDo untuk mengembangkan aplikasi Anda sendiri.
+        </p>
+      </div>
       
-      <div v-if="session.error" class="mb-6 p-4 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-sm border border-red-100 dark:border-red-800">
+      <div v-if="session.error" class="mb-6 p-4 bg-red-bg text-red rounded-[8px] text-[0.9rem] border border-red-border">
         {{ session.error }}
       </div>
 
-      <form @submit.prevent="submitForm" class="space-y-4">
-        <template v-if="mode === 'register'">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Lengkap</label>
-            <input v-model="form.name" type="text" required class="w-full bg-white dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organisasi/Institusi</label>
-            <input v-model="form.organization" type="text" required class="w-full bg-white dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500" />
-          </div>
-        </template>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-          <input v-model="form.email" type="email" required class="w-full bg-white dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500" />
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-          <input v-model="form.password" type="password" required class="w-full bg-white dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500" />
+      <form @submit.prevent="submitForm" class="space-y-5">
+        <div v-if="mode === 'register'">
+          <label class="block text-[0.85rem] font-semibold text-text-primary mb-1.5">Nama Lengkap</label>
+          <input 
+            v-model="form.name"
+            type="text" 
+            required 
+            class="w-full bg-bg-base border border-border-strong rounded-[6px] px-4 py-2.5 text-text-primary focus:outline-none focus:border-brand" 
+          />
         </div>
 
-        <button type="submit" :disabled="session.loading" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-70 mt-6">
-          {{ session.loading ? 'Memproses...' : (mode === 'register' ? 'Daftar Sekarang' : 'Login') }}
+        <div v-if="mode === 'register'">
+          <label class="block text-[0.85rem] font-semibold text-text-primary mb-1.5">Organisasi / Kampus</label>
+          <input 
+            v-model="form.organization"
+            type="text" 
+            required 
+            class="w-full bg-bg-base border border-border-strong rounded-[6px] px-4 py-2.5 text-text-primary focus:outline-none focus:border-brand" 
+          />
+        </div>
+
+        <div>
+          <label class="block text-[0.85rem] font-semibold text-text-primary mb-1.5">Email</label>
+          <input 
+            v-model="form.email"
+            type="email" 
+            required 
+            class="w-full bg-bg-base border border-border-strong rounded-[6px] px-4 py-2.5 text-text-primary focus:outline-none focus:border-brand" 
+          />
+        </div>
+        
+        <div>
+          <label class="block text-[0.85rem] font-semibold text-text-primary mb-1.5">Password</label>
+          <input 
+            v-model="form.password"
+            type="password" 
+            required 
+            class="w-full bg-bg-base border border-border-strong rounded-[6px] px-4 py-2.5 text-text-primary focus:outline-none focus:border-brand" 
+          />
+        </div>
+        
+        <button 
+          type="submit" 
+          :disabled="session.loading"
+          class="w-full mt-2 py-3 bg-brand hover:bg-brand-dark text-white rounded-[6px] font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          <svg v-if="session.loading" class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ mode === 'register' ? 'Daftar Sekarang' : 'Login' }}
         </button>
       </form>
-
-      <div class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-        <span v-if="mode === 'login'">Belum punya akun? <button @click="mode = 'register'" class="text-blue-600 dark:text-blue-400 font-medium hover:underline">Daftar sekarang</button></span>
-        <span v-else>Sudah punya akun? <button @click="mode = 'login'" class="text-blue-600 dark:text-blue-400 font-medium hover:underline">Login di sini</button></span>
+      
+      <div class="mt-6 text-center text-[0.9rem] text-text-secondary pt-6 border-t border-border">
+        {{ mode === 'register' ? 'Sudah punya akun?' : 'Belum punya API Key?' }}
+        <button 
+          @click="mode = mode === 'register' ? 'login' : 'register'" 
+          class="text-brand font-semibold hover:underline ml-1 focus:outline-none"
+        >
+          {{ mode === 'register' ? 'Login di sini' : 'Daftar sekarang' }}
+        </button>
       </div>
     </div>
   </div>

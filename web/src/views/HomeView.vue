@@ -33,6 +33,10 @@ onMounted(checkStatus)
         <span class="topbar-name">SiReDo<span class="topbar-api"> API</span></span>
       </div>
       <div class="topbar-links">
+        <span class="topbar-status">
+          <span :class="['status-dot', serverStatus === 'online' && cacheReady ? 'dot-green' : serverStatus === 'online' ? 'dot-amber' : 'dot-red']"></span>
+          {{ serverStatus === 'online' && cacheReady ? 'Online' : serverStatus === 'online' ? 'Warming Up' : 'Offline' }}
+        </span>
         <router-link to="/docs" class="tl">Dokumentasi API</router-link>
       </div>
     </header>
@@ -40,13 +44,9 @@ onMounted(checkStatus)
     <!-- Hero -->
     <section class="hero-section">
       <div class="hero-inner">
-        <div class="hero-badge">
-          <span :class="['status-dot', serverStatus === 'online' && cacheReady ? 'dot-green' : serverStatus === 'online' ? 'dot-amber' : 'dot-red']"></span>
-          {{ serverStatus === 'online' && cacheReady ? 'Server Online · Model Ready' : serverStatus === 'online' ? 'Server Online · Warming Up' : 'Server Offline' }}
-        </div>
         <h1 class="hero-title">
           Sistem Rekomendasi Dosen<br>
-          <span class="hero-gradient">Berbasis Hybrid AI</span>
+          <span class="hero-highlight">Berbasis Hybrid AI</span>
         </h1>
         <p class="hero-desc">
           SiReDo menggunakan algoritma <strong>BM25</strong> (lexical) dan <strong>SBERT</strong> (semantic) 
@@ -90,7 +90,7 @@ onMounted(checkStatus)
 
         <div class="cards-grid">
           <router-link to="/preprocessing" class="doc-card doc-card-feature">
-            <div class="card-icon" style="background:#ede9ff;color:#5b4bdb">
+            <div class="card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             </div>
             <h3>Pipeline NLP</h3>
@@ -99,7 +99,7 @@ onMounted(checkStatus)
           </router-link>
 
           <router-link to="/docs" class="doc-card">
-            <div class="card-icon" style="background:#eff6ff;color:#2563eb">
+            <div class="card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             </div>
             <h3>API Reference</h3>
@@ -109,7 +109,7 @@ onMounted(checkStatus)
 
 
           <router-link to="/register" class="doc-card">
-            <div class="card-icon" style="background:#fffbeb;color:#d97706">
+            <div class="card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
             </div>
             <h3>Daftar & API Key</h3>
@@ -118,7 +118,7 @@ onMounted(checkStatus)
           </router-link>
 
           <a href="http://localhost:5174" target="_blank" class="doc-card">
-            <div class="card-icon" style="background:#fdf4ff;color:#a21caf">
+            <div class="card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
             <h3>Polibatam SiReDo</h3>
@@ -212,18 +212,16 @@ onMounted(checkStatus)
   padding: 5rem 2rem 4rem;
   text-align: center;
 }
-.hero-badge {
+.topbar-status {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  background: var(--bg-muted);
-  border: 1px solid var(--border);
-  border-radius: 99px;
-  padding: 0.3rem 0.9rem;
-  font-size: 0.78rem;
+  gap: 0.4rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 1.75rem;
+  padding-right: 1rem;
+  border-right: 1px solid var(--border);
+  margin-right: 0.5rem;
 }
 .status-dot {
   width: 7px; height: 7px;
@@ -247,11 +245,8 @@ onMounted(checkStatus)
   color: var(--text-primary);
   margin: 0 0 1.25rem;
 }
-.hero-gradient {
-  background: linear-gradient(135deg, var(--brand), #9b59f5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.hero-highlight {
+  color: var(--brand);
 }
 .hero-desc {
   font-size: 1.05rem;
@@ -277,7 +272,7 @@ onMounted(checkStatus)
   border-radius: var(--radius);
   text-decoration: none;
   transition: background 0.15s, transform 0.1s;
-  box-shadow: 0 2px 12px rgba(91,75,219,0.3);
+  border: 1px solid var(--brand);
 }
 .btn-primary:hover { background: var(--brand-dim); transform: translateY(-1px); }
 .btn-ghost {
@@ -343,19 +338,18 @@ onMounted(checkStatus)
 }
 .doc-card:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
   transform: translateY(-2px);
 }
 .doc-card-feature {
   grid-column: span 2;
-  background: linear-gradient(135deg, #faf9ff, #f5f0ff);
-  border-color: #d4c8ff;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 .card-icon {
-  width: 38px; height: 38px;
-  border-radius: var(--radius);
+  width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 0.25rem;
+  color: var(--text-primary);
 }
 .card-icon svg { width: 20px; height: 20px; }
 .doc-card h3 {

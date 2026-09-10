@@ -40,32 +40,32 @@
 
           <div class="pipeline-flow">
             <div class="pf-step">
-              <div class="pf-icon" style="background:#ede9ff;color:#5b4bdb">📝</div>
+              <div class="pf-icon">📝</div>
               <div class="pf-label">Input Query</div>
               <div class="pf-sub">Judul + Abstrak</div>
             </div>
             <div class="pf-arrow">→</div>
             <div class="pf-step">
-              <div class="pf-icon" style="background:#fef9c3;color:#854d0e">🧹</div>
+              <div class="pf-icon">🧹</div>
               <div class="pf-label">Preprocessing</div>
               <div class="pf-sub">Case Fold · Stopword · N-Gram</div>
             </div>
             <div class="pf-arrow">→</div>
             <div class="pf-fork">
-              <div class="pf-step pf-step-blue">
-                <div class="pf-icon" style="background:#eff6ff;color:#2563eb">📊</div>
+              <div class="pf-step">
+                <div class="pf-icon">📊</div>
                 <div class="pf-label">BM25</div>
                 <div class="pf-sub">Lexical Scoring</div>
               </div>
-              <div class="pf-step pf-step-fuchsia">
-                <div class="pf-icon" style="background:#fdf4ff;color:#a21caf">🧠</div>
+              <div class="pf-step">
+                <div class="pf-icon">🧠</div>
                 <div class="pf-label">SBERT</div>
                 <div class="pf-sub">Semantic Vector</div>
               </div>
             </div>
             <div class="pf-arrow">→</div>
             <div class="pf-step">
-              <div class="pf-icon" style="background:#f0fdf4;color:#16a34a">🏆</div>
+              <div class="pf-icon">🏆</div>
               <div class="pf-label">Hybrid Ranking</div>
               <div class="pf-sub">α·BM25 + β·SBERT</div>
             </div>
@@ -324,9 +324,8 @@
           </p>
 
           <div class="scenario-cards">
-            <div class="scenario-card" style="border-left-color: var(--brand)">
+            <div class="scenario-card">
               <div class="sc-header">
-                <span class="sc-badge" style="background:var(--brand-light);color:var(--brand)">A</span>
                 <h3>Hard Filter — Mencegah Out-of-Domain</h3>
               </div>
               <p>
@@ -337,9 +336,8 @@
               <div class="sc-impact">Dampak: Meningkatkan presisi</div>
             </div>
 
-            <div class="scenario-card" style="border-left-color: var(--green)">
+            <div class="scenario-card">
               <div class="sc-header">
-                <span class="sc-badge" style="background:var(--green-bg);color:var(--green)">B</span>
                 <h3>Adaptive Alpha — Bobot Dinamis</h3>
               </div>
               <p>
@@ -350,9 +348,8 @@
               <div class="sc-impact">Dampak: Meningkatkan akurasi lintas jenis query</div>
             </div>
 
-            <div class="scenario-card" style="border-left-color: var(--amber)">
+            <div class="scenario-card">
               <div class="sc-header">
-                <span class="sc-badge" style="background:var(--amber-bg);color:var(--amber)">C</span>
                 <h3>Ekspansi Sinonim — Mengatasi Vocabulary Gap</h3>
               </div>
               <p>
@@ -363,9 +360,8 @@
               <div class="sc-impact">Dampak: Meningkatkan recall untuk SBERT</div>
             </div>
 
-            <div class="scenario-card" style="border-left-color: var(--blue)">
+            <div class="scenario-card">
               <div class="sc-header">
-                <span class="sc-badge" style="background:var(--blue-bg);color:var(--blue)">D</span>
                 <h3>Incremental Indexing — Zero Downtime Sync</h3>
               </div>
               <p>
@@ -490,7 +486,6 @@
 .scenario-cards { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
 .scenario-card {
   border: 1px solid var(--border);
-  border-left: 4px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.25rem 1rem;
 }
