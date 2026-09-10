@@ -37,7 +37,7 @@ onMounted(checkStatus)
           <span :class="['status-dot', serverStatus === 'online' && cacheReady ? 'dot-green' : serverStatus === 'online' ? 'dot-amber' : 'dot-red']"></span>
           {{ serverStatus === 'online' && cacheReady ? 'Online' : serverStatus === 'online' ? 'Warming Up' : 'Offline' }}
         </span>
-        <router-link to="/docs" class="tl">Dokumentasi API</router-link>
+        <router-link to="/docs/quickstart" class="tl tl-btn">Let's Go</router-link>
       </div>
     </header>
 
@@ -54,7 +54,8 @@ onMounted(checkStatus)
           berdasarkan judul dan abstrak topik penelitian.
         </p>
         <div class="hero-actions">
-          <a href="#demo" class="btn-primary">Mulai Analisis →</a>
+          <router-link to="/docs/quickstart" class="btn-primary">Let's Go →</router-link>
+          <a href="#demo" class="btn-ghost">Simulasi Langsung ↓</a>
         </div>
 
         <!-- Quick stats -->
@@ -82,47 +83,70 @@ onMounted(checkStatus)
       </div>
     </section>
 
-    <!-- Docs cards grid -->
+    <!-- Docs cards grid (5 Halaman Dokumentasi Sesuai Urutan) -->
     <section class="docs-section">
       <div class="docs-inner">
 
-        <div class="section-label">Dokumentasi</div>
+        <div class="section-label">Dokumentasi & Integrasi</div>
 
         <div class="cards-grid">
-          <router-link to="/preprocessing" class="doc-card doc-card-feature">
+          <!-- 1. Quickstart -->
+          <router-link to="/docs/quickstart" class="doc-card">
             <div class="card-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-            <h3>Pipeline NLP</h3>
-            <p>Pelajari bagaimana sistem memproses teks dari preprocessing, ekspansi sinonim, BM25, SBERT, hingga Hybrid Ranking.</p>
-            <span class="card-cta">Baca artikel →</span>
+            <h3>1. Quickstart</h3>
+            <p>Panduan cepat 3 langkah untuk mengintegrasikan SiReDo API ke dalam aplikasi frontend atau backend.</p>
+            <span class="card-cta">Mulai integrasi →</span>
           </router-link>
 
-          <router-link to="/docs" class="doc-card">
+          <!-- 2. Dokumentasi API -->
+          <router-link to="/docs/api" class="doc-card">
             <div class="card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             </div>
-            <h3>API Reference</h3>
-            <p>Dokumentasi lengkap endpoint REST untuk integrasi dengan sistem akademik (SIAKAD).</p>
-            <span class="card-cta">Lihat referensi →</span>
+            <h3>2. Dokumentasi API</h3>
+            <p>Spesifikasi endpoint REST lengkap untuk single, batch JSON, batch Excel upload, config, dan status.</p>
+            <span class="card-cta">Lihat endpoint REST →</span>
           </router-link>
 
+          <!-- 3. Pipeline NLP -->
+          <router-link to="/docs/pipeline" class="doc-card">
+            <div class="card-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <h3>3. Pipeline NLP</h3>
+            <p>Pelajari tahapan pengolahan teks dari preprocessing, ekspansi sinonim, BM25, SBERT, hingga Hybrid Ranking.</p>
+            <span class="card-cta">Pelajari pipeline →</span>
+          </router-link>
 
-          <router-link to="/register" class="doc-card">
+          <!-- 4. Caching & Indexing Method -->
+          <router-link to="/docs/caching" class="doc-card">
+            <div class="card-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zM9 12h6M9 8h6M9 16h4"/></svg>
+            </div>
+            <h3>4. Caching & Indexing Method</h3>
+            <p>Arsitektur Multi-Tier Caching dan Hybrid Incremental Indexing untuk latensi sub-50ms tanpa downtime.</p>
+            <span class="card-cta">Baca arsitektur →</span>
+          </router-link>
+
+          <!-- 5. API Key -->
+          <router-link to="/docs/api-key" class="doc-card">
             <div class="card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
             </div>
-            <h3>Daftar & API Key</h3>
-            <p>Dapatkan akses API Key untuk menggunakan seluruh endpoint. Pantau penggunaan dan regenerasi key.</p>
-            <span class="card-cta">Buka dashboard →</span>
+            <h3>5. API Key</h3>
+            <p>Daftar sebagai developer institusi untuk mendapatkan kredensial API Key yang aman untuk setiap request.</p>
+            <span class="card-cta">Kelola API Key →</span>
           </router-link>
 
+          <!-- Client App Link -->
           <a href="http://localhost:5174" target="_blank" class="doc-card">
             <div class="card-icon">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
             <h3>Polibatam SiReDo</h3>
-            <p>Aplikasi web contoh (Client) yang mengonsumsi API ini, berisi daftar dosen, penjadwalan TA, dan fitur batch.</p>
+            <p>Portal web contoh kampus yang mengonsumsi API ini untuk direktori dosen, penjadwalan, dan batch.</p>
             <span class="card-cta">Buka aplikasi (:5174) →</span>
           </a>
         </div>

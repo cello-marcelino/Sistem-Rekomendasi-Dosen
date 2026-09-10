@@ -1,78 +1,101 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ServerStatusBadge from './ServerStatusBadge.vue'
 
 const route = useRoute()
 const mobileOpen = ref(false)
 
-const sections = [
-  {
-    label: 'Mulai',
-    items: [
-      { name: 'Beranda', path: '/', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-    ]
-  },
-  {
-    label: 'API & Integrasi',
-    items: [
-      { name: 'Pipeline NLP', path: '/preprocessing', icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z' },
-      { name: 'Dokumentasi API', path: '/docs', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', badge: 'REST' },
-    ]
-  },
-  {
-    label: 'Developer',
-    items: [
-      { name: 'Quickstart', path: '/quickstart', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
-      { name: 'Daftar & API Key', path: '/register', icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' }
-    ]
-  },
+// State dropdown dokumentasi
+const docsDropdownOpen = ref(true)
+
+// Daftar menu dokumentasi berurutan sesuai instruksi
+const docItems = [
+  { name: 'Quickstart', path: '/docs/quickstart' },
+  { name: 'Dokumentasi API', path: '/docs/api' },
+  { name: 'Pipeline NLP', path: '/docs/pipeline' },
+  { name: 'Caching & Indexing Method', path: '/docs/caching' },
+  { name: 'API Key', path: '/docs/api-key' },
 ]
+
+// Cek apakah route saat ini ada di dalam grup dokumentasi
+const isDocsActive = computed(() => {
+  return docItems.some(item => route.path === item.path) || route.path.startsWith('/docs')
+})
+
+// Auto buka dropdown jika route aktif berada di dokumentasi
+watch(
+  () => route.path,
+  () => {
+    if (isDocsActive.value) {
+      docsDropdownOpen.value = true
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <!-- Mobile overlay -->
   <div v-if="mobileOpen" class="mobile-overlay" @click="mobileOpen = false" />
 
-  <!-- Sidebar -->
+  <!-- Sidebar Utama (Minimal Text-Only Nested Dropdown) -->
   <aside class="sidebar" :class="{ 'mobile-open': mobileOpen }">
-    <!-- Logo -->
-    <div class="sidebar-logo">
-      <router-link to="/" class="logo-link" @click="mobileOpen = false">
-        <div class="logo-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-          </svg>
-        </div>
-        <div>
-          <div class="logo-name">SiReDo</div>
-          <div class="logo-version">v3 · Feature-Module</div>
-        </div>
+    <!-- Brand / Header -->
+    <div class="sidebar-header">
+      <router-link to="/" class="brand-link" @click="mobileOpen = false">
+        <span class="brand-title">SiReDo <span class="brand-sub">API</span></span>
+        <span class="brand-badge">v3.2</span>
       </router-link>
     </div>
 
-    <!-- Nav sections -->
+    <!-- Navigation List (Text-Only Minimalist) -->
     <nav class="sidebar-nav">
-      <div v-for="section in sections" :key="section.label" class="nav-section">
-        <div class="nav-section-label">{{ section.label }}</div>
+      <!-- Section: Navigasi Utama -->
+      <div class="nav-group">
+        <div class="nav-group-label">Navigasi</div>
         <router-link
-          v-for="item in section.items"
-          :key="item.path"
-          :to="item.path"
+          to="/"
           class="nav-item"
-          :class="{ active: route.path === item.path }"
+          :class="{ active: route.path === '/' }"
           @click="mobileOpen = false"
         >
-          <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" :d="item.icon" />
-          </svg>
-          <span>{{ item.name }}</span>
-          <span v-if="item.badge" class="nav-badge" :class="item.badge === 'Live' ? 'badge-live' : 'badge-rest'">{{ item.badge }}</span>
+          <span class="nav-item-text">Beranda</span>
         </router-link>
+      </div>
+
+      <!-- Section: Dokumentasi (Nested Dropdown) -->
+      <div class="nav-group">
+        <!-- Dropdown Parent Header -->
+        <button
+          type="button"
+          class="nav-dropdown-toggle"
+          :class="{ 'nav-dropdown-toggle--active': isDocsActive }"
+          @click="docsDropdownOpen = !docsDropdownOpen"
+        >
+          <span class="nav-group-label mb-0">Dokumentasi</span>
+          <span class="dropdown-caret" :class="{ 'dropdown-caret--open': docsDropdownOpen }">
+            {{ docsDropdownOpen ? '▾' : '▸' }}
+          </span>
+        </button>
+
+        <!-- Nested Dropdown Menu Items (Teks Saja, Urutan Sesuai Spesifikasi) -->
+        <div v-show="docsDropdownOpen" class="nav-nested-list">
+          <router-link
+            v-for="item in docItems"
+            :key="item.path"
+            :to="item.path"
+            class="nav-nested-item"
+            :class="{ active: route.path === item.path }"
+            @click="mobileOpen = false"
+          >
+            <span class="nav-item-text">{{ item.name }}</span>
+          </router-link>
+        </div>
       </div>
     </nav>
 
-    <!-- Footer -->
+    <!-- Footer Status -->
     <div class="sidebar-footer">
       <ServerStatusBadge />
     </div>
@@ -101,67 +124,79 @@ const sections = [
   transition: transform 0.25s ease;
 }
 
-/* Logo */
-.sidebar-logo {
-  padding: 1.25rem 1rem 1rem;
+/* Brand / Header */
+.sidebar-header {
+  padding: 1.25rem 1.1rem;
   border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
 }
-.logo-link {
+.brand-link {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  justify-content: space-between;
   text-decoration: none;
 }
-.logo-icon {
-  width: 34px; height: 34px;
-  background: var(--brand);
-  border-radius: var(--radius);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  color: white;
-}
-.logo-icon svg { width: 18px; height: 18px; }
-.logo-name {
-  font-size: 0.95rem;
+.brand-title {
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
 }
-.logo-version {
-  font-size: 0.68rem;
-  color: var(--text-muted);
+.brand-sub {
+  color: var(--brand);
+  font-weight: 700;
+}
+.brand-badge {
   font-family: var(--font-mono);
-  margin-top: 1px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--brand);
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  padding: 2px 7px;
+  border-radius: 99px;
 }
 
 /* Nav */
 .sidebar-nav {
   flex: 1;
-  padding: 1rem 0.65rem;
+  padding: 1.25rem 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
-.nav-section-label {
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-group-label {
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 0 0.6rem;
-  margin-bottom: 0.35rem;
+  padding: 0 0.5rem;
+  margin-bottom: 0.4rem;
 }
+.mb-0 {
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+}
+
+/* Standalone Nav Item (Text Only) */
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.65rem;
-  border-radius: var(--radius);
-  font-size: 0.865rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.12s, color 0.12s;
+  border-left: 2.5px solid transparent;
 }
 .nav-item:hover {
   background: var(--bg-muted);
@@ -171,30 +206,85 @@ const sections = [
   background: var(--brand-light);
   color: var(--brand);
   font-weight: 600;
-  border-left: 3px solid var(--brand);
+  border-left-color: var(--brand);
 }
-.nav-icon {
-  width: 16px; height: 16px;
-  flex-shrink: 0;
-  opacity: 0.7;
+
+/* Dropdown Parent Toggle Header */
+.nav-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
 }
-.nav-item.active .nav-icon { opacity: 1; }
-.nav-badge {
-  margin-left: auto;
-  font-size: 0.6rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 99px;
-  font-family: var(--font-mono);
-  letter-spacing: 0.04em;
+.nav-dropdown-toggle:hover {
+  background: var(--bg-muted);
 }
-.badge-live { background: #dcfce7; color: #16a34a; }
-.badge-rest { background: var(--brand-light); color: var(--brand); border: 1px solid var(--brand-border); }
+.nav-dropdown-toggle--active .nav-group-label {
+  color: var(--brand);
+}
+
+.dropdown-caret {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: color 0.15s;
+  user-select: none;
+}
+.nav-dropdown-toggle:hover .dropdown-caret,
+.dropdown-caret--open {
+  color: var(--brand);
+}
+
+/* Nested Sub-items (Dropdown Children) */
+.nav-nested-list {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 1.5px solid var(--border);
+  margin-top: 0.35rem;
+  gap: 2px;
+}
+
+.nav-nested-item {
+  display: flex;
+  align-items: center;
+  padding: 0.42rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background 0.12s, color 0.12s, border-left-color 0.12s;
+  border-left: 2px solid transparent;
+  line-height: 1.35;
+}
+.nav-nested-item:hover {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+.nav-nested-item.active {
+  background: var(--brand-light);
+  color: var(--brand);
+  font-weight: 600;
+  border-left-color: var(--brand);
+}
+
+.nav-item-text {
+  letter-spacing: -0.01em;
+}
 
 /* Footer */
 .sidebar-footer {
   padding: 1rem;
   border-top: 1px solid var(--border);
+  background: var(--bg-base);
 }
 
 /* Mobile */

@@ -23,7 +23,7 @@
         <p class="text-text-secondary mb-5 leading-relaxed">
           Untuk menggunakan endpoint yang dilindungi, Anda memerlukan API Key. Silakan mendaftar sebagai developer kampus untuk mendapatkan akses.
         </p>
-        <router-link to="/register" class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-[6px] font-medium transition-colors shadow-sm">
+        <router-link to="/docs/api-key" class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-[6px] font-medium transition-colors shadow-sm">
           Daftar & Dapatkan API Key
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         </router-link>

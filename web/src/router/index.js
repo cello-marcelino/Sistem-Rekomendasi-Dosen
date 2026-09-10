@@ -1,8 +1,9 @@
-﻿import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import PreprocessingView from '../views/PreprocessingView.vue'
-import ApiDocsView from '../views/ApiDocsView.vue'
 import QuickstartView from '../views/QuickstartView.vue'
+import ApiDocsView from '../views/ApiDocsView.vue'
+import PreprocessingView from '../views/PreprocessingView.vue'
+import CachingIndexingView from '../views/CachingIndexingView.vue'
 import ClientRegisterView from '../views/ClientRegisterView.vue'
 
 const router = createRouter({
@@ -14,33 +15,46 @@ const router = createRouter({
       component: HomeView,
       meta: { layout: 'none' }
     },
-    {
-      path: '/preprocessing',
-      name: 'Pipeline',
-      component: PreprocessingView
-    },
+    // Documentation Routes (Sesuai Urutan Dropdown Navigasi)
     {
       path: '/docs',
-      name: 'ApiDocs',
-      component: ApiDocsView
+      redirect: '/docs/quickstart'
     },
     {
-      path: '/quickstart',
+      path: '/docs/quickstart',
       name: 'Quickstart',
       component: QuickstartView
     },
     {
-      path: '/register',
+      path: '/docs/api',
+      name: 'ApiDocs',
+      component: ApiDocsView
+    },
+    {
+      path: '/docs/pipeline',
+      name: 'Pipeline',
+      component: PreprocessingView
+    },
+    {
+      path: '/docs/caching',
+      name: 'CachingIndexing',
+      component: CachingIndexingView
+    },
+    {
+      path: '/docs/api-key',
       name: 'ClientRegister',
       component: ClientRegisterView
     },
-    // Redirects for old routes
-    { path: '/install', redirect: '/quickstart' },
-    { path: '/single', redirect: '/' },
-    { path: '/clients', redirect: '/register' },
-    { path: '/client/register', redirect: '/register' }
+
+    // Backward Compatibility & Alias Redirects
+    { path: '/quickstart', redirect: '/docs/quickstart' },
+    { path: '/preprocessing', redirect: '/docs/pipeline' },
+    { path: '/register', redirect: '/docs/api-key' },
+    { path: '/clients', redirect: '/docs/api-key' },
+    { path: '/client/register', redirect: '/docs/api-key' },
+    { path: '/install', redirect: '/docs/quickstart' },
+    { path: '/single', redirect: '/' }
   ]
 })
 
 export default router
-
