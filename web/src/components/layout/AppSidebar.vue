@@ -7,17 +7,13 @@ const route = useRoute()
 const router = useRouter()
 const mobileOpen = ref(false)
 
-// State dropdown dokumentasi
+// State dropdown section navigasi
 const docsDropdownOpen = ref(true)
+const integrationDropdownOpen = ref(true)
 const activeAnchor = ref('')
 
-// Daftar menu dokumentasi berurutan sesuai instruksi dengan sub-sections
+// Section 1: Dokumentasi (API, Pipeline NLP, Caching)
 const docItems = [
-  {
-    name: 'Quickstart',
-    path: '/docs/quickstart',
-    sections: []
-  },
   {
     name: 'Dokumentasi API',
     path: '/docs/api',
@@ -56,6 +52,19 @@ const docItems = [
       { id: 'efisiensi', label: '4. Ringkasan Dampak' },
     ]
   },
+]
+
+// Section 2: Integrasi (Quickstart & API Key)
+const integrationItems = [
+  {
+    name: 'Quickstart',
+    path: '/docs/quickstart',
+    sections: [
+      { id: 'step-1', label: '1. Dapatkan API Key' },
+      { id: 'step-2', label: '2. Request API' },
+      { id: 'step-3', label: '3. Frontend Client' },
+    ]
+  },
   {
     name: 'API Key',
     path: '/docs/api-key',
@@ -63,9 +72,15 @@ const docItems = [
   },
 ]
 
-// Cek apakah route saat ini ada di dalam grup dokumentasi
+const allItems = [...docItems, ...integrationItems]
+
+// Cek status aktif per section
 const isDocsActive = computed(() => {
-  return docItems.some(item => route.path === item.path) || route.path.startsWith('/docs')
+  return docItems.some(item => route.path === item.path)
+})
+
+const isIntegrationActive = computed(() => {
+  return integrationItems.some(item => route.path === item.path)
 })
 
 let observer = null
@@ -76,8 +91,8 @@ const setupObserver = () => {
     observer = null
   }
 
-  const currentDoc = docItems.find(item => item.path === route.path)
-  if (!currentDoc || !currentDoc.sections || currentDoc.sections.length === 0) {
+  const currentItem = allItems.find(item => item.path === route.path)
+  if (!currentItem || !currentItem.sections || currentItem.sections.length === 0) {
     activeAnchor.value = ''
     return
   }
@@ -85,8 +100,8 @@ const setupObserver = () => {
   // Set default initial anchor
   if (window.location.hash) {
     activeAnchor.value = window.location.hash.replace('#', '')
-  } else if (currentDoc.sections.length > 0) {
-    activeAnchor.value = currentDoc.sections[0].id
+  } else if (currentItem.sections.length > 0) {
+    activeAnchor.value = currentItem.sections[0].id
   }
 
   observer = new IntersectionObserver((entries) => {
@@ -98,18 +113,21 @@ const setupObserver = () => {
     rootMargin: '-10% 0px -70% 0px'
   })
 
-  currentDoc.sections.forEach(sec => {
+  currentItem.sections.forEach(sec => {
     const el = document.getElementById(sec.id)
     if (el) observer.observe(el)
   })
 }
 
-// Auto buka dropdown jika route aktif berada di dokumentasi
+// Auto buka dropdown sesuai route aktif
 watch(
   () => route.path,
   () => {
     if (isDocsActive.value) {
       docsDropdownOpen.value = true
+    }
+    if (isIntegrationActive.value) {
+      integrationDropdownOpen.value = true
     }
     setTimeout(() => {
       setupObserver()
@@ -183,10 +201,62 @@ const navigateToSection = (itemPath, sectionId) => {
           </span>
         </button>
 
-        <!-- Nested Dropdown Menu Items (Teks Saja, Urutan Sesuai Spesifikasi) -->
+        <!-- Nested Dropdown Menu Items (Teks Saja) -->
         <div v-show="docsDropdownOpen" class="nav-nested-list">
           <div
             v-for="item in docItems"
+            :key="item.path"
+            class="nav-group-item-wrap"
+          >
+            <!-- Level 1 Item Link -->
+            <router-link
+              :to="item.path"
+              class="nav-nested-item"
+              :class="{ active: route.path === item.path }"
+              @click="mobileOpen = false"
+            >
+              <span class="nav-item-text">{{ item.name }}</span>
+            </router-link>
+
+            <!-- Level 2 Sub-Sections (Teks Saja Minimalis, Muncul Saat Halaman Aktif) -->
+            <div
+              v-if="route.path === item.path && item.sections && item.sections.length > 0"
+              class="nav-sub-list"
+            >
+              <button
+                v-for="sec in item.sections"
+                :key="sec.id"
+                type="button"
+                class="nav-sub-item"
+                :class="{ active: activeAnchor === sec.id }"
+                @click="navigateToSection(item.path, sec.id)"
+              >
+                <span class="nav-sub-text">{{ sec.label }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Integrasi (Nested Dropdown) -->
+      <div class="nav-group">
+        <!-- Dropdown Parent Header -->
+        <button
+          type="button"
+          class="nav-dropdown-toggle"
+          :class="{ 'nav-dropdown-toggle--active': isIntegrationActive }"
+          @click="integrationDropdownOpen = !integrationDropdownOpen"
+        >
+          <span class="nav-group-label mb-0">Integrasi</span>
+          <span class="dropdown-caret" :class="{ 'dropdown-caret--open': integrationDropdownOpen }">
+            {{ integrationDropdownOpen ? '▾' : '▸' }}
+          </span>
+        </button>
+
+        <!-- Nested Dropdown Menu Items (Teks Saja) -->
+        <div v-show="integrationDropdownOpen" class="nav-nested-list">
+          <div
+            v-for="item in integrationItems"
             :key="item.path"
             class="nav-group-item-wrap"
           >

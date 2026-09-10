@@ -15,7 +15,7 @@
 
     <div class="space-y-8">
       <!-- Step 1 -->
-      <div class="bg-bg-base rounded-[14px] shadow-sm border border-border p-6 sm:p-8">
+      <div id="step-1" class="bg-bg-base rounded-[14px] shadow-sm border border-border p-6 sm:p-8">
         <h2 class="text-[1.25rem] font-bold text-text-primary mb-4 flex items-center gap-3">
           <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-light text-brand text-[0.9rem] font-bold">1</span>
           Dapatkan API Key
@@ -30,7 +30,7 @@
       </div>
 
       <!-- Step 2 -->
-      <div class="bg-bg-base rounded-[14px] shadow-sm border border-border p-6 sm:p-8">
+      <div id="step-2" class="bg-bg-base rounded-[14px] shadow-sm border border-border p-6 sm:p-8">
         <h2 class="text-[1.25rem] font-bold text-text-primary mb-4 flex items-center gap-3">
           <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-light text-brand text-[0.9rem] font-bold">2</span>
           Lakukan Request API
@@ -53,7 +53,7 @@
       </div>
 
       <!-- Step 3 -->
-      <div class="bg-bg-base rounded-[14px] shadow-sm border border-border p-6 sm:p-8">
+      <div id="step-3" class="bg-bg-base rounded-[14px] shadow-sm border border-border p-6 sm:p-8">
         <h2 class="text-[1.25rem] font-bold text-text-primary mb-4 flex items-center gap-3">
           <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-light text-brand text-[0.9rem] font-bold">3</span>
           Gunakan di Aplikasi Frontend (Vue/React)
