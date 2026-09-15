@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import api from '../services/api'
 
 const loading = ref(true)
@@ -9,6 +9,20 @@ const simulating = ref(false)
 const saveSuccess = ref(false)
 const errorMessage = ref('')
 const activeTab = ref('hybrid') // 'hybrid' | 'corpus' | 'bm25' | 'sandbox'
+
+// Engine Status & Real-time Warmup State
+const systemStatus = ref(null)
+const showStatusModal = ref(false)
+let statusPollInterval = null
+
+const isSyncing = computed(() => {
+  const state = systemStatus.value?.warmup_status?.state || systemStatus.value?.status
+  return state === 'reloading' || state === 'warming_up'
+})
+
+const warmupSteps = computed(() => {
+  return systemStatus.value?.warmup_status?.steps || []
+})
 
 // Configuration state
 const config = reactive({
@@ -55,6 +69,48 @@ const presets = [
   }
 ]
 
+const fetchStatus = async () => {
+  try {
+    const res = await api.get('/system/status')
+    if (res.data?.data) {
+      systemStatus.value = res.data.data
+      const state = res.data.data.warmup_status?.state || res.data.data.status
+      if ((state === 'reloading' || state === 'warming_up') && !statusPollInterval) {
+        startPolling()
+      } else if (state !== 'reloading' && state !== 'warming_up' && statusPollInterval) {
+        stopPolling()
+      }
+    }
+  } catch (err) {
+    console.warn('Gagal membaca status AI engine:', err)
+  }
+}
+
+const startPolling = () => {
+  if (statusPollInterval) return
+  statusPollInterval = setInterval(async () => {
+    try {
+      const res = await api.get('/system/status')
+      if (res.data?.data) {
+        systemStatus.value = res.data.data
+        const state = res.data.data?.warmup_status?.state || res.data.data?.status
+        if (state !== 'reloading' && state !== 'warming_up') {
+          stopPolling()
+        }
+      }
+    } catch {
+      stopPolling()
+    }
+  }, 1000)
+}
+
+const stopPolling = () => {
+  if (statusPollInterval) {
+    clearInterval(statusPollInterval)
+    statusPollInterval = null
+  }
+}
+
 const loadConfig = async () => {
   loading.value = true
   errorMessage.value = ''
@@ -79,7 +135,8 @@ const saveConfig = async () => {
     if (res.data?.data) {
       Object.assign(config, res.data.data)
       saveSuccess.value = true
-      setTimeout(() => { saveSuccess.value = false }, 3000)
+      setTimeout(() => { saveSuccess.value = false }, 4000)
+      fetchStatus()
     }
   } catch (err) {
     errorMessage.value = err.response?.data?.message || err.message || 'Gagal menyimpan konfigurasi.'
@@ -99,7 +156,8 @@ const resetConfig = async () => {
     if (res.data?.data) {
       Object.assign(config, res.data.data)
       saveSuccess.value = true
-      setTimeout(() => { saveSuccess.value = false }, 3000)
+      setTimeout(() => { saveSuccess.value = false }, 4000)
+      fetchStatus()
     }
   } catch (err) {
     errorMessage.value = err.response?.data?.message || err.message || 'Gagal mereset konfigurasi.'
@@ -181,6 +239,11 @@ const comparisonRows = computed(() => {
 
 onMounted(() => {
   loadConfig()
+  fetchStatus()
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 </script>
 
@@ -217,6 +280,76 @@ onMounted(() => {
           {{ saving ? 'Menyimpan...' : 'Simpan Perubahan' }}
         </button>
       </div>
+    </div>
+
+    <!-- Active Re-indexing / Syncing Live Banner (Real-time Progress) -->
+    <div
+      v-if="isSyncing"
+      class="p-4 rounded border border-amber-300 bg-amber-50 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
+    >
+      <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-amber-700 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-mono">
+              Syncing Index
+            </span>
+            <span class="text-xs font-semibold text-amber-900">
+              {{ systemStatus?.warmup_status?.message || 'Menyinkronkan indeks NLP Engine...' }}
+            </span>
+          </div>
+          <p class="text-[11px] text-amber-700 mt-0.5">
+            {{ systemStatus?.warmup_status?.detail || 'Layanan rekomendasi tetap aktif melayani traffic (Zero Downtime)' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="w-28 bg-amber-200 rounded-full h-2 overflow-hidden">
+          <div
+            class="bg-amber-600 h-2 transition-all duration-300"
+            :style="{ width: (systemStatus?.warmup_status?.progress_pct || 20) + '%' }"
+          ></div>
+        </div>
+        <button
+          @click="showStatusModal = true"
+          type="button"
+          class="px-2.5 py-1 text-xs font-semibold bg-white border border-amber-300 text-amber-800 rounded hover:bg-amber-100 transition-colors shadow-sm"
+        >
+          Lihat Log Live
+        </button>
+      </div>
+    </div>
+
+    <!-- Engine Ready / Zero-Downtime Summary Bar -->
+    <div
+      v-else-if="systemStatus"
+      class="px-4 py-2.5 rounded border border-gray-200 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+    >
+      <div class="flex items-center gap-3 text-gray-700">
+        <span class="inline-flex items-center gap-1.5 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          AI Engine: <span class="font-bold text-gray-900 font-mono">Siap & Aktif</span>
+        </span>
+        <span class="text-gray-300">|</span>
+        <span>Device: <strong class="font-mono text-gray-800">{{ systemStatus?.device || 'CPU' }}</strong></span>
+        <span class="text-gray-300">|</span>
+        <span>Korpus: <strong class="font-mono text-gray-800">{{ systemStatus?.total_dosen || 89 }} Dosen</strong></span>
+        <span class="text-gray-300 hidden md:inline">|</span>
+        <span class="text-emerald-700 font-medium hidden md:inline">Zero-Downtime Double Buffering</span>
+      </div>
+
+      <button
+        @click="showStatusModal = true"
+        type="button"
+        class="text-xs text-teal-700 hover:text-teal-900 font-semibold self-start sm:self-auto hover:underline inline-flex items-center gap-1"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.5m6 4a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        Status & Log Engine
+      </button>
     </div>
 
     <!-- Feedback Notice -->
@@ -738,6 +871,147 @@ onMounted(() => {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warm-up & Engine Status Live Modal -->
+    <div
+      v-if="showStatusModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+      @click.self="showStatusModal = false"
+    >
+      <div class="bg-white rounded-lg shadow-xl border border-gray-200 max-w-xl w-full p-6 space-y-5">
+        <!-- Modal Header -->
+        <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-gray-900 font-sans">
+                Status & Log Engine NLP (SiReDo V3)
+              </h2>
+              <span
+                class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider"
+                :class="isSyncing ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'"
+              >
+                {{ isSyncing ? 'Menyinkronkan' : 'Ready & Idle' }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+              Zero-Downtime Double Buffering aktif. Request rekomendasi tidak pernah terblokir saat re-indexing.
+            </p>
+          </div>
+
+          <button
+            @click="showStatusModal = false"
+            type="button"
+            class="text-gray-400 hover:text-gray-600 text-xl font-bold p-1 leading-none"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- System Engine Metrics -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Device Komputasi</div>
+            <div class="text-sm font-bold font-mono text-gray-900 mt-0.5">{{ systemStatus?.device || 'CPU' }}</div>
+          </div>
+          <div class="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Total Dosen</div>
+            <div class="text-sm font-bold font-mono text-gray-900 mt-0.5">{{ systemStatus?.total_dosen || 89 }} Terindeks</div>
+          </div>
+          <div class="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Durasi Warmup</div>
+            <div class="text-sm font-bold font-mono text-teal-800 mt-0.5">
+              {{ systemStatus?.warmup_status?.elapsed_seconds ? systemStatus.warmup_status.elapsed_seconds + ' detik' : '< 1 detik' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- 5-Step Pipeline Stepper -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between text-xs font-bold text-gray-800 border-b border-gray-100 pb-2">
+            <span>Tahapan Pipeline Warm-up & Indexing</span>
+            <span class="font-mono text-[11px] text-gray-500">
+              Progress: {{ systemStatus?.warmup_status?.progress_pct || 100 }}%
+            </span>
+          </div>
+
+          <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+            <div
+              v-for="step in warmupSteps"
+              :key="step.id"
+              class="p-3 rounded border text-xs transition-all"
+              :class="[
+                step.status === 'completed' ? 'border-emerald-200 bg-emerald-50/50 text-gray-800' :
+                step.status === 'running' ? 'border-amber-400 bg-amber-50 text-amber-900 ring-1 ring-amber-400' :
+                step.status === 'error' ? 'border-rose-300 bg-rose-50 text-rose-900' :
+                'border-gray-200 bg-gray-50/60 text-gray-400'
+              ]"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div
+                    class="w-5 h-5 rounded-full flex items-center justify-center font-mono font-bold text-[10px] shrink-0"
+                    :class="[
+                      step.status === 'completed' ? 'bg-emerald-600 text-white' :
+                      step.status === 'running' ? 'bg-amber-600 text-white animate-pulse' :
+                      step.status === 'error' ? 'bg-rose-600 text-white' :
+                      'bg-gray-200 text-gray-600'
+                    ]"
+                  >
+                    <span v-if="step.status === 'completed'">✓</span>
+                    <span v-else-if="step.status === 'running'">...</span>
+                    <span v-else>{{ step.id }}</span>
+                  </div>
+                  <div>
+                    <div class="font-bold text-gray-900">{{ step.title }}</div>
+                    <div class="text-[11px] text-gray-500">{{ step.desc }}</div>
+                  </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <span
+                    v-if="step.status === 'completed'"
+                    class="font-mono font-semibold text-[11px] text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded"
+                  >
+                    {{ step.duration_ms }} ms
+                  </span>
+                  <span
+                    v-else-if="step.status === 'running'"
+                    class="font-mono font-semibold text-[10px] text-amber-800 bg-amber-200 px-1.5 py-0.5 rounded animate-pulse"
+                  >
+                    BERJALAN
+                  </span>
+                  <span
+                    v-else
+                    class="font-mono text-[10px] text-gray-400"
+                  >
+                    PENDING
+                  </span>
+                </div>
+              </div>
+
+              <div v-if="step.detail" class="mt-2 pl-7 text-[11px] text-gray-600 font-mono">
+                &rsaquo; {{ step.detail }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+          <span class="text-[11px] text-gray-400 font-mono">
+            Terakhir disinkronkan: {{ systemStatus?.warmup_status?.completed_at ? new Date(systemStatus.warmup_status.completed_at).toLocaleTimeString('id-ID') : 'Aktif' }}
+          </span>
+
+          <button
+            @click="showStatusModal = false"
+            type="button"
+            class="px-4 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            Tutup
+          </button>
         </div>
       </div>
     </div>

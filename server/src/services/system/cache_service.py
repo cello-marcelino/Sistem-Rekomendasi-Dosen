@@ -13,10 +13,11 @@ from server.src.services.nlp.bm25_engine import BM25Engine
 from server.src.services.nlp.sbert_engine import SBERTEngine
 
 class CacheService:
-    """Thread-safe Singleton managing in-memory lecturer data, BM25, and SBERT model state."""
+    """Thread-safe Singleton managing in-memory lecturer data, BM25, and SBERT model state with Zero-Downtime Double Buffering."""
     
     _instance: Optional['CacheService'] = None
-    _lock = threading.RLock()
+    _singleton_lock = threading.Lock()
+    _rebuild_lock = threading.Lock()
 
     @staticmethod
     def _get_default_steps():
@@ -70,6 +71,7 @@ class CacheService:
 
     def __init__(self):
         self.is_ready: bool = False
+        self._is_rebuilding: bool = False
         self.dosen_list: List[Dosen] = []
         self.bm25: BM25Engine = BM25Engine()
         self.sbert: SBERTEngine = SBERTEngine()
@@ -94,26 +96,36 @@ class CacheService:
         
     @classmethod
     def get_instance(cls) -> 'CacheService':
-        with cls._lock:
-            if cls._instance is None:
-                cls._instance = cls()
-            return cls._instance
+        # Double-Checked Locking: No lock contention once instantiated!
+        if cls._instance is None:
+            with cls._singleton_lock:
+                if cls._instance is None:
+                    cls._instance = cls()
+        return cls._instance
 
-    def initialize_cache_async(self, force_refresh: bool = False, force_reload: bool = False):
+    def initialize_cache_async(self, force_refresh: bool = False, force_reload: bool = False, force_keybert: bool = False, force_sbert: bool = False):
         """Menjalankan warm-up di background thread agar server langsung siap menerima HTTP requests."""
+        if self._is_rebuilding:
+            logger.info("Proses warm-up/rebuild sudah berjalan di background, permintaan re-index digabungkan.")
+            return None
+
         thread = threading.Thread(
             target=self.initialize_cache,
-            kwargs={"force_refresh": force_refresh, "force_reload": force_reload},
+            kwargs={"force_refresh": force_refresh, "force_reload": force_reload, "force_keybert": force_keybert, "force_sbert": force_sbert},
             daemon=True
         )
         thread.start()
         return thread
 
-    def initialize_cache(self, force_refresh: bool = False, force_reload: bool = False):
-        with self._lock:
+    def initialize_cache(self, force_refresh: bool = False, force_reload: bool = False, force_keybert: bool = False, force_sbert: bool = False):
+        with self._rebuild_lock:
             if self.is_ready and not force_refresh and not force_reload:
                 return
-            self._warm_up(force_refresh=force_refresh or force_reload)
+            self._is_rebuilding = True
+            try:
+                self._warm_up(force_refresh=force_refresh or force_reload, force_keybert=force_keybert, force_sbert=force_sbert)
+            finally:
+                self._is_rebuilding = False
 
     def _set_step_running(self, step_id: int, step_code: str, message: str, detail: str):
         self.warmup_status["current_step"] = step_id
@@ -145,14 +157,19 @@ class CacheService:
                 s["status"] = "error"
                 s["detail"] = error_msg
 
-    def _warm_up(self, force_refresh: bool = False):
+    def _warm_up(self, force_refresh: bool = False, force_keybert: bool = False, force_sbert: bool = False):
         logger.info("==================================================")
         logger.info("MEMULAI PROSES WARM-UP SERVER (SIREDO V3)")
         logger.info("==================================================")
         start_total = time.time()
         
         is_reload = force_refresh or (self.warmup_status.get("state") == "ready")
-        self.is_ready = False
+        
+        # Zero-Downtime: JANGAN matikan is_ready jika server sebelumnya sudah beroperasi!
+        was_ready = self.is_ready
+        if not was_ready:
+            self.is_ready = False
+            
         self.warmup_status["state"] = "reloading" if is_reload else "warming_up"
         self.warmup_status["completed"] = False
         self.warmup_status["current_step"] = 0
@@ -175,13 +192,13 @@ class CacheService:
         self._set_step_running(1, "loading_data", "Mengambil data dosen dari Storage...", "Menghubungkan ke database dan membaca profil dosen...")
         logger.info(f"[1/5] {self.warmup_status['message']}")
         start_step = time.time()
-        self.dosen_list = self.repository.get_all()
-        if not self.dosen_list:
+        loaded_dosen = self.repository.get_all()
+        if not loaded_dosen:
             logger.error("Gagal memuat data dosen dari sumber data manapun!")
             self._set_step_error(1, "Gagal memuat data dosen dari database/file")
-            self.is_ready = True
+            self.is_ready = was_ready
             return
-        d_count = len(self.dosen_list)
+        d_count = len(loaded_dosen)
         self.warmup_status["total_dosen"] = d_count
         step_dur = int((time.time() - start_step) * 1000)
         self._set_step_completed(1, f"Berhasil memuat {d_count} data profil dosen", duration_ms=step_dur)
@@ -193,7 +210,7 @@ class CacheService:
         start_step = time.time()
         corpus_terbobot = []
         corpus_normal = []
-        for d in self.dosen_list:
+        for d in loaded_dosen:
             tb, tn = Preprocessor.build_corpus_text(d)
             corpus_terbobot.append(tb)
             corpus_normal.append(tn)
@@ -201,22 +218,24 @@ class CacheService:
         self._set_step_completed(2, f"Preprocessing {d_count} dokumen korpus selesai", duration_ms=step_dur)
         logger.info(f"      [OK] Preprocessing korpus selesai ({step_dur}ms)")
         
-        # Step 3: BM25 Fitting
+        # Step 3: BM25 Fitting (Double-Buffering: bangun di objek baru terisolasi)
         self._set_step_running(3, "vektoring", "Tokenisasi & Fitting BM25 Engine...", "Membangun inverted index dan matriks pembobotan BM25Okapi...")
         logger.info(f"[3/5] {self.warmup_status['message']}")
         start_step = time.time()
         corpus_tokens = [Preprocessor.preprocess_for_bm25(text) for text in corpus_terbobot]
-        self.bm25.fit(corpus_tokens)
+        new_bm25 = BM25Engine()
+        new_bm25.fit(corpus_tokens)
         step_dur = int((time.time() - start_step) * 1000)
         self._set_step_completed(3, f"Lexical BM25 Engine siap ({len(corpus_tokens)} dokumen)", duration_ms=step_dur)
         logger.info(f"      [OK] Lexical BM25 Engine siap ({step_dur}ms)")
         
-        # Step 4: SBERT & KeyBERT Encoding
+        # Step 4: SBERT & KeyBERT Encoding (force_keybert and force_sbert protected)
         self._set_step_running(4, "embedding", "Menyiapkan Semantic SBERT Engine & KeyBERT...", f"Meng-encode representasi vektor dense 384-dimensi ({Config.TORCH_DEVICE.upper()})...")
         logger.info(f"[4/5] {self.warmup_status['message']}")
         start_step = time.time()
         sbert_texts = [Preprocessor.preprocess_for_sbert(text) for text in corpus_terbobot]
-        self.sbert.encode_corpus(sbert_texts, corpus_normal, cache_path=sbert_cache, force_refresh=force_refresh)
+        target_sbert = self.sbert if self.sbert is not None else SBERTEngine()
+        target_sbert.encode_corpus(sbert_texts, corpus_normal, cache_path=sbert_cache, force_refresh=force_refresh, force_keybert=force_keybert, force_sbert=force_sbert)
         step_dur = int((time.time() - start_step) * 1000)
         self._set_step_completed(4, f"Semantic SBERT & KeyBERT Embeddings siap ({Config.TORCH_DEVICE.upper()})", duration_ms=step_dur)
         logger.info(f"      [OK] Semantic SBERT Engine siap ({step_dur}ms)")
@@ -227,7 +246,7 @@ class CacheService:
         start_step = time.time()
         try:
             with open(dosen_cache, 'wb') as f:
-                pickle.dump(self.dosen_list, f)
+                pickle.dump(loaded_dosen, f)
             step_dur = int((time.time() - start_step) * 1000)
             self._set_step_completed(5, "Snapshot cache tersimpan di disk", duration_ms=step_dur)
             logger.info(f"      [OK] Cache state tersimpan ({step_dur}ms)")
@@ -235,8 +254,13 @@ class CacheService:
             logger.warning(f"      [WARN] Gagal menyimpan cache pkl: {e}")
             self._set_step_completed(5, f"Peringatan penyimpanan cache: {e}", duration_ms=0)
             
-        total_dur = time.time() - start_total
+        # ATOMIC SWAP: Terapkan pointer data baru ke active instance secara atomik
+        self.dosen_list = loaded_dosen
+        self.bm25 = new_bm25
+        self.sbert = target_sbert
         self.is_ready = True
+        
+        total_dur = time.time() - start_total
         self.warmup_status["state"] = "ready"
         self.warmup_status["step_code"] = "ready"
         self.warmup_status["step_name"] = "Ready & Idle"
@@ -253,7 +277,7 @@ class CacheService:
 
     def incremental_add(self, new_dosen: Dosen):
         """Tambahkan 1 dosen baru ke index tanpa full rebuild."""
-        with self._lock:
+        with self._rebuild_lock:
             if not self.is_ready:
                 self._warm_up()
                 return
@@ -279,7 +303,7 @@ class CacheService:
 
     def incremental_update(self, dosen_identifier):
         """Update 1 dosen di index tanpa full rebuild."""
-        with self._lock:
+        with self._rebuild_lock:
             if not self.is_ready:
                 self._warm_up()
                 return
@@ -323,7 +347,7 @@ class CacheService:
 
     def incremental_delete(self, dosen_identifier):
         """Hapus 1 dosen dari index tanpa full rebuild."""
-        with self._lock:
+        with self._rebuild_lock:
             if not self.is_ready:
                 return
             
@@ -358,7 +382,9 @@ class CacheService:
             tb, _ = Preprocessor.build_corpus_text(d)
             corpus_terbobot.append(tb)
         corpus_tokens = [Preprocessor.preprocess_for_bm25(text) for text in corpus_terbobot]
-        self.bm25.fit(corpus_tokens)
+        new_bm25 = BM25Engine()
+        new_bm25.fit(corpus_tokens)
+        self.bm25 = new_bm25
 
     def _save_cache(self):
         """Simpan current state ke disk."""

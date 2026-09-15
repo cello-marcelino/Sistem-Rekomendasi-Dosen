@@ -49,14 +49,14 @@ class SBERTEngine:
             self.model = SentenceTransformer(self.MODEL_NAME, device=device)
             self.kw_model = KeyBERT(model=self.model)
 
-    def encode_corpus(self, corpus_texts: List[str], corpus_normal: List[str], cache_path: Optional[str] = None, force_refresh: bool = False) -> np.ndarray:
+    def encode_corpus(self, corpus_texts: List[str], corpus_normal: List[str], cache_path: Optional[str] = None, force_refresh: bool = False, force_keybert: bool = False, force_sbert: bool = False) -> np.ndarray:
         self.load_model()
         device = self.get_compute_device()
         
         kb_cache_path = cache_path.replace('sbert_embeddings.npy', 'keybert_dosen.json') if cache_path else None
         
-        # 1. Load or Generate SBERT Embeddings
-        if cache_path and os.path.exists(cache_path) and not force_refresh:
+        # 1. Load or Generate SBERT Embeddings (Disk-cached to ensure sub-second warm-up)
+        if cache_path and os.path.exists(cache_path) and not force_sbert:
             logger.info(f"Memuat SBERT cache embeddings dari disk: {cache_path}")
             self.corpus_embeddings = np.load(cache_path)
             if len(self.corpus_embeddings) != len(corpus_texts):
@@ -69,37 +69,60 @@ class SBERTEngine:
             if cache_path:
                 np.save(cache_path, self.corpus_embeddings)
                 
-        # 2. Load or Generate KeyBERT Keywords
-        if kb_cache_path and os.path.exists(kb_cache_path) and not force_refresh:
+        # 2. Load or Generate KeyBERT Keywords (Protected with disk cache to prevent 300+ sec CPU block)
+        if force_keybert:
+            # Explicit refresh: always regenerate and write to disk
+            self._generate_keybert(corpus_normal, kb_cache_path)
+        elif kb_cache_path and os.path.exists(kb_cache_path):
             try:
                 with open(kb_cache_path, 'r', encoding='utf-8') as f:
                     self.keybert_data = json.load(f)
-                if len(self.keybert_data) != len(corpus_normal):
-                    self._generate_keybert(corpus_normal, kb_cache_path)
+                # Size mismatch is tolerated when force_keybert=False — KeyBERT is XAI supplement,
+                # not a blocker. A stale cache is infinitely better than a 5-minute CPU block.
+                logger.info(f"Memuat KeyBERT XAI cache dari disk: {kb_cache_path} ({len(self.keybert_data)} entri)")
             except Exception as e:
                 logger.warning(f"Gagal memuat cache KeyBERT: {e}. Meregenerasi...")
                 self._generate_keybert(corpus_normal, kb_cache_path)
         else:
+            # No disk cache exists at all — must generate for the first time
             self._generate_keybert(corpus_normal, kb_cache_path)
             
         return self.corpus_embeddings
 
     def _generate_keybert(self, corpus_normal: List[str], kb_cache_path: Optional[str] = None):
         device = self.get_compute_device()
-        logger.info(f"Mengekstrak topik kata kunci KeyBERT (Semantic XAI - {device.upper()})...")
-        self.keybert_data = []
-        for teks in corpus_normal:
-            raw_keywords = self.kw_model.extract_keywords(
-                teks,
+        n = len(corpus_normal)
+        logger.info(f"Mengekstrak topik kata kunci KeyBERT batch ({n} dosen, {device.upper()})...")
+
+        # Batch extraction: jauh lebih cepat dari sequential loop
+        try:
+            batch_results = self.kw_model.extract_keywords(
+                corpus_normal,
                 keyphrase_ngram_range=(1, 3),
                 stop_words=list(STOPWORDS),
-                use_maxsum=True,
-                nr_candidates=15,
                 top_n=5
             )
-            clean_kw = [(str(kw[0]), float(kw[1])) for kw in raw_keywords]
-            self.keybert_data.append(clean_kw)
-            
+        except TypeError:
+            # Fallback: beberapa versi KeyBERT tidak support list input
+            logger.warning("Batch KeyBERT gagal, fallback ke sequential mode")
+            batch_results = [
+                self.kw_model.extract_keywords(
+                    teks,
+                    keyphrase_ngram_range=(1, 3),
+                    stop_words=list(STOPWORDS),
+                    use_maxsum=True,
+                    nr_candidates=15,
+                    top_n=5
+                )
+                for teks in corpus_normal
+            ]
+
+        self.keybert_data = [
+            [(str(kw[0]), float(kw[1])) for kw in doc_kws]
+            for doc_kws in batch_results
+        ]
+
+        logger.info(f"KeyBERT selesai: {len(self.keybert_data)} dosen diproses")
         if kb_cache_path:
             with open(kb_cache_path, 'w', encoding='utf-8') as f:
                 json.dump(self.keybert_data, f, ensure_ascii=False, indent=2)

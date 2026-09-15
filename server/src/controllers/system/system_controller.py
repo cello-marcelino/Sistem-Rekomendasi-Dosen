@@ -50,14 +50,26 @@ class SystemController:
         if not data or not isinstance(data, dict):
             raise ValidationError("Request body harus berupa JSON object yang valid")
             
-        updated = ConfigService.update_config(data)
-        
-        # If corpus weighting changed, trigger background re-indexing automatically (skip during automated testing)
+        # Smart dirty checking: only trigger re-indexing if corpus weights ACTUALLY changed numerically
         is_testing = current_app.config.get('TESTING', False)
         corpus_keys = {"weight_keahlian", "weight_publikasi", "weight_bimbingan", "weight_pengujian"}
-        if not is_testing and any(k in data for k in corpus_keys):
+        current_cfg = ConfigService.get_config()
+        weights_changed = False
+        for k in corpus_keys:
+            if k in data:
+                try:
+                    if int(data[k]) != int(current_cfg.get(k, 0)):
+                        weights_changed = True
+                        break
+                except (ValueError, TypeError):
+                    pass
+            
+        updated = ConfigService.update_config(data)
+        
+        # If corpus weighting really changed, trigger fast background re-indexing automatically
+        if not is_testing and weights_changed:
             cache = CacheService.get_instance()
-            cache.initialize_cache_async(force_refresh=True)
+            cache.initialize_cache_async(force_refresh=True, force_keybert=False)
             
         return ResponseFormatter.success(data=updated, message="Konfigurasi sistem berhasil diperbarui")
 
@@ -67,7 +79,7 @@ class SystemController:
         is_testing = current_app.config.get('TESTING', False)
         if not is_testing:
             cache = CacheService.get_instance()
-            cache.initialize_cache_async(force_refresh=True)
+            cache.initialize_cache_async(force_refresh=True, force_keybert=False)
             
         return ResponseFormatter.success(
             data=reset_cfg, 
@@ -108,11 +120,11 @@ class SystemController:
     @staticmethod
     def reload_system():
         cache = CacheService.get_instance()
-        cache.initialize_cache_async(force_refresh=True)
+        cache.initialize_cache_async(force_refresh=True, force_keybert=False)
         return ResponseFormatter.success(
             data={
-                "status": "reloading",
-                "cache_ready": False,
+                "status": cache.warmup_status.get("state", "reloading"),
+                "cache_ready": cache.is_ready,
                 "warmup_status": cache.warmup_status
             },
             message="Proses reload dan re-indexing NLP engine dimulai di background"
