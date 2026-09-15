@@ -8,10 +8,10 @@
 
       <!-- Page Header -->
       <div class="page-header">
-        <span class="page-badge">REST API REFERENCE</span>
+        <span class="page-badge">DOKUMENTASI TEKNIS</span>
         <h1 class="page-title">Dokumentasi API SiReDo</h1>
         <p class="page-lead">
-          Panduan integrasi teknis RESTful API SiReDo untuk menghubungkan Sistem Informasi Akademik (SIAKAD) atau aplikasi kampus dengan mesin rekomendasi dosen berbasis NLP.
+          Spesifikasi endpoint RESTful SiReDo untuk menghubungkan Sistem Informasi Akademik (SIAKAD) dengan mesin rekomendasi pembimbing skripsi.
         </p>
 
         <!-- Base URL & Quick Info Ribbon -->
@@ -41,144 +41,128 @@
       <!-- API Architecture Flow Diagram -->
       <section class="section-block" id="architecture-flow">
         <div class="section-header-compact">
-          <h2 class="text-xl font-bold text-text-primary">Alur Interaksi API & Gateway</h2>
-          <span class="section-tag">High-Level Flow</span>
+          <h2 class="text-xl font-bold text-text-primary">Alur Interaksi Gateway &amp; Engine</h2>
+          <span class="section-tag">Alur Sistem</span>
         </div>
         <p class="text-sm text-text-secondary mb-4">
-          Visualisasi bagaimana sistem akademik Anda berkomunikasi secara aman dan berlatensi rendah dengan SiReDo Engine.
+          Tahapan pemrosesan permintaan dari portal akademik kampus hingga penerbitan rekomendasi terukur.
         </p>
 
-        <div class="api-flow-diagram">
-          <!-- Step 1 -->
-          <div class="flow-card">
-            <div class="flow-card-icon bg-brand-light text-brand">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+        <div class="api-flow-container">
+          <div class="flow-step-item">
+            <span class="flow-step-idx">01</span>
+            <div class="flow-step-body">
+              <h4 class="flow-step-title">Klien SIAKAD</h4>
+              <p class="flow-step-desc">Kirim payload JSON judul/abstrak tesis beserta header <code>X-API-Key</code>.</p>
             </div>
-            <div class="flow-card-step">01. KLIEN / SIAKAD</div>
-            <h4 class="flow-card-title">HTTP Request</h4>
-            <p class="flow-card-desc">Kirim payload JSON judul/abstrak tesis beserta header <code>X-API-Key</code>.</p>
           </div>
 
-          <div class="flow-arrow">
-            <svg class="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="flow-card">
-            <div class="flow-card-icon bg-blue-bg text-blue-main">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
+          <div class="flow-step-item">
+            <span class="flow-step-idx">02</span>
+            <div class="flow-step-body">
+              <h4 class="flow-step-title">Auth Middleware</h4>
+              <p class="flow-step-desc">Validasi tanda tangan token HMAC, rate-limiting, dan sanitasi payload input.</p>
             </div>
-            <div class="flow-card-step">02. SECURITY MIDDLEWARE</div>
-            <h4 class="flow-card-title">HMAC Auth Verification</h4>
-            <p class="flow-card-desc">Memvalidasi izin klien, rate-limiting, serta sanitasi payload input.</p>
           </div>
 
-          <div class="flow-arrow">
-            <svg class="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="flow-card">
-            <div class="flow-card-icon bg-amber-bg text-amber">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+          <div class="flow-step-item">
+            <span class="flow-step-idx">03</span>
+            <div class="flow-step-body">
+              <h4 class="flow-step-title">In-Memory NLP</h4>
+              <p class="flow-step-desc">Pencarian leksikal BM25 &amp; semantik SBERT dari matriks RAM secara instan.</p>
             </div>
-            <div class="flow-card-step">03. IN-MEMORY ENGINE</div>
-            <h4 class="flow-card-title">Hybrid NLP Inference</h4>
-            <p class="flow-card-desc">Pencarian leksikal BM25 &amp; semantik SBERT dari matriks RAM secara instan.</p>
           </div>
 
-          <div class="flow-arrow">
-            <svg class="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </div>
-
-          <!-- Step 4 -->
-          <div class="flow-card">
-            <div class="flow-card-icon bg-green-bg text-green-main">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+          <div class="flow-step-item">
+            <span class="flow-step-idx">04</span>
+            <div class="flow-step-body">
+              <h4 class="flow-step-title">Envelope Response</h4>
+              <p class="flow-step-desc">Output JSON terstruktur dengan skor transparansi XAI dan irisan kata kunci.</p>
             </div>
-            <div class="flow-card-step">04. ENVELOPE RESPONSE</div>
-            <h4 class="flow-card-title">Top-K Dosen + XAI</h4>
-            <p class="flow-card-desc">Output JSON terstruktur dengan skor transparansi XAI dan irisan kata kunci.</p>
           </div>
         </div>
       </section>
 
-      <!-- Endpoint Directory Cards -->
+      <!-- Endpoint Catalog Section -->
       <section class="section-block" id="endpoints-overview">
         <div class="section-header-compact">
           <h2 class="text-xl font-bold text-text-primary">Katalog Endpoint</h2>
-          <span class="section-tag">Summary</span>
+          <span class="section-tag">Katalog</span>
         </div>
         <p class="text-sm text-text-secondary mb-4">
-          Seluruh endpoint menggunakan format respons seragam (*envelope pattern*).
+          Daftar seluruh endpoint yang tersedia dengan format respons envelope seragam.
         </p>
 
-        <div class="endpoint-cards-grid">
-          <!-- Card 1 -->
-          <a href="#single" class="endpoint-item-card group">
-            <div class="endpoint-card-top">
+        <div class="endpoint-catalog-card">
+          <!-- 1. Single -->
+          <a href="#single" class="endpoint-catalog-row">
+            <div class="endpoint-method-col">
               <span class="badge-post">POST</span>
-              <span class="endpoint-speed-badge">Live Single</span>
             </div>
-            <div class="endpoint-path">/rekomendasi/single</div>
-            <p class="endpoint-desc">Rekomendasi 1 dokumen tesis. Mengembalikan top-K dosen teratas beserta visual penjelasan XAI.</p>
+            <div class="endpoint-info-col">
+              <div class="endpoint-path">/rekomendasi/single</div>
+              <p class="endpoint-desc">Rekomendasi 1 dokumen tesis beserta metadata bobot dan rincian XAI.</p>
+            </div>
+            <div class="endpoint-meta-col">
+              <span class="endpoint-type-badge">Single Document</span>
+            </div>
           </a>
 
-          <!-- Card 2 -->
-          <a href="#batch" class="endpoint-item-card group">
-            <div class="endpoint-card-top">
+          <!-- 2. Batch JSON -->
+          <a href="#batch" class="endpoint-catalog-row">
+            <div class="endpoint-method-col">
               <span class="badge-post">POST</span>
-              <span class="endpoint-speed-badge">Batch JSON</span>
             </div>
-            <div class="endpoint-path">/rekomendasi/batch</div>
-            <p class="endpoint-desc">Pemrosesan massal banyak judul skripsi/tesis sekaligus dalam 1 request array JSON.</p>
+            <div class="endpoint-info-col">
+              <div class="endpoint-path">/rekomendasi/batch</div>
+              <p class="endpoint-desc">Pemrosesan massal banyak proposal sekaligus dalam satu array JSON.</p>
+            </div>
+            <div class="endpoint-meta-col">
+              <span class="endpoint-type-badge">Batch JSON</span>
+            </div>
           </a>
 
-          <!-- Card 3 -->
-          <a href="#batch-upload" class="endpoint-item-card group">
-            <div class="endpoint-card-top">
+          <!-- 3. Batch Upload -->
+          <a href="#batch-upload" class="endpoint-catalog-row">
+            <div class="endpoint-method-col">
               <span class="badge-post">POST</span>
-              <span class="endpoint-speed-badge">File Upload</span>
             </div>
-            <div class="endpoint-path">/rekomendasi/batch/upload</div>
-            <p class="endpoint-desc">Upload spreadsheet Excel (.xlsx) untuk memproses ratusan draf skripsi mahasiswa sekaligus.</p>
+            <div class="endpoint-info-col">
+              <div class="endpoint-path">/rekomendasi/batch/upload</div>
+              <p class="endpoint-desc">Unggah berkas spreadsheet Excel (.xlsx) untuk memproses proposal seangkatan.</p>
+            </div>
+            <div class="endpoint-meta-col">
+              <span class="endpoint-type-badge">Excel Upload</span>
+            </div>
           </a>
 
-          <!-- Card 4 -->
-          <a href="#status" class="endpoint-item-card group">
-            <div class="endpoint-card-top">
+          <!-- 4. Status -->
+          <a href="#status" class="endpoint-catalog-row">
+            <div class="endpoint-method-col">
               <span class="badge-get">GET</span>
-              <span class="endpoint-speed-badge">Health Check</span>
             </div>
-            <div class="endpoint-path">/status</div>
-            <p class="endpoint-desc">Memeriksa ketersediaan model AI in-memory dan kesiapan cache server secara berkelanjutan.</p>
+            <div class="endpoint-info-col">
+              <div class="endpoint-path">/status</div>
+              <p class="endpoint-desc">Pemeriksaan kesiapan model in-memory dan status worker secara berkelanjutan.</p>
+            </div>
+            <div class="endpoint-meta-col">
+              <span class="endpoint-type-badge">Health Check</span>
+            </div>
           </a>
 
-          <!-- Card 5 -->
-          <a href="#config-get" class="endpoint-item-card group">
-            <div class="endpoint-card-top">
-              <div class="flex gap-1">
-                <span class="badge-get">GET</span>
-                <span class="badge-patch">PATCH</span>
-              </div>
-              <span class="endpoint-speed-badge">Engine Tuning</span>
+          <!-- 5. Config -->
+          <a href="#config-get" class="endpoint-catalog-row">
+            <div class="endpoint-method-col flex gap-1">
+              <span class="badge-get">GET</span>
+              <span class="badge-patch">PATCH</span>
             </div>
-            <div class="endpoint-path">/config</div>
-            <p class="endpoint-desc">Membaca atau memperbarui parameter bobot adaptif, top-K, dan threshold skor.</p>
+            <div class="endpoint-info-col">
+              <div class="endpoint-path">/config</div>
+              <p class="endpoint-desc">Membaca atau memperbarui parameter bobot adaptif, top-K, dan threshold.</p>
+            </div>
+            <div class="endpoint-meta-col">
+              <span class="endpoint-type-badge">Engine Tuning</span>
+            </div>
           </a>
         </div>
       </section>
@@ -539,7 +523,7 @@
           <pre class="code-panel-body"><code>{
   <span class="tok-key">"status"</span>: <span class="tok-str">"success"</span>,
   <span class="tok-key">"data"</span>: {
-    <span class="tok-key">"cache_ready"</span>: <span class="tok-bool">true</span>,      <span class="tok-comment">// Siap melayani rekomendasi dalam &lt; 50ms</span>
+    <span class="tok-key">"cache_ready"</span>: <span class="tok-bool">true</span>,      <span class="tok-comment">// Siap melayani rekomendasi real-time</span>
     <span class="tok-key">"version"</span>: <span class="tok-str">"3.1.0"</span>,
     <span class="tok-key">"indexing_mode"</span>: <span class="tok-str">"hybrid_incremental"</span>
   }
@@ -547,66 +531,59 @@
         </div>
       </section>
 
-      <!-- HTTP Status Codes & Error Handling Visual Grid -->
+      <!-- HTTP Status Matrix & Error Handling -->
       <section class="section-block" id="errors">
         <div class="section-header-compact">
-          <h2 class="text-xl font-bold text-text-primary">HTTP Status Matrix & Error Handling</h2>
-          <span class="section-tag">Diagnostics</span>
+          <h2 class="text-xl font-bold text-text-primary">HTTP Status Matrix &amp; Error Handling</h2>
+          <span class="section-tag">Status &amp; Diagnostik</span>
         </div>
         <p class="text-sm text-text-secondary mb-4">
-          Standar penanganan kesalahan HTTP yang digunakan oleh seluruh endpoint SiReDo API.
+          Standar kode status HTTP dan format respons kesalahan yang digunakan oleh seluruh endpoint SiReDo API.
         </p>
 
-        <div class="status-cards-grid">
-          <!-- 200 OK -->
-          <div class="status-card border-green-border bg-[#f0fdf4]">
-            <div class="flex items-center justify-between mb-2">
-              <span class="status-number text-green-main">200</span>
-              <span class="status-pill bg-[#dcfce7] text-green-main">OK</span>
-            </div>
-            <h4 class="text-sm font-bold text-text-primary mb-1">Permintaan Berhasil</h4>
-            <p class="text-xs text-text-secondary">Request sukses diproses dan rekomendasi berhasil digenerate.</p>
-          </div>
-
-          <!-- 400 Bad Request -->
-          <div class="status-card border-amber-border bg-[#fffbeb]">
-            <div class="flex items-center justify-between mb-2">
-              <span class="status-number text-amber">400</span>
-              <span class="status-pill bg-[#fef3c7] text-amber">Bad Request</span>
-            </div>
-            <h4 class="text-sm font-bold text-text-primary mb-1">Payload Tidak Lengkap</h4>
-            <p class="text-xs text-text-secondary">Field judul dan abstrak sama-sama kosong, atau format JSON salah sintaks.</p>
-          </div>
-
-          <!-- 401 Unauthorized -->
-          <div class="status-card border-red-border bg-[#fef2f2]">
-            <div class="flex items-center justify-between mb-2">
-              <span class="status-number text-red">401</span>
-              <span class="status-pill bg-[#fee2e2] text-red">Unauthorized</span>
-            </div>
-            <h4 class="text-sm font-bold text-text-primary mb-1">API Key Tidak Sah</h4>
-            <p class="text-xs text-text-secondary">Header <code>X-API-Key</code> tidak disertakan atau sudah dicabut (revoked).</p>
-          </div>
-
-          <!-- 422 Unprocessable Entity -->
-          <div class="status-card border-brand-border bg-brand-light">
-            <div class="flex items-center justify-between mb-2">
-              <span class="status-number text-brand">422</span>
-              <span class="status-pill bg-[#ede9fe] text-brand">Unprocessable</span>
-            </div>
-            <h4 class="text-sm font-bold text-text-primary mb-1">Validasi Schema Gagal</h4>
-            <p class="text-xs text-text-secondary">Tipe data tidak valid (contoh: <code>k_rank</code> diisi string atau float negatif).</p>
-          </div>
-
-          <!-- 500 Internal Error -->
-          <div class="status-card border-red-border bg-[#fef2f2]">
-            <div class="flex items-center justify-between mb-2">
-              <span class="status-number text-red">500</span>
-              <span class="status-pill bg-[#fee2e2] text-red">Server Error</span>
-            </div>
-            <h4 class="text-sm font-bold text-text-primary mb-1">In-Memory Cache Loading</h4>
-            <p class="text-xs text-text-secondary">Server sedang memuat model pertama kali. Cek status via <code>GET /status</code>.</p>
-          </div>
+        <div class="status-matrix-card">
+          <table class="status-table">
+            <thead>
+              <tr>
+                <th class="status-th w-28">Status</th>
+                <th class="status-th w-44">Tipe Respon</th>
+                <th class="status-th">Kondisi Terjadi</th>
+                <th class="status-th">Solusi Penanganan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="status-td"><span class="badge-status-ok">200 OK</span></td>
+                <td class="status-td font-semibold text-text-primary">Success</td>
+                <td class="status-td text-text-secondary">Permintaan valid dan rekomendasi berhasil diproses.</td>
+                <td class="status-td text-text-muted">Data siap dikonsumsi klien.</td>
+              </tr>
+              <tr>
+                <td class="status-td"><span class="badge-status-warn">400</span></td>
+                <td class="status-td font-semibold text-text-primary">Bad Request</td>
+                <td class="status-td text-text-secondary">Field <code>judul</code> dan <code>abstrak</code> kosong, atau format JSON cacat.</td>
+                <td class="status-td text-text-muted">Pastikan minimal salah satu field terisi teks yang valid.</td>
+              </tr>
+              <tr>
+                <td class="status-td"><span class="badge-status-err">401</span></td>
+                <td class="status-td font-semibold text-text-primary">Unauthorized</td>
+                <td class="status-td text-text-secondary">Header <code>X-API-Key</code> tidak disertakan atau token tidak valid.</td>
+                <td class="status-td text-text-muted">Periksa API Key di portal developer.</td>
+              </tr>
+              <tr>
+                <td class="status-td"><span class="badge-status-warn">422</span></td>
+                <td class="status-td font-semibold text-text-primary">Unprocessable Entity</td>
+                <td class="status-td text-text-secondary">Nilai parameter berada di luar batasan (contoh: <code>k_rank</code> negatif).</td>
+                <td class="status-td text-text-muted">Sesuaikan nilai dengan batas schema (1–20).</td>
+              </tr>
+              <tr>
+                <td class="status-td"><span class="badge-status-err">500</span></td>
+                <td class="status-td font-semibold text-text-primary">Server Error</td>
+                <td class="status-td text-text-secondary">Cache engine sedang memuat model pertama kali (warming up).</td>
+                <td class="status-td text-text-muted">Cek endpoint <code>GET /status</code> hingga <code>cache_ready: true</code>.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -760,88 +737,117 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-.flow-card-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.75rem;
-}
-
-.flow-card-step {
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  margin-bottom: 0.2rem;
-}
-
-.flow-card-title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 0.35rem;
-}
-
-.flow-card-desc {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.flow-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* Endpoint Directory Grid */
-.endpoint-cards-grid {
+/* API Flow Container */
+.api-flow-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  margin: 1.25rem 0;
-  width: 100%;
-}
-
-.endpoint-item-card {
+  margin: 1.5rem 0;
   background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1rem 1.15rem;
-  text-decoration: none;
+  padding: 1.25rem;
+}
+
+.flow-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--border);
+}
+
+.flow-step-item:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.flow-step-idx {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--brand);
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  padding: 0.2rem 0.45rem;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.flow-step-body {
   display: flex;
   flex-direction: column;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  gap: 0.2rem;
 }
 
-.endpoint-item-card:hover {
-  border-color: var(--brand-border);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(114, 9, 183, 0.06);
+.flow-step-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
 }
 
-.endpoint-card-top {
+.flow-step-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Endpoint Catalog Card */
+.endpoint-catalog-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 1.25rem 0;
+}
+
+.endpoint-catalog-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
+  gap: 1.25rem;
+  padding: 1.1rem 1.4rem;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s;
 }
 
-.endpoint-speed-badge {
-  font-size: 0.68rem;
+.endpoint-catalog-row:last-child {
+  border-bottom: none;
+}
+
+.endpoint-catalog-row:hover {
+  background-color: var(--bg-subtle);
+}
+
+.endpoint-method-col {
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.endpoint-info-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.endpoint-info-col .endpoint-path {
+  margin-bottom: 0.2rem;
+}
+
+.endpoint-meta-col {
+  flex-shrink: 0;
+}
+
+.endpoint-type-badge {
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-muted);
   background: var(--bg-subtle);
-  padding: 2px 7px;
-  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
 }
 
 .endpoint-path {
@@ -849,7 +855,6 @@
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.35rem;
 }
 
 .endpoint-desc {
@@ -1039,34 +1044,86 @@
   border-right: none;
 }
 
-/* Status Matrix Grid */
-.status-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 1rem;
-  margin: 1.25rem 0;
-  width: 100%;
-}
-
-.status-card {
-  border: 1px solid;
+/* Status Matrix Table */
+.status-matrix-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.1rem;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
+  margin: 1.25rem 0;
 }
 
-.status-number {
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.status-th {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.status-td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.status-table tbody tr:last-child .status-td {
+  border-bottom: none;
+}
+
+.status-td code {
   font-family: var(--font-mono);
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  padding: 1px 4px;
+  border-radius: var(--radius-sm);
 }
 
-.status-pill {
-  font-size: 0.68rem;
+.badge-status-ok {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 99px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--green-bg);
+  color: var(--green);
+  border: 1px solid var(--green-border);
+  display: inline-block;
+}
+
+.badge-status-warn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid var(--amber-border);
+  display: inline-block;
+}
+
+.badge-status-err {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: #fef2f2;
+  color: var(--red);
+  border: 1px solid #fecaca;
+  display: inline-block;
 }
 
 /* Badges */
@@ -1095,13 +1152,26 @@
   .docs-page {
     padding: 2rem 1.25rem 4rem;
   }
-  .api-flow-diagram {
-    flex-direction: column;
-    align-items: stretch;
+  .api-flow-container {
+    grid-template-columns: 1fr;
   }
-  .flow-arrow {
-    transform: rotate(90deg);
-    padding: 0.5rem 0;
+  .flow-step-item {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-right: 0;
+    padding-bottom: 0.75rem;
+  }
+  .flow-step-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .endpoint-catalog-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .status-matrix-card {
+    overflow-x: auto;
   }
 }
 </style>
