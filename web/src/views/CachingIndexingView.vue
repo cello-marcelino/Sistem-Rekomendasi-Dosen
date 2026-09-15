@@ -32,7 +32,7 @@
           </div>
           <div class="kpi-info">
             <span class="kpi-value">100%</span>
-            <span class="kpi-label">Zero Downtime Update</span>
+            <span class="kpi-label">Pembaruan Latar Belakang</span>
           </div>
         </div>
 
@@ -239,20 +239,20 @@
               <h3>Pencarian Rekomendasi Instan</h3>
             </div>
             <p>
-              Waktu pencarian terpangkas dari hitungan detik menjadi di bawah 50 milidetik, memberikan respons instan bagi sistem akademik (SIAKAD) maupun portal bimbingan.
+              Waktu pencarian terpangkas dari hitungan detik menjadi sangat responsif, memberikan respons instan bagi sistem akademik (SIAKAD) maupun portal bimbingan.
             </p>
-            <div class="solution-tag">⚡ Latensi Sangat Rendah</div>
+            <div class="solution-tag">Respon Cepat &amp; Stabil</div>
           </div>
 
           <div class="solution-card">
             <div class="solution-header">
               <div class="solution-num">2</div>
-              <h3>Layanan Tanpa Henti (Zero Downtime)</h3>
+              <h3>Pembaruan Latar Belakang Berkelanjutan</h3>
             </div>
             <p>
               Penambahan atau pengeditan data profil dosen oleh admin dapat dilakukan kapan saja. Sistem memperbarui indeks secara langsung di latar belakang tanpa memutus koneksi API.
             </p>
-            <div class="solution-tag">🛡️ Ketersediaan 24/7</div>
+            <div class="solution-tag">Ketersediaan Tinggi</div>
           </div>
 
           <div class="solution-card">
@@ -263,7 +263,7 @@
             <p>
               Beban CPU berkurang drastis karena server tidak lagi mengulang inferensi AI untuk data yang sama, menghemat sumber daya server secara signifikan.
             </p>
-            <div class="solution-tag">🌱 Efisiensi Resource</div>
+            <div class="solution-tag">Efisiensi Resource</div>
           </div>
 
           <div class="solution-card">
@@ -274,7 +274,7 @@
             <p>
               Operasi pencarian tidak membebani database utama kampus, sehingga database SIAKAD tetap stabil dan terlindungi dari lonjakan traffic mahasiswa.
             </p>
-            <div class="solution-tag">🔒 Stabilitas Sistem</div>
+            <div class="solution-tag">Stabilitas Sistem</div>
           </div>
         </div>
       </section>
@@ -288,19 +288,19 @@
               <tr>
                 <th>Aspek Evaluasi</th>
                 <th>Pendekatan Konvensional</th>
-                <th>Metode Caching & Indexing SiReDo</th>
+                <th>Metode Caching &amp; Indexing SiReDo</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><strong>Kecepatan Respon Pencarian</strong></td>
                 <td>Lambat (&gt; 1.5 detik per query)</td>
-                <td><span class="badge-fast">Instan (&lt; 50ms)</span> via in-memory vector index</td>
+                <td><span class="badge-fast">Instan</span> via in-memory vector index</td>
               </tr>
               <tr>
                 <td><strong>Pembaruan Profil Dosen Baru</strong></td>
                 <td>Server harus restart / Full Re-indexing</td>
-                <td><span class="badge-fast">Zero Downtime</span> pembaruan indeks parsial di latar belakang</td>
+                <td><span class="badge-fast">Aktif Berkelanjutan</span> pembaruan indeks parsial di latar belakang</td>
               </tr>
               <tr>
                 <td><strong>Beban Database Kampus</strong></td>

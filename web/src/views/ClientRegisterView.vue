@@ -291,7 +291,7 @@ const maskedKey = computed(() => {
               </svg>
             </div>
             <div>
-              <h4 class="text-sm font-bold text-text-primary">Latensi Rendah &lt; 50 ms</h4>
+              <h4 class="text-sm font-bold text-text-primary">Respons Cepat & In-Memory</h4>
               <p class="text-xs text-text-secondary">In-memory caching memastikan SIAKAD Anda tetap responsif tanpa jeda tunggu.</p>
             </div>
           </div>

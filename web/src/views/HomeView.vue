@@ -243,7 +243,7 @@ onMounted(checkStatus)
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zM9 12h6M9 8h6M9 16h4"/></svg>
             </div>
             <h3>4. Caching & Indexing Method</h3>
-            <p>Arsitektur Multi-Tier Caching dan Hybrid Incremental Indexing untuk latensi sub-50ms tanpa downtime.</p>
+            <p>Arsitektur penyimpanan indeks memori dan sinkronisasi data dosen secara konsisten di latar belakang.</p>
             <span class="card-cta">Baca arsitektur →</span>
           </router-link>
 

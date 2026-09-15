@@ -165,7 +165,7 @@
               <span class="endpoint-speed-badge">Health Check</span>
             </div>
             <div class="endpoint-path">/status</div>
-            <p class="endpoint-desc">Memeriksa ketersediaan model AI in-memory dan kesiapan cache server (zero downtime).</p>
+            <p class="endpoint-desc">Memeriksa ketersediaan model AI in-memory dan kesiapan cache server secara berkelanjutan.</p>
           </a>
 
           <!-- Card 5 -->

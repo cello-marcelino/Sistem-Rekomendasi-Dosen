@@ -130,7 +130,7 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
           <div class="code-box">
             <div class="code-box-header">
               <span class="code-box-title text-green-main">Expected Response (200 OK)</span>
-              <span class="text-xs font-mono text-text-muted">&lt; 45 ms</span>
+              <span class="text-xs font-mono text-text-muted">JSON Response</span>
             </div>
             <pre class="code-box-content"><code>{
   <span class="tok-key">"status"</span>: <span class="tok-str">"success"</span>,
@@ -298,7 +298,7 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
         </div>
         <div>
           <h4 class="next-title">Metode Caching & Indexing</h4>
-          <p class="next-desc">Mengapa SiReDo berlatensi &lt; 50ms dengan zero downtime update.</p>
+          <p class="next-desc">Arsitektur penyimpanan indeks memori dan sinkronisasi data di latar belakang.</p>
         </div>
       </router-link>
     </div>

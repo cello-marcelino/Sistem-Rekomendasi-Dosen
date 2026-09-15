@@ -2,13 +2,13 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand Accent: Violet oklch(49.1% 0.27 292.581) */
-  --color-brand: oklch(49.1% 0.27 292.581);
-  --color-brand-light: oklch(96.5% 0.025 292.581);
-  --color-brand-subtle: oklch(93.5% 0.05 292.581);
-  --color-brand-dim: oklch(58% 0.24 292.581);
-  --color-brand-dark: oklch(42% 0.24 292.581);
-  --color-brand-border: oklch(88% 0.08 292.581);
+  /* Brand Accent: Violet oklch(54.1% 0.281 293.009) */
+  --color-brand: oklch(54.1% 0.281 293.009);
+  --color-brand-light: oklch(96.5% 0.025 293.009);
+  --color-brand-subtle: oklch(93.5% 0.05 293.009);
+  --color-brand-dim: oklch(62% 0.24 293.009);
+  --color-brand-dark: oklch(46% 0.25 293.009);
+  --color-brand-border: oklch(88% 0.08 293.009);
 
   /* Neutrals & Surfaces */
   --color-bg-base: #ffffff;
@@ -70,7 +70,7 @@ html { scroll-behavior: smooth; }
   --brand-border: var(--color-brand-border);
   --brand-dim: var(--color-brand-dim);
   --brand-dark: var(--color-brand-dark);
-  --brand-ring: oklch(49.1% 0.27 292.581 / 0.16);
+  --brand-ring: oklch(54.1% 0.281 293.009 / 0.16);
 
   --bg: var(--color-bg-base);
   --bg-subtle: var(--color-bg-subtle);

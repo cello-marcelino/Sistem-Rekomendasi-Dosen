@@ -425,7 +425,7 @@
           <div class="scenario-card-modern">
             <div class="scm-header">
               <span class="scm-badge scm-badge--green">Incremental Indexing</span>
-              <h4>Hot-Reload Tanpa Downtime</h4>
+              <h4>Pembaruan Otomatis Latar Belakang</h4>
             </div>
             <p>
               Pembaruan data dosen via panel admin diproses secara lokal di memori dalam hitungan detik tanpa mengganggu sesi pengguna yang sedang aktif.
