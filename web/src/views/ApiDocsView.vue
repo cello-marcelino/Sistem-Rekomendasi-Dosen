@@ -32,8 +32,8 @@
           </div>
           <div class="meta-divider"></div>
           <div class="meta-item">
-            <span class="meta-label">AVG LATENCY</span>
-            <span class="meta-val text-brand font-semibold">&lt; 50 ms (In-Memory)</span>
+            <span class="meta-label">RESPONS</span>
+            <span class="meta-val text-brand font-semibold">Envelope Pattern</span>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@
             </div>
             <div class="flow-card-step">03. IN-MEMORY ENGINE</div>
             <h4 class="flow-card-title">Hybrid NLP Inference</h4>
-            <p class="flow-card-desc">Pencarian leksikal BM25 & semantik SBERT dari cache RAM dalam &lt; 50 ms.</p>
+            <p class="flow-card-desc">Pencarian leksikal BM25 &amp; semantik SBERT dari matriks RAM secara instan.</p>
           </div>
 
           <div class="flow-arrow">
@@ -132,7 +132,7 @@
           <a href="#single" class="endpoint-item-card group">
             <div class="endpoint-card-top">
               <span class="badge-post">POST</span>
-              <span class="endpoint-speed-badge">&lt; 50 ms</span>
+              <span class="endpoint-speed-badge">Live Single</span>
             </div>
             <div class="endpoint-path">/rekomendasi/single</div>
             <p class="endpoint-desc">Rekomendasi 1 dokumen tesis. Mengembalikan top-K dosen teratas beserta visual penjelasan XAI.</p>

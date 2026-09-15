@@ -25,10 +25,10 @@ const closeXai = () => {
     <!-- Header -->
     <div class="sp-header">
       <div class="sp-header__inner">
-        <span class="page-badge">Live Tool</span>
+        <span class="page-badge">SIMULASI INTERAKTIF</span>
         <h1 class="sp-title">Single Recommendation</h1>
         <p class="sp-lead">
-          Analisis satu topik penelitian secara real-time — lihat skor <strong>BM25</strong>, <strong>SBERT</strong>, dan <strong>Hybrid</strong> beserta Pipeline Log dan XAI Explanation.
+          Pencocokan topik penelitian secara instan dengan skor BM25, SBERT, dan Hybrid terukur beserta rincian Explainable AI.
         </p>
       </div>
     </div>

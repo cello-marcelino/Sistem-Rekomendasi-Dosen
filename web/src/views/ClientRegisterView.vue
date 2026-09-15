@@ -56,16 +56,15 @@ const maskedKey = computed(() => {
     <!-- Header -->
     <div class="page-header">
       <div class="flex items-center gap-2 mb-2">
-        <span class="page-badge">PORTAL DEVELOPER KAMPUS</span>
-        <span class="badge-status">INTEGRASI SIAKAD</span>
+        <span class="page-badge">PORTAL DEVELOPER</span>
       </div>
       <h1 class="page-title">
-        {{ session.isAuthenticated ? 'Dashboard Kredensial Developer' : 'Manajemen Akses API' }}
+        {{ session.isAuthenticated ? 'Kredensial Developer Kampus' : 'Kredensial API Key' }}
       </h1>
       <p class="page-lead">
         {{ session.isAuthenticated 
-          ? 'Kelola token autentikasi, pantau status hak akses, dan dapatkan cuplikan kode siap pakai untuk integrasi.'
-          : 'Daftarkan akun pengembang atau login untuk mendapatkan API Key resmi SiReDo bagi portal akademik kampus Anda.' }}
+          ? 'Kelola token autentikasi dan salin cuplikan kode integrasi resmi SiReDo untuk sistem kampus Anda.'
+          : 'Daftarkan akun pengembang atau masuk untuk mendapatkan API Key resmi SiReDo bagi portal akademik kampus Anda.' }}
       </p>
     </div>
 
@@ -85,7 +84,6 @@ const maskedKey = computed(() => {
             <div>
               <div class="flex items-center gap-2">
                 <h3 class="text-lg font-bold text-text-primary">{{ session.client?.name }}</h3>
-                <span class="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-green-bg text-green-main border border-green-border">Terverifikasi</span>
               </div>
               <p class="text-xs text-text-secondary mt-0.5">
                 {{ session.client?.organization }} &bull; <span class="font-mono">{{ session.client?.email }}</span>
@@ -360,16 +358,6 @@ const maskedKey = computed(() => {
   border-radius: 99px;
 }
 
-.badge-status {
-  font-size: 0.68rem;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  padding: 3px 8px;
-  border-radius: 99px;
-}
 
 .page-title {
   font-size: 2.1rem;

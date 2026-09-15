@@ -19,8 +19,8 @@
             </svg>
           </div>
           <div class="kpi-info">
-            <span class="kpi-value">&lt; 50 ms</span>
-            <span class="kpi-label">Latensi Rekomendasi</span>
+            <span class="kpi-value">Instan</span>
+            <span class="kpi-label">Respons Leksikal &amp; Semantik</span>
           </div>
         </div>
 
@@ -31,8 +31,8 @@
             </svg>
           </div>
           <div class="kpi-info">
-            <span class="kpi-value">100%</span>
-            <span class="kpi-label">Pembaruan Latar Belakang</span>
+            <span class="kpi-value">Otomatis</span>
+            <span class="kpi-label">Sinkronisasi Latar Belakang</span>
           </div>
         </div>
 
@@ -55,7 +55,7 @@
             </svg>
           </div>
           <div class="kpi-info">
-            <span class="kpi-value">98% Hemat</span>
+            <span class="kpi-value">Efisien</span>
             <span class="kpi-label">Reduksi Beban CPU</span>
           </div>
         </div>
@@ -97,8 +97,8 @@
 
             <div class="bar-row">
               <div class="bar-meta">
-                <span class="bar-label">Metode Caching & Indexing SiReDo</span>
-                <span class="bar-time bar-time--fast">&lt; 45 ms (40x Lebih Cepat)</span>
+                <span class="bar-label">Metode Caching &amp; Indexing SiReDo</span>
+                <span class="bar-time bar-time--fast">In-Memory (Respons Instan)</span>
               </div>
               <div class="bar-track">
                 <div class="bar-fill bar-fill--brand" style="width: 4%"></div>
@@ -107,30 +107,30 @@
           </div>
         </div>
 
-        <!-- Problem Cards Grid -->
-        <div class="problem-grid">
-          <div class="problem-card-visual">
-            <div class="problem-badge-pill">Kendala 1</div>
-            <h4>Latensi Tinggi Real-Time</h4>
-            <p>
-              Menghitung ulang representasi neural network setiap kali ada query pencarian menyebabkan delay respons sistem, memperlambat proses review akademik.
-            </p>
+        <!-- Problem Single-Layer Card -->
+        <div class="problem-list-card">
+          <div class="problem-item">
+            <div class="problem-item-num">01</div>
+            <div>
+              <h4 class="text-sm font-bold text-text-primary">Komputasi Vektor Berulang</h4>
+              <p class="text-xs text-text-secondary mt-1">Menghitung ulang representasi neural network setiap kali ada query pencarian memperlambat alokasi dosen pembimbing.</p>
+            </div>
           </div>
 
-          <div class="problem-card-visual">
-            <div class="problem-badge-pill">Kendala 2</div>
-            <h4>Beban Query Database SIAKAD</h4>
-            <p>
-              Membaca ribuan data publikasi dan riwayat bimbingan berulang dari database relasional membebani kapasitas server database kampus.
-            </p>
+          <div class="problem-item">
+            <div class="problem-item-num">02</div>
+            <div>
+              <h4 class="text-sm font-bold text-text-primary">Beban Query Database Kampus</h4>
+              <p class="text-xs text-text-secondary mt-1">Membaca ribuan publikasi dan riwayat skripsi berulang dari database relasional membebani server SIAKAD.</p>
+            </div>
           </div>
 
-          <div class="problem-card-visual">
-            <div class="problem-badge-pill">Kendala 3</div>
-            <h4>Downtime Saat Pembaruan Data</h4>
-            <p>
-              Jika satu profil dosen ditambahkan, pendekatan konvensional mengharuskan pemrosesan ulang seluruh database (Full Re-indexing) yang mematikan layanan sementara.
-            </p>
+          <div class="problem-item">
+            <div class="problem-item-num">03</div>
+            <div>
+              <h4 class="text-sm font-bold text-text-primary">Jeda Saat Pembaruan Data Dosen</h4>
+              <p class="text-xs text-text-secondary mt-1">Re-indexing manual memakan waktu lama saat ada penambahan profil dosen baru di tengah semester.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -176,7 +176,7 @@
 
           <!-- Flow 2 -->
           <div class="flow-card">
-            <div class="flow-badge flow-badge--serve">Tahap 2 · Real-Time Serving (&lt; 50ms)</div>
+            <div class="flow-badge flow-badge--serve">Tahap 2 · Real-Time Serving</div>
             <div class="flow-steps">
               <div class="flow-step">
                 <div class="fs-icon">1</div>
@@ -232,49 +232,37 @@
           Penerapan metode ini memberikan dampak nyata terhadap skalabilitas, performa, dan keandalan sistem SiReDo:
         </p>
 
-        <div class="solution-grid">
-          <div class="solution-card">
-            <div class="solution-header">
-              <div class="solution-num">1</div>
-              <h3>Pencarian Rekomendasi Instan</h3>
+        <div class="solution-list-card">
+          <div class="solution-item">
+            <div class="solution-item-num">01</div>
+            <div class="solution-item-main">
+              <h4 class="text-sm font-bold text-text-primary">Pencarian Rekomendasi Instan</h4>
+              <p class="text-xs text-text-secondary mt-1">Respons real-time bagi sistem akademik (SIAKAD) tanpa jeda pemrosesan AI berulang.</p>
             </div>
-            <p>
-              Waktu pencarian terpangkas dari hitungan detik menjadi sangat responsif, memberikan respons instan bagi sistem akademik (SIAKAD) maupun portal bimbingan.
-            </p>
-            <div class="solution-tag">Respon Cepat &amp; Stabil</div>
           </div>
 
-          <div class="solution-card">
-            <div class="solution-header">
-              <div class="solution-num">2</div>
-              <h3>Pembaruan Latar Belakang Berkelanjutan</h3>
+          <div class="solution-item">
+            <div class="solution-item-num">02</div>
+            <div class="solution-item-main">
+              <h4 class="text-sm font-bold text-text-primary">Pembaruan Latar Belakang Berkelanjutan</h4>
+              <p class="text-xs text-text-secondary mt-1">Penambahan data dosen diperbarui di latar belakang tanpa memutus koneksi API pengguna.</p>
             </div>
-            <p>
-              Penambahan atau pengeditan data profil dosen oleh admin dapat dilakukan kapan saja. Sistem memperbarui indeks secara langsung di latar belakang tanpa memutus koneksi API.
-            </p>
-            <div class="solution-tag">Ketersediaan Tinggi</div>
           </div>
 
-          <div class="solution-card">
-            <div class="solution-header">
-              <div class="solution-num">3</div>
-              <h3>Penghematan Komputasi Server</h3>
+          <div class="solution-item">
+            <div class="solution-item-num">03</div>
+            <div class="solution-item-main">
+              <h4 class="text-sm font-bold text-text-primary">Penghematan Komputasi Server</h4>
+              <p class="text-xs text-text-secondary mt-1">Beban CPU berkurang drastis dengan meniadakan komputasi ulang vektor data yang tidak berubah.</p>
             </div>
-            <p>
-              Beban CPU berkurang drastis karena server tidak lagi mengulang inferensi AI untuk data yang sama, menghemat sumber daya server secara signifikan.
-            </p>
-            <div class="solution-tag">Efisiensi Resource</div>
           </div>
 
-          <div class="solution-card">
-            <div class="solution-header">
-              <div class="solution-num">4</div>
-              <h3>Isolasi Database Utama</h3>
+          <div class="solution-item">
+            <div class="solution-item-num">04</div>
+            <div class="solution-item-main">
+              <h4 class="text-sm font-bold text-text-primary">Isolasi Database Utama SIAKAD</h4>
+              <p class="text-xs text-text-secondary mt-1">Pencarian terisolasi di memori RAM, melindungi database relasional kampus dari lonjakan traffic.</p>
             </div>
-            <p>
-              Operasi pencarian tidak membebani database utama kampus, sehingga database SIAKAD tetap stabil dan terlindungi dari lonjakan traffic mahasiswa.
-            </p>
-            <div class="solution-tag">Stabilitas Sistem</div>
           </div>
         </div>
       </section>
@@ -478,45 +466,37 @@
 .bar-fill--amber { background: var(--amber); }
 .bar-fill--brand { background: var(--brand); }
 
-/* Problem grid */
-.problem-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
+/* Problem list card */
+.problem-list-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   margin: 1.25rem 0 2rem;
-  width: 100%;
 }
-.problem-card-visual {
+
+.problem-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.problem-item:last-child {
+  border-bottom: none;
+}
+
+.problem-item-num {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--red);
   background: #fef2f2;
   border: 1px solid #fecaca;
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.problem-badge-pill {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--red);
-  background: #fee2e2;
-  padding: 2px 7px;
-  border-radius: 99px;
-  width: fit-content;
-}
-.problem-card-visual h4 {
-  margin: 0.25rem 0 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--red);
-}
-.problem-card-visual p {
-  margin: 0 !important;
-  font-size: 0.825rem;
-  color: var(--text-secondary);
-  line-height: 1.55;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
 
 /* Dual Flow Container */
@@ -651,65 +631,41 @@
   line-height: 1.5;
 }
 
-/* Solution Grid */
-.solution-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 1.25rem;
-  margin: 1.5rem 0 2rem;
-  width: 100%;
-}
-.solution-card {
+/* Solution list card */
+.solution-list-card {
   background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.4rem;
+  overflow: hidden;
+  margin: 1.5rem 0 2rem;
+}
+
+.solution-item {
   display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  transition: border-color 0.15s;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid var(--border);
 }
-.solution-card:hover {
-  border-color: var(--brand-border);
+
+.solution-item:last-child {
+  border-bottom: none;
 }
-.solution-header {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-.solution-num {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--brand-light);
-  color: var(--brand);
+
+.solution-item-num {
   font-family: var(--font-mono);
-  font-weight: 700;
   font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 700;
+  color: var(--brand);
+  background: var(--brand-light);
   border: 1px solid var(--brand-border);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
-.solution-card h3 {
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-}
-.solution-card p {
-  font-size: 0.83rem;
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.6;
-}
-.solution-tag {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--brand);
-  margin-top: auto;
-  padding-top: 0.4rem;
+
+.solution-item-main {
+  flex: 1;
 }
 
 /* Comparison table */

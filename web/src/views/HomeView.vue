@@ -206,71 +206,61 @@ onMounted(checkStatus)
 
         <div class="section-label">Dokumentasi & Integrasi</div>
 
-        <div class="cards-grid">
+        <div class="docs-list-card">
           <!-- 1. Quickstart -->
-          <router-link to="/docs/quickstart" class="doc-card">
-            <div class="card-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <router-link to="/docs/quickstart" class="doc-list-item">
+            <div class="doc-item-num">01</div>
+            <div class="doc-item-main">
+              <h3 class="doc-item-title">Quickstart Integrasi</h3>
+              <p class="doc-item-desc">Panduan cepat 3 langkah untuk mengintegrasikan SiReDo API ke dalam aplikasi frontend atau backend.</p>
             </div>
-            <h3>1. Quickstart</h3>
-            <p>Panduan cepat 3 langkah untuk mengintegrasikan SiReDo API ke dalam aplikasi frontend atau backend.</p>
-            <span class="card-cta">Mulai integrasi →</span>
+            <span class="doc-item-cta">Mulai integrasi →</span>
           </router-link>
 
           <!-- 2. Dokumentasi API -->
-          <router-link to="/docs/api" class="doc-card">
-            <div class="card-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <router-link to="/docs/api" class="doc-list-item">
+            <div class="doc-item-num">02</div>
+            <div class="doc-item-main">
+              <h3 class="doc-item-title">Dokumentasi API</h3>
+              <p class="doc-item-desc">Spesifikasi endpoint REST lengkap untuk single, batch JSON, batch Excel upload, config, dan status.</p>
             </div>
-            <h3>2. Dokumentasi API</h3>
-            <p>Spesifikasi endpoint REST lengkap untuk single, batch JSON, batch Excel upload, config, dan status.</p>
-            <span class="card-cta">Lihat endpoint REST →</span>
+            <span class="doc-item-cta">Lihat endpoint REST →</span>
           </router-link>
 
           <!-- 3. Pipeline NLP -->
-          <router-link to="/docs/pipeline" class="doc-card">
-            <div class="card-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          <router-link to="/docs/pipeline" class="doc-list-item">
+            <div class="doc-item-num">03</div>
+            <div class="doc-item-main">
+              <h3 class="doc-item-title">Pipeline NLP</h3>
+              <p class="doc-item-desc">Tahapan pengolahan teks dari preprocessing, ekspansi sinonim, BM25, SBERT, hingga Hybrid Ranking.</p>
             </div>
-            <h3>3. Pipeline NLP</h3>
-            <p>Pelajari tahapan pengolahan teks dari preprocessing, ekspansi sinonim, BM25, SBERT, hingga Hybrid Ranking.</p>
-            <span class="card-cta">Pelajari pipeline →</span>
+            <span class="doc-item-cta">Pelajari pipeline →</span>
           </router-link>
 
           <!-- 4. Caching & Indexing Method -->
-          <router-link to="/docs/caching" class="doc-card">
-            <div class="card-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zM9 12h6M9 8h6M9 16h4"/></svg>
+          <router-link to="/docs/caching" class="doc-list-item">
+            <div class="doc-item-num">04</div>
+            <div class="doc-item-main">
+              <h3 class="doc-item-title">Caching &amp; Indexing Method</h3>
+              <p class="doc-item-desc">Arsitektur penyimpanan indeks memori dan sinkronisasi data dosen secara konsisten di latar belakang.</p>
             </div>
-            <h3>4. Caching & Indexing Method</h3>
-            <p>Arsitektur penyimpanan indeks memori dan sinkronisasi data dosen secara konsisten di latar belakang.</p>
-            <span class="card-cta">Baca arsitektur →</span>
+            <span class="doc-item-cta">Baca arsitektur →</span>
           </router-link>
 
           <!-- 5. API Key -->
-          <router-link to="/docs/api-key" class="doc-card">
-            <div class="card-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+          <router-link to="/docs/api-key" class="doc-list-item">
+            <div class="doc-item-num">05</div>
+            <div class="doc-item-main">
+              <h3 class="doc-item-title">Kredensial API Key</h3>
+              <p class="doc-item-desc">Daftar sebagai developer institusi untuk mendapatkan kredensial API Key yang aman untuk setiap request.</p>
             </div>
-            <h3>5. API Key</h3>
-            <p>Daftar sebagai developer institusi untuk mendapatkan kredensial API Key yang aman untuk setiap request.</p>
-            <span class="card-cta">Kelola API Key →</span>
+            <span class="doc-item-cta">Kelola API Key →</span>
           </router-link>
-
-          <!-- Client App Link -->
-          <a href="http://localhost:5174" target="_blank" class="doc-card">
-            <div class="card-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </div>
-            <h3>Polibatam SiReDo</h3>
-            <p>Portal web contoh kampus yang mengonsumsi API ini untuk direktori dosen, penjadwalan, dan batch.</p>
-            <span class="card-cta">Buka aplikasi (:5174) →</span>
-          </a>
         </div>
 
         <!-- Quick install / base URL info -->
         <div class="quickstart">
-          <div class="qs-label">Base URL</div>
+          <div class="qs-label">Base URL &amp; Endpoint Utama</div>
           <pre class="qs-code"><span class="tok-key">POST</span>  http://localhost:5000/api/rekomendasi/single
 <span class="tok-key">POST</span>  http://localhost:5000/api/rekomendasi/batch
 <span class="tok-key">GET</span>   http://localhost:5000/api/config
@@ -412,11 +402,10 @@ onMounted(checkStatus)
   padding: 0.65rem 1.5rem;
   border-radius: var(--radius);
   text-decoration: none;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  transition: background 0.15s, transform 0.1s;
   border: 1px solid var(--brand);
-  box-shadow: 0 4px 14px oklch(49.1% 0.27 292.581 / 0.22);
 }
-.btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 6px 18px oklch(49.1% 0.27 292.581 / 0.3); }
+.btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); }
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
@@ -643,62 +632,65 @@ onMounted(checkStatus)
   color: var(--text-muted);
   margin-bottom: 1.25rem;
 }
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-}
-.doc-card {
+.docs-list-card {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.4rem;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+.doc-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.15rem 1.5rem;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
 }
-.doc-card:hover {
-  border-color: var(--brand-border);
-  box-shadow: 0 8px 24px oklch(49.1% 0.27 292.581 / 0.08);
-  transform: translateY(-2px);
+.doc-list-item:last-child {
+  border-bottom: none;
 }
-.doc-card-feature {
-  grid-column: span 2;
-  background: linear-gradient(150deg, var(--bg) 0%, oklch(98.5% 0.01 292.581) 100%);
-  border-color: var(--brand-border);
+.doc-list-item:hover {
+  background: var(--bg-subtle);
 }
-.card-icon {
-  width: 24px; height: 24px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 0.25rem;
-  color: var(--text-primary);
-}
-.doc-card:hover .card-icon {
+.doc-item-num {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
   color: var(--brand);
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
-.card-icon svg { width: 20px; height: 20px; }
-.doc-card h3 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-}
-.doc-card p {
-  font-size: 0.83rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0;
+.doc-item-main {
   flex: 1;
 }
-.card-cta {
-  font-size: 0.8rem;
+.doc-item-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+.doc-item-desc {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+.doc-item-cta {
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--brand);
-  margin-top: 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+.doc-list-item:hover .doc-item-cta {
+  transform: translateX(3px);
 }
 
 /* Quickstart */

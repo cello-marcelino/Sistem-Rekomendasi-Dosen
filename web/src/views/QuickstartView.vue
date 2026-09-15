@@ -9,23 +9,12 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
     <!-- Header -->
     <div class="page-header">
       <div class="flex items-center gap-2 mb-2">
-        <span class="page-badge">PANDUAN CEPAT</span>
-        <span class="badge-time">ESTIMASI: ~3 MENIT</span>
+        <span class="page-badge">PANDUAN INTEGRASI</span>
       </div>
-      <h1 class="page-title">Quickstart Developer</h1>
+      <h1 class="page-title">Quickstart Integrasi</h1>
       <p class="page-lead">
-        Panduan langkah demi langkah untuk mengintegrasikan mesin rekomendasi dosen SiReDo ke dalam portal akademik atau sistem kampus Anda.
+        Integrasikan mesin rekomendasi dosen SiReDo ke dalam portal akademik atau sistem kampus Anda dalam 3 langkah terstruktur.
       </p>
-
-      <!-- Highlights Ribbon -->
-      <div class="tech-stack-ribbon">
-        <span class="ribbon-label">KOMPATIBILITAS:</span>
-        <span class="tech-pill">Vue 3 / React</span>
-        <span class="tech-pill">Laravel / PHP</span>
-        <span class="tech-pill">Node.js / Express</span>
-        <span class="tech-pill">Python / FastAPI</span>
-        <span class="tech-pill">REST cURL</span>
-      </div>
     </div>
 
     <!-- Stepper Tracker -->
@@ -34,7 +23,7 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
         <div class="step-num bg-brand-light text-brand">1</div>
         <div class="step-info">
           <span class="step-title">Dapatkan API Key</span>
-          <span class="step-sub">Registrasi & Token</span>
+          <span class="step-sub">Registrasi &amp; Token</span>
         </div>
       </a>
       <div class="step-connector"></div>
@@ -63,38 +52,26 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
         <div class="step-header">
           <div class="step-badge-num">1</div>
           <div>
-            <h2 class="step-heading">Dapatkan Kredensial API Key</h2>
+            <h2 class="step-heading">Kredensial API Key</h2>
             <p class="step-desc">Semua endpoint rekomendasi SiReDo membutuhkan autentikasi header <code>X-API-Key</code>.</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-          <div class="key-preview-box">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-mono font-bold text-text-muted uppercase tracking-wider">Mock Developer Token</span>
-              <span class="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-green-bg text-green-main border border-green-border">Active</span>
-            </div>
-            <div class="key-display-field">
+        <div class="step-content-divided">
+          <div class="token-summary">
+            <div class="token-code-row">
+              <span class="text-xs font-mono font-bold text-text-muted">TOKEN CONTOH:</span>
               <code class="text-sm font-mono text-brand font-semibold">srd_live_9b4e72ac01f89c4...</code>
             </div>
-            <p class="text-xs text-text-muted mt-3 leading-relaxed">
-              Token unik berbasis HMAC untuk mengidentifikasi request sistem kampus Anda dan mencatat analitik rekomendasi.
+            <p class="text-xs text-text-secondary mt-1">
+              Token autentikasi berbasis HMAC untuk memvalidasi request resmi dari sistem kampus Anda.
             </p>
           </div>
-
-          <div class="flex flex-col justify-center gap-3 p-5 bg-bg-subtle rounded-xl border border-border">
-            <h4 class="text-sm font-bold text-text-primary">Belum memiliki API Key?</h4>
-            <p class="text-xs text-text-secondary leading-relaxed">
-              Daftarkan institusi atau nama pengembang Anda secara instan di portal developer SiReDo untuk memperoleh token aktif.
-            </p>
-            <div>
-              <router-link to="/docs/api-key" class="btn-primary inline-flex items-center gap-2">
-                Daftar & Ambil API Key
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </router-link>
-            </div>
+          <div class="token-cta-row">
+            <span class="text-xs text-text-secondary">Belum memiliki token aktif?</span>
+            <router-link to="/docs/api-key" class="btn-primary inline-flex items-center gap-2">
+              Daftar &amp; Ambil API Key &rarr;
+            </router-link>
           </div>
         </div>
       </div>
@@ -264,43 +241,31 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
 
     </div>
 
-    <!-- Next Actions Grid -->
-    <div class="next-grid">
-      <router-link to="/docs/api" class="next-card group">
-        <div class="next-icon bg-brand-light text-brand">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-          </svg>
-        </div>
-        <div>
-          <h4 class="next-title">Jelajahi API Reference</h4>
-          <p class="next-desc">Daftar endpoint lengkap untuk batch processing dan tuning konfigurasi.</p>
-        </div>
-      </router-link>
+    <!-- Next Actions -->
+    <div class="next-steps-card">
+      <div class="next-steps-header">Langkah Selanjutnya</div>
+      <div class="next-steps-list">
+        <router-link to="/docs/api" class="next-step-item">
+          <div>
+            <div class="next-step-title">Jelajahi API Reference &rarr;</div>
+            <div class="next-step-desc">Daftar endpoint lengkap untuk batch processing dan tuning konfigurasi.</div>
+          </div>
+        </router-link>
 
-      <router-link to="/docs/pipeline" class="next-card group">
-        <div class="next-icon bg-blue-bg text-blue-main">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-          </svg>
-        </div>
-        <div>
-          <h4 class="next-title">Pelajari Pipeline NLP</h4>
-          <p class="next-desc">Pahami cara kerja BM25, IndoBERT/SBERT, dan Explainable AI (XAI).</p>
-        </div>
-      </router-link>
+        <router-link to="/docs/pipeline" class="next-step-item">
+          <div>
+            <div class="next-step-title">Pelajari Pipeline NLP &rarr;</div>
+            <div class="next-step-desc">Pahami cara kerja BM25, representasi semantik SBERT, dan Explainable AI (XAI).</div>
+          </div>
+        </router-link>
 
-      <router-link to="/docs/caching" class="next-card group">
-        <div class="next-icon bg-green-bg text-green-main">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <div>
-          <h4 class="next-title">Metode Caching & Indexing</h4>
-          <p class="next-desc">Arsitektur penyimpanan indeks memori dan sinkronisasi data di latar belakang.</p>
-        </div>
-      </router-link>
+        <router-link to="/docs/caching" class="next-step-item">
+          <div>
+            <div class="next-step-title">Metode Caching &amp; Indexing &rarr;</div>
+            <div class="next-step-desc">Arsitektur penyimpanan indeks memori dan sinkronisasi data dosen secara konsisten.</div>
+          </div>
+        </router-link>
+      </div>
     </div>
 
   </div>
@@ -333,16 +298,7 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
   border-radius: 99px;
 }
 
-.badge-time {
-  font-size: 0.68rem;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  padding: 3px 8px;
-  border-radius: 99px;
-}
+
 
 .page-title {
   font-size: 2.1rem;
@@ -359,30 +315,7 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
   margin: 0 0 1.25rem;
 }
 
-.tech-stack-ribbon {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
 
-.ribbon-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  letter-spacing: 0.06em;
-}
-
-.tech-pill {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-base);
-  border: 1px solid var(--border);
-  padding: 3px 9px;
-  border-radius: var(--radius-sm);
-}
 
 /* Stepper */
 .stepper-container {
@@ -575,54 +508,84 @@ const activeLang = ref('vue') // 'vue' | 'fetch' | 'php'
   background: var(--bg-subtle);
 }
 
-/* Next Actions */
-.next-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.25rem;
-  margin-top: 2.5rem;
-  width: 100%;
+/* Step 1 Divided Content */
+.step-content-divided {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.next-card {
+.token-code-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.token-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Next Steps Card */
+.next-steps-card {
   background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  margin-top: 2.5rem;
+  overflow: hidden;
+}
+
+.next-steps-header {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+
+.next-steps-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.next-step-item {
+  padding: 1rem 1.25rem;
   text-decoration: none;
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
 }
 
-.next-card:hover {
-  border-color: var(--brand-border);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(114, 9, 183, 0.06);
+.next-step-item:last-child {
+  border-bottom: none;
 }
 
-.next-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.next-step-item:hover {
+  background: var(--bg-subtle);
 }
 
-.next-title {
+.next-step-title {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 0.25rem;
+  color: var(--brand);
+  margin-bottom: 0.2rem;
 }
 
-.next-desc {
-  font-size: 0.75rem;
+.next-step-desc {
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.45;
   margin: 0;
 }
 

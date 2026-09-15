@@ -4,10 +4,10 @@
 
       <!-- Page Header -->
       <div class="page-header">
-        <span class="page-badge">Technical Deep Dive</span>
-        <h1 class="page-title">Pipeline NLP SiReDo</h1>
+        <span class="page-badge">DOKUMENTASI PIPELINE</span>
+        <h1 class="page-title">Pipeline NLP &amp; Scoring</h1>
         <p class="page-lead">
-          Visualisasi teknis pemrosesan teks query penelitian menjadi rekomendasi dosen yang akurat, terukur, dan dapat dijelaskan (explainable).
+          Tahapan pemrosesan teks dari judul dan abstrak skripsi menjadi rekomendasi dosen terukur berbasis BM25 dan SBERT.
         </p>
       </div>
 
