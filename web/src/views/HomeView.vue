@@ -42,9 +42,9 @@ onMounted(checkStatus)
       </div>
 
       <nav class="hidden md:flex items-center gap-5 text-xs font-medium text-gray-600">
-        <a href="#masalah-solusi" class="hover:text-gray-900 transition-colors no-underline">Masalah &amp; Solusi</a>
-        <a href="#kapabilitas" class="hover:text-gray-900 transition-colors no-underline">Potensi Integrasi</a>
-        <a href="#demo" class="hover:text-gray-900 transition-colors no-underline">Uji Coba Langsung</a>
+        <a href="#perbandingan" class="hover:text-gray-900 transition-colors no-underline">Alur Kerja</a>
+        <a href="#kapabilitas" class="hover:text-gray-900 transition-colors no-underline">Kapabilitas API</a>
+        <a href="#demo" class="hover:text-gray-900 transition-colors no-underline">Uji Coba Live</a>
       </nav>
 
       <div class="flex items-center gap-3">
@@ -71,9 +71,9 @@ onMounted(checkStatus)
       </div>
     </header>
 
-    <!-- Hero Section (Product Hook) -->
-    <section class="bg-white border-b border-gray-200 py-14 sm:py-20">
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-4">
+    <!-- Hero Section with Visual Pipeline Architecture -->
+    <section class="bg-white border-b border-gray-200 py-12 sm:py-16">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-4">
         <div
           class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono font-semibold uppercase tracking-wider border"
           style="color: oklch(54.1% 0.281 293.009); background-color: oklch(96.5% 0.025 293.009); border-color: oklch(88% 0.08 293.009)"
@@ -81,18 +81,18 @@ onMounted(checkStatus)
           REST API ENGINE REKOMENDASI TUGAS AKHIR
         </div>
 
-        <h1 class="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight font-sans">
-          Otomatiskan Penentuan Pembimbing &amp; Penguji Skripsi di Kampus Anda
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight font-sans">
+          Otomatiskan Penugasan Pembimbing &amp; Penguji Skripsi
         </h1>
 
-        <p class="text-sm sm:text-base text-gray-600 max-w-xl mx-auto leading-relaxed">
-          SiReDo API menjembatani sistem informasi akademik (SIAKAD) dengan AI hibrida. Kirim draf proposal mahasiswa, dapatkan rekomendasi dosen paling kompeten secara instan, objektif, dan transparan.
+        <p class="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto">
+          Hubungkan portal skripsi kampus dengan engine hybrid NLP (BM25 + SBERT) via REST API.
         </p>
 
-        <div class="flex items-center justify-center gap-3 pt-2">
+        <div class="flex items-center justify-center gap-3 pt-1">
           <router-link
             to="/docs"
-            class="px-5 py-2.5 text-xs sm:text-sm font-semibold text-white rounded-[4px] shadow-sm transition-opacity hover:opacity-90 no-underline"
+            class="px-4 py-2 text-xs font-semibold text-white rounded-[4px] shadow-sm transition-opacity hover:opacity-90 no-underline"
             style="background-color: oklch(54.1% 0.281 293.009)"
           >
             Buka Dokumentasi API →
@@ -100,177 +100,272 @@ onMounted(checkStatus)
 
           <a
             href="#demo"
-            class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-[4px] shadow-sm transition-colors no-underline"
+            class="px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-[4px] shadow-sm transition-colors no-underline"
           >
             Uji Coba Langsung ↓
           </a>
         </div>
+
+        <!-- Visual Integration Diagram (Visual Graphic Hook) -->
+        <div class="pt-8">
+          <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 sm:p-6 text-left shadow-sm">
+            <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 border-b border-slate-800 pb-3 mb-4">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                Topologi Integrasi REST API
+              </span>
+              <span class="text-slate-500">Latency &lt; 100ms</span>
+            </div>
+
+            <!-- Flow Nodes Graphic -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center text-center font-mono">
+              <!-- Node 1 -->
+              <div class="p-3 bg-slate-800/80 border border-slate-700 rounded text-left space-y-1">
+                <div class="text-[10px] text-slate-400 uppercase tracking-wider">Sumber Sistem</div>
+                <div class="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                  SIAKAD / Portal Kampus
+                </div>
+                <div class="text-[10px] text-slate-400 truncate">Payload: Judul &amp; Abstrak</div>
+              </div>
+
+              <!-- Node 2 (Engine) -->
+              <div
+                class="p-3 rounded text-left space-y-1 relative border"
+                style="background-color: oklch(54.1% 0.281 293.009 / 0.15); border-color: oklch(54.1% 0.281 293.009 / 0.4)"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] uppercase tracking-wider font-bold" style="color: oklch(88% 0.08 293.009)">Engine AI</span>
+                  <span class="px-1 py-0.2 text-[9px] font-bold rounded text-white" style="background-color: oklch(54.1% 0.281 293.009)">POST</span>
+                </div>
+                <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  SiReDo Hybrid Core
+                </div>
+                <div class="text-[10px] text-slate-300">BM25 (Leksikal) + SBERT</div>
+              </div>
+
+              <!-- Node 3 -->
+              <div class="p-3 bg-slate-800/80 border border-slate-700 rounded text-left space-y-1">
+                <div class="text-[10px] text-slate-400 uppercase tracking-wider">Hasil Rekomendasi</div>
+                <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Top-K Dosen + XAI
+                </div>
+                <div class="text-[10px] text-slate-400 truncate">Skor Kecocokan &amp; Kata Kunci</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Problem vs Solution Story Section -->
-    <section id="masalah-solusi" class="py-14 sm:py-18 border-b border-gray-200 bg-slate-50/60">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
-        <div class="text-center max-w-2xl mx-auto">
-          <h2 class="text-2xl font-bold text-gray-900 font-sans tracking-tight">
-            Tantangan Pengelolaan Skripsi &amp; Solusi SiReDo API
+    <!-- Visual Comparison: Manual vs SiReDo API Flow -->
+    <section id="perbandingan" class="py-12 border-b border-gray-200 bg-slate-50">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
+        <div class="text-center">
+          <h2 class="text-lg font-bold text-gray-900 tracking-tight font-sans">
+            Perbandingan Alur Kerja: Manual vs SiReDo API
           </h2>
-          <p class="text-xs sm:text-sm text-gray-600 mt-1.5 leading-relaxed">
-            Dari proses manual yang memakan waktu berminggu-minggu menjadi pencocokan cerdas berbasis data publikasi dan keahlian dosen.
-          </p>
+          <p class="text-xs text-gray-500 mt-0.5">Transformasi proses alokasi dari 2 minggu menjadi sub-detik.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <!-- Problem Box -->
-          <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="flex items-center gap-2">
+        <div class="space-y-4">
+          <!-- Flow 1: Manual (Before) -->
+          <div class="bg-white border border-rose-200 rounded-lg p-4 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 font-mono">
                 <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                <span class="text-xs font-bold uppercase tracking-wider text-rose-700 font-mono">Tantangan Proses Konvensional</span>
-              </div>
-
-              <ul class="space-y-3 text-xs text-gray-600 leading-relaxed list-none p-0 m-0">
-                <li class="flex items-start gap-2.5">
-                  <span class="text-rose-500 font-bold shrink-0">✕</span>
-                  <span><strong>Sortir manual ratusan proposal:</strong> Koordinator program studi harus membaca judul dan abstrak mahasiswa satu per satu di setiap awal semester.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-rose-500 font-bold shrink-0">✕</span>
-                  <span><strong>Keterbatasan pencarian kata kunci:</strong> Query judul mahasiswa sering menggunakan istilah baru atau bahasa Inggris yang tidak cocok dengan kata kunci statis di profil dosen.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-rose-500 font-bold shrink-0">✕</span>
-                  <span><strong>Mismatch keahlian &amp; beban bimbingan:</strong> Dosen sering ditugaskan di topik yang kurang relevan, sementara dosen yang kompeten terlewatkan.</span>
-                </li>
-              </ul>
+                Alur Manual (Konvensional)
+              </span>
+              <span class="text-[11px] font-mono text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                Waktu: 1–2 Minggu · Rawan Mismatch
+              </span>
             </div>
 
-            <div class="mt-5 pt-4 border-t border-gray-100 text-[11px] text-gray-400 font-mono">
-              Dampak: Evaluasi proposal lambat &amp; kualitas bimbingan tidak optimal.
+            <!-- Stepper Visual -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+              <div class="p-2.5 rounded bg-rose-50/50 border border-rose-100 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-rose-200 text-rose-800 flex items-center justify-center text-[10px] font-bold shrink-0">1</span>
+                <span class="text-gray-700">100+ Proposal Masuk</span>
+              </div>
+              <div class="p-2.5 rounded bg-rose-50/50 border border-rose-100 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-rose-200 text-rose-800 flex items-center justify-center text-[10px] font-bold shrink-0">2</span>
+                <span class="text-gray-700">Sortir Judul Manual</span>
+              </div>
+              <div class="p-2.5 rounded bg-rose-50/50 border border-rose-100 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-rose-200 text-rose-800 flex items-center justify-center text-[10px] font-bold shrink-0">3</span>
+                <span class="text-gray-700">Tebakan Alokasi Dosen</span>
+              </div>
             </div>
           </div>
 
-          <!-- Solution Box -->
-          <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 font-mono">Solusi SiReDo API</span>
-              </div>
-
-              <ul class="space-y-3 text-xs text-gray-600 leading-relaxed list-none p-0 m-0">
-                <li class="flex items-start gap-2.5">
-                  <span class="text-emerald-600 font-bold shrink-0">✓</span>
-                  <span><strong>Kombinasi BM25 + SBERT:</strong> Menggabungkan ketepatan kata kunci publikasi ilmiah dengan pemahaman semantik makna topik secara mendalam.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-emerald-600 font-bold shrink-0">✓</span>
-                  <span><strong>Integrasi REST universal:</strong> Dapat dihubungkan ke portal tugas akhir kampus, SIAKAD, maupun bot notifikasi hanya via HTTP request JSON.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-emerald-600 font-bold shrink-0">✓</span>
-                  <span><strong>Transparansi skor akademik (XAI):</strong> Setiap rekomendasi disertai persentase kecocokan dan irisan topik riset sebagai dasar justifikasi prodi.</span>
-                </li>
-              </ul>
+          <!-- Flow 2: Automated (After) -->
+          <div
+            class="bg-white rounded-lg p-4 shadow-sm space-y-3 border"
+            style="border-color: oklch(54.1% 0.281 293.009 / 0.4)"
+          >
+            <div class="flex items-center justify-between">
+              <span
+                class="inline-flex items-center gap-1.5 text-xs font-bold font-mono"
+                style="color: oklch(54.1% 0.281 293.009)"
+              >
+                <span class="w-2 h-2 rounded-full" style="background-color: oklch(54.1% 0.281 293.009)"></span>
+                Alur SiReDo API (Otomatis)
+              </span>
+              <span class="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-semibold">
+                Waktu: &lt; 1 Detik · Presisi &amp; Transparan
+              </span>
             </div>
 
-            <div class="mt-5 pt-4 border-t border-gray-100 text-[11px] text-gray-400 font-mono">
-              Hasil: Penentuan pembimbing &amp; penguji adil, cepat, dan terukur.
+            <!-- Stepper Visual -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+              <div class="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-bold shrink-0">1</span>
+                <span class="text-gray-800">Kirim HTTP POST JSON</span>
+              </div>
+              <div
+                class="p-2.5 rounded flex items-center gap-2 border"
+                style="background-color: oklch(96.5% 0.025 293.009); border-color: oklch(88% 0.08 293.009)"
+              >
+                <span
+                  class="w-5 h-5 rounded-full text-white flex items-center justify-center text-[10px] font-bold shrink-0"
+                  style="background-color: oklch(54.1% 0.281 293.009)"
+                >2</span>
+                <span class="text-gray-900 font-semibold">BM25 + SBERT Matching</span>
+              </div>
+              <div class="p-2.5 rounded bg-emerald-50 border border-emerald-200 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">3</span>
+                <span class="text-emerald-900 font-bold">Top 5 Dosen + Bukti XAI</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Possibilities / What You Can Build Section -->
-    <section id="kapabilitas" class="py-14 sm:py-18 bg-white border-b border-gray-200">
+    <!-- Visual Feature Capabilities: Interactive UI Widgets -->
+    <section id="kapabilitas" class="py-14 bg-white border-b border-gray-200">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
-        <div class="text-center max-w-2xl mx-auto">
-          <h2 class="text-2xl font-bold text-gray-900 font-sans tracking-tight">
-            Fitur yang Dapat Anda Bangun dengan SiReDo API
+        <div class="text-center max-w-xl mx-auto">
+          <h2 class="text-lg font-bold text-gray-900 font-sans tracking-tight">
+            Kapabilitas Sistem yang Dapat Anda Bangun
           </h2>
-          <p class="text-xs sm:text-sm text-gray-600 mt-1.5 leading-relaxed">
-            Satu engine cerdas yang fleksibel untuk membuka beragam kapabilitas automasi di ekosistem digital kampus Anda.
-          </p>
+          <p class="text-xs text-gray-500 mt-0.5">Pratinjau antarmuka yang dapat dihasilkan oleh sistem akademik Anda.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <!-- 1. Smart Advisor Matcher -->
-          <div class="border border-gray-200 rounded-lg p-5 shadow-sm bg-slate-50/40 flex flex-col justify-between">
-            <div class="space-y-2.5">
-              <div class="w-8 h-8 rounded-[4px] flex items-center justify-center text-white" style="background-color: oklch(54.1% 0.281 293.009)">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-              <h3 class="text-sm font-bold text-gray-900">1. Rekomendasi Pembimbing Real-time</h3>
-              <p class="text-xs text-gray-600 leading-relaxed">
-                Pasang saran otomatis di portal skripsi saat mahasiswa mengetik draf judul &amp; proposal. Mahasiswa dan koordinator langsung melihat daftar calon pembimbing yang paling linear dengan ide risetnya.
-              </p>
+          <!-- Widget 1: Advisor Matcher -->
+          <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-slate-50/50 space-y-3">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+              <span class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full" style="background-color: oklch(54.1% 0.281 293.009)"></span>
+                Rekomendasi Pembimbing Instan
+              </span>
+              <code class="text-[10px] font-mono text-gray-400">POST /rekomendasi/single</code>
             </div>
-            <div class="mt-4 pt-3 border-t border-gray-200/80 text-[11px] font-mono text-gray-500">
-              Endpoint: <code class="text-gray-800">POST /api/rekomendasi/single</code>
+
+            <!-- Mini UI Mockup -->
+            <div class="bg-white border border-gray-200 rounded p-3 space-y-2 text-xs">
+              <div class="text-[11px] text-gray-500">Proposal: <strong class="text-gray-800">"Klasifikasi Teks dengan IndoBERT"</strong></div>
+              <div class="flex items-center justify-between p-2 rounded bg-emerald-50/80 border border-emerald-200">
+                <span class="font-semibold text-emerald-950">Dr. Eng. Ir. Dosen A</span>
+                <span class="font-mono text-[10px] font-bold bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded">94.2% Match</span>
+              </div>
+              <div class="text-[10px] text-gray-500 flex items-center gap-1">
+                <span>Topik:</span>
+                <span class="bg-gray-100 px-1 rounded text-gray-700">NLP</span>
+                <span class="bg-gray-100 px-1 rounded text-gray-700">Deep Learning</span>
+              </div>
             </div>
           </div>
 
-          <!-- 2. Automated Examiner Allocator -->
-          <div class="border border-gray-200 rounded-lg p-5 shadow-sm bg-slate-50/40 flex flex-col justify-between">
-            <div class="space-y-2.5">
-              <div class="w-8 h-8 rounded-[4px] flex items-center justify-center text-white" style="background-color: oklch(54.1% 0.281 293.009)">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-              </div>
-              <h3 class="text-sm font-bold text-gray-900">2. Penentuan Penguji Sidang Otomatis</h3>
-              <p class="text-xs text-gray-600 leading-relaxed">
-                Integrasikan engine ke algoritma penjadwalan sidang. Sistem dapat mencocokkan puluhan mahasiswa sidang dengan dosen penguji yang benar-benar menguasai topik pengujian tanpa bentrok jadwal.
-              </p>
+          <!-- Widget 2: Examiner Allocation -->
+          <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-slate-50/50 space-y-3">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+              <span class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                Penugasan Penguji Sidang Otomatis
+              </span>
+              <code class="text-[10px] font-mono text-gray-400">POST /rekomendasi/batch</code>
             </div>
-            <div class="mt-4 pt-3 border-t border-gray-200/80 text-[11px] font-mono text-gray-500">
-              Endpoint: <code class="text-gray-800">POST /api/rekomendasi/batch</code>
+
+            <!-- Mini UI Mockup -->
+            <div class="bg-white border border-gray-200 rounded p-3 space-y-2 text-xs">
+              <div class="flex items-center justify-between text-[11px] text-gray-500">
+                <span>Sidang Mahasiswa: <strong class="text-gray-800">Mhs. Budi (IoT Sensor)</strong></span>
+                <span class="text-blue-600 font-mono">Bebas Konflik</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                <div class="p-1.5 rounded bg-blue-50 border border-blue-200 text-blue-950">
+                  <div class="text-[9px] text-blue-500 font-bold">PENGUJI 1</div>
+                  <div class="font-semibold truncate">Dr. Ir. Penguji A</div>
+                </div>
+                <div class="p-1.5 rounded bg-blue-50 border border-blue-200 text-blue-950">
+                  <div class="text-[9px] text-blue-500 font-bold">PENGUJI 2</div>
+                  <div class="font-semibold truncate">Dr. Penguji B, M.T.</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- 3. Batch Research Mapping -->
-          <div class="border border-gray-200 rounded-lg p-5 shadow-sm bg-slate-50/40 flex flex-col justify-between">
-            <div class="space-y-2.5">
-              <div class="w-8 h-8 rounded-[4px] flex items-center justify-center text-white" style="background-color: oklch(54.1% 0.281 293.009)">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                </svg>
-              </div>
-              <h3 class="text-sm font-bold text-gray-900">3. Pemetaan Riset Angkatan via Spreadsheet</h3>
-              <p class="text-xs text-gray-600 leading-relaxed">
-                Unggah satu berkas Excel berisi ratusan judul skripsi angkatan berjalan. Dapatkan rekap distribusi topik penelitian mahasiswa terhadap roadmap riset laboratorium dan kapasitas dosen prodi.
-              </p>
+          <!-- Widget 3: Batch Research Mapping -->
+          <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-slate-50/50 space-y-3">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+              <span class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                Audit Riset Angkatan via Excel
+              </span>
+              <code class="text-[10px] font-mono text-gray-400">POST /batch/upload</code>
             </div>
-            <div class="mt-4 pt-3 border-t border-gray-200/80 text-[11px] font-mono text-gray-500">
-              Endpoint: <code class="text-gray-800">POST /api/batch/upload</code>
+
+            <!-- Mini UI Mockup -->
+            <div class="bg-white border border-gray-200 rounded p-3 space-y-2 text-xs font-mono">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-gray-700 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  skripsi_angkatan_2026.xlsx
+                </span>
+                <span class="text-emerald-700 font-bold">142 Baris</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-emerald-500 h-1.5 w-full"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-gray-500">
+                <span>AI: 48</span>
+                <span>IoT: 44</span>
+                <span>Jaringan: 50</span>
+              </div>
             </div>
           </div>
 
-          <!-- 4. Academic Justification & XAI Panel -->
-          <div class="border border-gray-200 rounded-lg p-5 shadow-sm bg-slate-50/40 flex flex-col justify-between">
-            <div class="space-y-2.5">
-              <div class="w-8 h-8 rounded-[4px] flex items-center justify-center text-white" style="background-color: oklch(54.1% 0.281 293.009)">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 class="text-sm font-bold text-gray-900">4. Justifikasi Akreditasi &amp; Transparansi Skor</h3>
-              <p class="text-xs text-gray-600 leading-relaxed">
-                Tampilkan bukti kesesuaian bimbingan dosen berbasis riwayat publikasi ilmiah dan irisan kata kunci. Memenuhi standar evaluasi akreditasi prodi mengenai relevansi bimbingan tugas akhir.
-              </p>
+          <!-- Widget 4: XAI Akreditasi -->
+          <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-slate-50/50 space-y-3">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+              <span class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+                Transparansi Skor &amp; Bukti Akreditasi
+              </span>
+              <code class="text-[10px] font-mono text-gray-400">payload.xai</code>
             </div>
-            <div class="mt-4 pt-3 border-t border-gray-200/80 text-[11px] font-mono text-gray-500">
-              Payload: <code class="text-gray-800">scores.hybrid &amp; xai_explanation</code>
+
+            <!-- Mini UI Mockup -->
+            <div class="bg-white border border-gray-200 rounded p-3 space-y-2 text-xs font-mono">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-gray-600">Formula Skor Hibrida:</span>
+                <span class="font-bold" style="color: oklch(54.1% 0.281 293.009)">0.4 BM25 + 0.6 SBERT</span>
+              </div>
+              <div class="flex flex-wrap gap-1 pt-1">
+                <span class="text-[10px] bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700 font-sans">✓ irisan kata kunci cocok</span>
+                <span class="text-[10px] bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700 font-sans">✓ publikasi relevan</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Developer Quick Contract Preview -->
+    <!-- Developer Compact Contract Box -->
     <section class="max-w-4xl w-full mx-auto px-4 sm:px-6 py-10">
       <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
         <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center justify-between text-xs font-mono">
@@ -291,10 +386,10 @@ onMounted(checkStatus)
         <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 text-xs font-mono">
           <!-- Request -->
           <div class="p-4 bg-slate-900 text-slate-200 overflow-x-auto">
-            <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5 font-sans font-semibold">Input Payload (JSON)</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5 font-sans font-semibold">Request Body (JSON)</div>
             <pre class="leading-relaxed text-[11px] font-mono"><code>{
   "judul": "Klasifikasi Teks dengan IndoBERT",
-  "abstrak": "Analisis sentimen berbasis transformer...",
+  "abstrak": "Analisis sentimen transformer...",
   "top_k": 5
 }</code></pre>
           </div>
@@ -308,8 +403,7 @@ onMounted(checkStatus)
     "recommendations": [
       {
         "dosen": { "nama": "Dr. Eng. ..." },
-        "scores": { "hybrid": 0.842, "bm25": 0.79, "sbert": 0.89 },
-        "xai": { "irisan_kata": ["indobert", "klasifikasi"] }
+        "scores": { "hybrid": 0.942, "bm25": 0.88, "sbert": 0.96 }
       }
     ]
   }
