@@ -2,13 +2,13 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand Accent: Teal (Sesuai DESIGN.md master contract) */
-  --color-brand: #0f766e; /* teal-700 */
-  --color-brand-light: #f0fdfa; /* teal-50 */
-  --color-brand-subtle: #ccfbf1; /* teal-100 */
-  --color-brand-dim: #0d9488; /* teal-600 */
-  --color-brand-dark: #115e59; /* teal-800 */
-  --color-brand-border: #99f6e4; /* teal-200 */
+  /* Brand Accent: oklch(54.1% 0.281 293.009) */
+  --color-brand: oklch(54.1% 0.281 293.009);
+  --color-brand-light: oklch(96.5% 0.025 293.009);
+  --color-brand-subtle: oklch(92% 0.05 293.009);
+  --color-brand-dim: oklch(62% 0.24 293.009);
+  --color-brand-dark: oklch(45% 0.24 293.009);
+  --color-brand-border: oklch(88% 0.08 293.009);
 
   /* Neutrals & Surfaces */
   --color-bg-base: #f8fafc;
@@ -70,7 +70,7 @@ html { scroll-behavior: smooth; }
   --brand-border: var(--color-brand-border);
   --brand-dim: var(--color-brand-dim);
   --brand-dark: var(--color-brand-dark);
-  --brand-ring: rgba(15, 118, 110, 0.2);
+  --brand-ring: oklch(54.1% 0.281 293.009 / 0.16);
 
   --bg: var(--color-bg-base);
   --bg-subtle: var(--color-bg-subtle);
