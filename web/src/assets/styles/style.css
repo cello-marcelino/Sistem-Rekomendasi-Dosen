@@ -2,25 +2,25 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand Accent: oklch(54.1% 0.281 293.009) */
-  --color-brand: oklch(54.1% 0.281 293.009);
-  --color-brand-light: oklch(96.5% 0.025 293.009);
-  --color-brand-subtle: oklch(92% 0.05 293.009);
-  --color-brand-dim: oklch(62% 0.24 293.009);
-  --color-brand-dark: oklch(45% 0.24 293.009);
-  --color-brand-border: oklch(88% 0.08 293.009);
+  /* Brand Accent: Violet oklch(49.1% 0.27 292.581) */
+  --color-brand: oklch(49.1% 0.27 292.581);
+  --color-brand-light: oklch(96.5% 0.025 292.581);
+  --color-brand-subtle: oklch(93.5% 0.05 292.581);
+  --color-brand-dim: oklch(58% 0.24 292.581);
+  --color-brand-dark: oklch(42% 0.24 292.581);
+  --color-brand-border: oklch(88% 0.08 292.581);
 
   /* Neutrals & Surfaces */
-  --color-bg-base: #f8fafc;
-  --color-bg-subtle: #f1f5f9;
-  --color-bg-muted: #e2e8f0;
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
+  --color-bg-base: #ffffff;
+  --color-bg-subtle: #f8f8fb;
+  --color-bg-muted: #f2f2f7;
+  --color-border: #e4e4ef;
+  --color-border-strong: #c8c8dc;
 
   /* Text Colors */
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
+  --color-text-primary: #111118;
+  --color-text-secondary: #52525e;
+  --color-text-muted: #8f8f9e;
 
   /* Semantic Colors */
   --color-green-main: #16a34a;
@@ -39,23 +39,23 @@
   --color-red-bg: #fef2f2;
   --color-red-border: #fecaca;
 
-  --color-fuchsia-main: #0d9488;
-  --color-fuchsia-bg: #f0fdfa;
-  --color-fuchsia-border: #99f6e4;
+  --color-fuchsia-main: #a21caf;
+  --color-fuchsia-bg: #fdf4ff;
+  --color-fuchsia-border: #f0abfc;
 
   /* Layout / Container Variables */
   --sidebar-w: 260px;
   --content-max: 100%;
 
   /* Typography Fonts */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 
   /* Radius Tokens */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
 }
 
 /* Base resets & mapping to Tailwind theme variables */
@@ -70,7 +70,7 @@ html { scroll-behavior: smooth; }
   --brand-border: var(--color-brand-border);
   --brand-dim: var(--color-brand-dim);
   --brand-dark: var(--color-brand-dark);
-  --brand-ring: oklch(54.1% 0.281 293.009 / 0.16);
+  --brand-ring: oklch(49.1% 0.27 292.581 / 0.16);
 
   --bg: var(--color-bg-base);
   --bg-subtle: var(--color-bg-subtle);

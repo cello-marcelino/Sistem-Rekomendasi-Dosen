@@ -67,20 +67,20 @@ const closeXai = () => {
                   </div>
                   <div class="plog-row">
                     <div class="plog-block">
-                      <div class="plog-block-label plog-label--gray">Setelah Case Fold <span class="plog-count">{{ recStore.pipeline.preprocessing.after_case_fold?.length || 0 }} kata</span></div>
+                      <div class="plog-block-label plog-label--gray">🔡 Setelah Case Fold <span class="plog-count">{{ recStore.pipeline.preprocessing.after_case_fold?.length || 0 }} kata</span></div>
                       <div class="plog-tags">
                         <span v-for="t in recStore.pipeline.preprocessing.after_case_fold" :key="t" class="plog-tag plog-tag--gray">{{ t }}</span>
                       </div>
                     </div>
                     <div class="plog-block">
-                      <div class="plog-block-label plog-label--red">Setelah Stopword <span class="plog-count">{{ recStore.pipeline.preprocessing.after_stopword?.length || 0 }} tersisa</span></div>
+                      <div class="plog-block-label plog-label--red">🚫 Setelah Stopword <span class="plog-count">{{ recStore.pipeline.preprocessing.after_stopword?.length || 0 }} tersisa</span></div>
                       <div class="plog-tags">
                         <span v-for="t in recStore.pipeline.preprocessing.after_stopword" :key="t" class="plog-tag plog-tag--red">{{ t }}</span>
                       </div>
                     </div>
                   </div>
                   <div v-if="recStore.pipeline.preprocessing.bigrams?.length > 0" class="plog-block">
-                    <div class="plog-block-label plog-label--blue">Bigram Terbentuk</div>
+                    <div class="plog-block-label plog-label--blue">🔗 Bigram Terbentuk</div>
                     <div class="plog-tags">
                       <span v-for="t in recStore.pipeline.preprocessing.bigrams" :key="t" class="plog-tag plog-tag--blue">{{ t }}</span>
                     </div>
@@ -106,11 +106,7 @@ const closeXai = () => {
                     </div>
                   </div>
                   <div v-else class="plog-empty-msg">
-                    <div class="plog-empty-icon">
-                      <svg class="w-5 h-5 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    </div>
+                    <div class="plog-empty-icon">🔍</div>
                     <p>Tidak ada frasa yang cocok dengan kamus ontologi.</p>
                     <p class="plog-empty-sub">Query diproses tanpa ekspansi sinonim.</p>
                   </div>
@@ -194,7 +190,7 @@ const closeXai = () => {
                     = <span class="plog-formula-brand">Hybrid Score</span>
                   </div>
                   <div class="plog-mode-badge" :class="recStore.pipeline.hybrid.mode === 'manual' ? 'plog-mode--manual' : (recStore.pipeline.hybrid.mode === 'keyword' ? 'plog-mode--blue' : 'plog-mode--fuchsia')">
-                    {{ recStore.pipeline.hybrid.mode === 'manual' ? 'Mode Manual' : (recStore.pipeline.hybrid.mode === 'keyword' ? 'Mode Kata Kunci (BM25 dominan)' : 'Mode Abstrak (SBERT dominan)') }}
+                    {{ recStore.pipeline.hybrid.mode === 'manual' ? '⚙️ Manual Mode' : (recStore.pipeline.hybrid.mode === 'keyword' ? '⌨️ Keyword Mode (BM25 dominan)' : '📄 Abstrak Mode (SBERT dominan)') }}
                   </div>
                 </div>
                 <div v-else class="plog-wait">Menunggu data...</div>
