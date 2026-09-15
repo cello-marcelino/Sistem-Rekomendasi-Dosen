@@ -37,24 +37,27 @@ onMounted(checkStatus)
           <span :class="['status-dot', serverStatus === 'online' && cacheReady ? 'dot-green' : serverStatus === 'online' ? 'dot-amber' : 'dot-red']"></span>
           {{ serverStatus === 'online' && cacheReady ? 'Online' : serverStatus === 'online' ? 'Warming Up' : 'Offline' }}
         </span>
-        <router-link to="/docs/quickstart" class="tl tl-btn">Let's Go</router-link>
+        <router-link to="/docs/quickstart" class="tl tl-btn">Mulai Integrasi</router-link>
       </div>
     </header>
 
     <!-- Hero -->
     <section class="hero-section">
       <div class="hero-inner">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          REST API ENGINE REKOMENDASI TUGAS AKHIR
+        </div>
+
         <h1 class="hero-title">
           Sistem Rekomendasi Dosen<br>
           <span class="hero-highlight">Berbasis Hybrid AI</span>
         </h1>
         <p class="hero-desc">
-          SiReDo menggunakan algoritma <strong>BM25</strong> (lexical) dan <strong>SBERT</strong> (semantic) 
-          untuk menemukan dosen pembimbing atau penguji yang paling relevan 
-          berdasarkan judul dan abstrak topik penelitian.
+          SiReDo API menjembatani sistem informasi akademik (SIAKAD) dengan engine <strong>BM25</strong> (lexical) dan <strong>SBERT</strong> (semantic) untuk mencocokkan dosen pembimbing dan penguji secara otomatis.
         </p>
         <div class="hero-actions">
-          <router-link to="/docs/quickstart" class="btn-primary">Let's Go →</router-link>
+          <router-link to="/docs/quickstart" class="btn-primary">Mulai Integrasi →</router-link>
           <a href="#demo" class="btn-ghost">Simulasi Langsung ↓</a>
         </div>
 
@@ -78,6 +81,120 @@ onMounted(checkStatus)
           <div class="stat">
             <span class="stat-val">XAI</span>
             <span class="stat-lbl">Explainability</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Masalah & Solusi Section -->
+    <section class="story-section">
+      <div class="story-inner">
+        <div class="section-label">Tantangan &amp; Solusi</div>
+        <h2 class="section-title">Mengapa Kampus Membutuhkan SiReDo API?</h2>
+        <p class="section-desc">Mengubah proses alokasi manual yang memakan waktu menjadi pencocokan berbasis data yang instan dan objektif.</p>
+
+        <div class="story-grid">
+          <!-- Problem Card -->
+          <div class="story-card story-card--problem">
+            <div class="story-header">
+              <span class="story-dot dot-red"></span>
+              <span class="story-tag tag-red">Tantangan Konvensional</span>
+            </div>
+            <ul class="story-list">
+              <li>
+                <span class="list-bullet text-red">✕</span>
+                <span><strong>Sortir Manual:</strong> Membaca ratusan proposal skripsi satu per satu di setiap awal semester memakan waktu 1–2 minggu.</span>
+              </li>
+              <li>
+                <span class="list-bullet text-red">✕</span>
+                <span><strong>Pencarian Kata Kunci Biasa:</strong> Istilah riset baru atau bahasa Inggris sering luput dari pencarian teks statis.</span>
+              </li>
+              <li>
+                <span class="list-bullet text-red">✕</span>
+                <span><strong>Risiko Mismatch:</strong> Beban bimbingan menumpuk dan dosen sering ditugaskan di luar kepakaran utamanya.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Solution Card -->
+          <div class="story-card story-card--solution">
+            <div class="story-header">
+              <span class="story-dot dot-green"></span>
+              <span class="story-tag tag-green">Solusi SiReDo API</span>
+            </div>
+            <ul class="story-list">
+              <li>
+                <span class="list-bullet text-green">✓</span>
+                <span><strong>Hybrid BM25 + SBERT:</strong> Menggabungkan kata kunci publikasi ilmiah dengan pemahaman makna topik riset terkini.</span>
+              </li>
+              <li>
+                <span class="list-bullet text-green">✓</span>
+                <span><strong>REST API Plug &amp; Play:</strong> Terintegrasi ke portal tugas akhir atau SIAKAD kampus mana pun hanya via HTTP JSON.</span>
+              </li>
+              <li>
+                <span class="list-bullet text-green">✓</span>
+                <span><strong>Transparansi Skor (XAI):</strong> Setiap rekomendasi disertai skor numerik terukur dan irisan kata kunci untuk audit prodi.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Possibilities Section (Fitur yang Bisa Dibangun) -->
+    <section class="possibilities-section">
+      <div class="possibilities-inner">
+        <div class="section-label">Kapabilitas Integrasi</div>
+        <h2 class="section-title">Fitur yang Dapat Anda Bangun dengan SiReDo API</h2>
+        <p class="section-desc">Satu set endpoint REST terpadu untuk membuka beragam automasi cerdas di sistem informasi akademik Anda.</p>
+
+        <div class="possibilities-grid">
+          <!-- Possibility 1 -->
+          <div class="possibility-card">
+            <div class="possibility-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            </div>
+            <h3>1. Rekomendasi Pembimbing Real-time</h3>
+            <p>Tampilkan saran calon pembimbing langsung di portal saat mahasiswa mengetik draf judul dan proposal skripsi.</p>
+            <div class="possibility-footer">
+              <code>POST /api/rekomendasi/single</code>
+            </div>
+          </div>
+
+          <!-- Possibility 2 -->
+          <div class="possibility-card">
+            <div class="possibility-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+            </div>
+            <h3>2. Penugasan Penguji Sidang Otomatis</h3>
+            <p>Hubungkan ke jadwal sidang untuk mencocokkan mahasiswa dengan dosen penguji yang paling kompeten tanpa bentrok topik.</p>
+            <div class="possibility-footer">
+              <code>POST /api/rekomendasi/batch</code>
+            </div>
+          </div>
+
+          <!-- Possibility 3 -->
+          <div class="possibility-card">
+            <div class="possibility-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>
+            </div>
+            <h3>3. Audit Riset Angkatan via Spreadsheet</h3>
+            <p>Unggah satu berkas Excel berisi 100+ proposal untuk memetakan sebaran topik riset mahasiswa terhadap kapasitas dosen.</p>
+            <div class="possibility-footer">
+              <code>POST /api/batch/upload</code>
+            </div>
+          </div>
+
+          <!-- Possibility 4 -->
+          <div class="possibility-card">
+            <div class="possibility-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            </div>
+            <h3>4. Bukti Akreditasi &amp; Transparansi Skor</h3>
+            <p>Dapatkan data irisan kata kunci dan riwayat publikasi sebagai dasar objektif penetapan dosen tugas akhir prodi.</p>
+            <div class="possibility-footer">
+              <code>scores.hybrid &amp; xai</code>
+            </div>
           </div>
         </div>
       </div>
@@ -324,6 +441,189 @@ onMounted(checkStatus)
 .stat-val { display: block; font-size: 0.9rem; font-weight: 700; font-family: var(--font-mono); color: var(--brand); }
 .stat-lbl { display: block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
 .stat-div { width: 1px; height: 28px; background: var(--border); }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand);
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  padding: 0.35rem 0.85rem;
+  border-radius: 99px;
+  margin-bottom: 1.5rem;
+}
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+/* Story section (Masalah & Solusi) */
+.story-section {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-subtle);
+  padding: 4.5rem 0;
+}
+.story-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin: 0 0 0.4rem;
+}
+.section-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+.story-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+.story-card--problem {
+  border-top: 3px solid var(--red);
+}
+.story-card--solution {
+  border-top: 3px solid var(--green);
+}
+.story-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.story-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.story-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.tag-red { color: var(--red); }
+.tag-green { color: var(--green); }
+.story-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.story-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.83rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.story-list strong {
+  color: var(--text-primary);
+}
+.list-bullet {
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+.text-red { color: var(--red); }
+.text-green { color: var(--green); }
+
+/* Possibilities section */
+.possibilities-section {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  padding: 4.5rem 0;
+}
+.possibilities-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.possibilities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+.possibility-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.possibility-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand);
+  margin-bottom: 0.25rem;
+}
+.possibility-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.possibility-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.possibility-card p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+.possibility-footer {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.possibility-footer code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-muted);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 768px) {
+  .story-grid, .possibilities-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* Docs section */
 .docs-section {
