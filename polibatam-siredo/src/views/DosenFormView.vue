@@ -118,7 +118,6 @@ onMounted(() => {
   fetchLecturerForEdit()
 })
 
-// Dynamic Array Helpers
 const addPublikasi = () => publikasiList.value.push('')
 const removePublikasi = (idx) => {
   publikasiList.value.splice(idx, 1)
@@ -146,7 +145,6 @@ const handleSubmit = async () => {
   isSaving.value = true
   errorMessage.value = null
 
-  // Combine education levels
   const eduParts = []
   if (formData.value.pendidikan_d3?.trim()) eduParts.push(formData.value.pendidikan_d3.trim())
   if (formData.value.pendidikan_s1_d4?.trim()) eduParts.push(formData.value.pendidikan_s1_d4.trim())
@@ -183,296 +181,162 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="space-y-6 max-w-5xl mx-auto animate-in">
-    <!-- Page Header -->
-    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-      <router-link to="/admin/dosen" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition-colors mb-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Kembali ke Manajemen Dosen
-      </router-link>
-      <h1 class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
-        {{ isEditMode ? 'Edit Data Dosen' : 'Tambah Dosen Pembimbing Baru' }}
-      </h1>
-      <p class="text-xs text-gray-500 mt-1">Lengkapi formulir di bawah ini untuk menyimpan data master dosen dan riwayat portfolio akademiknya.</p>
+  <div class="w-full flex flex-col animate-in bg-white h-full">
+    <!-- Header -->
+    <div class="py-6 lg:py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 flex justify-between items-end bg-white">
+      <div class="max-w-3xl">
+        <router-link to="/admin/dosen" class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 hover:text-gray-900 mb-4 inline-flex items-center gap-1">
+          &larr; KEMBALI
+        </router-link>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">
+          {{ isEditMode ? 'Edit Data Dosen' : 'Registrasi Dosen' }}
+        </h1>
+        <p class="text-sm text-gray-600 m-0 font-mono">
+          {{ isEditMode ? formData.nidn || 'ID: ' + dosenId : 'Penambahan master data dosen dan portfolio keahlian' }}
+        </p>
+      </div>
+      <button 
+        @click="handleSubmit"
+        :disabled="isSaving" 
+        class="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white text-sm font-semibold rounded-[4px] transition-colors shadow-sm hidden md:block"
+      >
+        {{ isSaving ? 'Menyimpan...' : (isEditMode ? 'Simpan Perubahan' : 'Tambah Data') }}
+      </button>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="bg-white rounded-xl border border-gray-200 shadow-sm p-16 flex flex-col items-center justify-center min-h-[350px]">
-      <div class="w-10 h-10 border-4 border-gray-100 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
-      <span class="text-gray-500 text-sm font-medium">Memuat data formulir dosen...</span>
+    <div v-if="isLoading" class="flex-1 flex flex-col items-center justify-center p-20 min-h-[400px]">
+      <div class="w-8 h-8 border-2 border-gray-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
+      <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Memuat Data...</span>
     </div>
 
-    <!-- Form Body -->
-    <form v-else @submit.prevent="handleSubmit" class="space-y-6">
-      <div v-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm font-semibold">
+    <!-- Form Area -->
+    <form v-else @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto px-6 lg:px-8 py-8 flex flex-col gap-8 bg-gray-50">
+      
+      <div v-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-[4px] text-xs font-bold font-mono">
         {{ errorMessage }}
       </div>
 
-      <!-- Section 1: Identitas & Keahlian Utama -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-gray-50/70 border-b border-gray-200 font-bold text-sm text-gray-900 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs flex items-center justify-center font-bold">1</span>
-          <span>Identitas & Keahlian Utama</span>
-        </div>
-        <div class="p-6 space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label for="nama" class="text-xs font-semibold text-gray-700">Nama Lengkap & Gelar *</label>
-              <input 
-                id="nama" 
-                type="text" 
-                v-model="formData.nama" 
-                placeholder="Contoh: Dr. Supardianto, S.ST., M.Eng" 
-                required 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
-            <div class="space-y-1.5">
-              <label for="nidn" class="text-xs font-semibold text-gray-700">NIDN / Kode Dosen</label>
-              <input 
-                id="nidn" 
-                type="text" 
-                v-model="formData.nidn" 
-                placeholder="Contoh: 0012058901" 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 font-mono focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
+      <!-- Section: Identitas -->
+      <section class="border border-gray-200 bg-white">
+        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-4">
+           <span class="text-[10px] font-mono font-bold text-gray-500">01</span>
+           <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Identitas Utama</h2>
+        </header>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Nama Lengkap & Gelar *</label>
+            <input type="text" v-model="formData.nama" required class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
           </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">NIDN</label>
+            <input type="text" v-model="formData.nidn" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none font-mono text-gray-900" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Program Studi</label>
+            <input type="text" v-model="formData.program_studi" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Bidang Keahlian (Koma)</label>
+            <input type="text" v-model="formData.bidang_keahlian" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          </div>
+        </div>
+      </section>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label for="prodi" class="text-xs font-semibold text-gray-700">Program Studi</label>
-              <input 
-                id="prodi" 
-                type="text" 
-                v-model="formData.program_studi" 
-                placeholder="Contoh: Teknik Informatika / TRPL / Geomatika" 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
-            <div class="space-y-1.5">
-              <label for="keahlian" class="text-xs font-semibold text-gray-700">Bidang Keahlian Utama (Pisahkan dengan koma)</label>
-              <input 
-                id="keahlian" 
-                type="text" 
-                v-model="formData.bidang_keahlian" 
-                placeholder="Contoh: Artificial Intelligence, Machine Learning, NLP" 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
+      <!-- Section: Pendidikan -->
+      <section class="border border-gray-200 bg-white">
+        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-4">
+           <span class="text-[10px] font-mono font-bold text-gray-500">02</span>
+           <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Riwayat Pendidikan</h2>
+        </header>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Diploma 3 (D3)</label>
+            <input type="text" v-model="formData.pendidikan_d3" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Sarjana (S1/D4)</label>
+            <input type="text" v-model="formData.pendidikan_s1_d4" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Magister (S2)</label>
+            <input type="text" v-model="formData.pendidikan_s2" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Doktor (S3)</label>
+            <input type="text" v-model="formData.pendidikan_s3" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Section 2: Riwayat Pendidikan Formal -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-gray-50/70 border-b border-gray-200 font-bold text-sm text-gray-900 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs flex items-center justify-center font-bold">2</span>
-          <span>Riwayat Pendidikan Formal</span>
+      <!-- Section: Publikasi -->
+      <section class="border border-gray-200 bg-white">
+        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
+           <div class="flex items-center gap-4">
+             <span class="text-[10px] font-mono font-bold text-gray-500">03</span>
+             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Publikasi Jurnal</h2>
+           </div>
+           <button type="button" @click="addPublikasi" class="text-[10px] font-mono font-bold text-teal-600 border border-teal-200 px-3 py-1 hover:bg-teal-50 bg-white">
+             + TAMBAH
+           </button>
+        </header>
+        <div class="p-0 divide-y divide-gray-200">
+           <div v-for="(item, idx) in publikasiList" :key="idx" class="flex items-center px-6 py-3 bg-white">
+             <span class="w-8 text-[10px] font-mono text-gray-400">#{{ idx + 1 }}</span>
+             <input type="text" v-model="publikasiList[idx]" class="flex-1 bg-transparent border-none text-sm focus:outline-none text-gray-900" placeholder="Judul Publikasi..." />
+             <button type="button" @click="removePublikasi(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold font-mono ml-4">HAPUS</button>
+           </div>
         </div>
-        <div class="p-6 space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label for="edu-d3" class="text-xs font-semibold text-gray-700">Diploma 3 (D3)</label>
-              <input 
-                id="edu-d3" 
-                type="text" 
-                v-model="formData.pendidikan_d3" 
-                placeholder="Contoh: D3 Teknik Informatika Politeknik Negeri Batam" 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
-            <div class="space-y-1.5">
-              <label for="edu-s1" class="text-xs font-semibold text-gray-700">Sarjana / Terapan (S1 / D4)</label>
-              <input 
-                id="edu-s1" 
-                type="text" 
-                v-model="formData.pendidikan_s1_d4" 
-                placeholder="Contoh: S1 Ilmu Komputer Universitas Indonesia" 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
-          </div>
+      </section>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label for="edu-s2" class="text-xs font-semibold text-gray-700">Magister (S2)</label>
-              <input 
-                id="edu-s2" 
-                type="text" 
-                v-model="formData.pendidikan_s2" 
-                placeholder="Contoh: S2 Teknik Elektro & Informatika Institut Teknologi Bandung" 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
-            <div class="space-y-1.5">
-              <label for="edu-s3" class="text-xs font-semibold text-gray-700">Doktor (S3 / Ph.D)</label>
-              <input 
-                id="edu-s3" 
-                type="text" 
-                v-model="formData.pendidikan_s3" 
-                placeholder="Contoh: S3 Computer Science Universite Grenoble Alpes" 
-                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
-            </div>
-          </div>
+      <!-- Section: Bimbingan -->
+      <section class="border border-gray-200 bg-white">
+        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
+           <div class="flex items-center gap-4">
+             <span class="text-[10px] font-mono font-bold text-gray-500">04</span>
+             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Riwayat Bimbingan</h2>
+           </div>
+           <button type="button" @click="addBimbingan" class="text-[10px] font-mono font-bold text-teal-600 border border-teal-200 px-3 py-1 hover:bg-teal-50 bg-white">
+             + TAMBAH
+           </button>
+        </header>
+        <div class="p-0 divide-y divide-gray-200">
+           <div v-for="(item, idx) in bimbinganList" :key="idx" class="flex items-center px-6 py-3 bg-white">
+             <span class="w-8 text-[10px] font-mono text-gray-400">#{{ idx + 1 }}</span>
+             <input type="text" v-model="bimbinganList[idx]" class="flex-1 bg-transparent border-none text-sm focus:outline-none text-gray-900" placeholder="Judul Skripsi Bimbingan..." />
+             <button type="button" @click="removeBimbingan(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold font-mono ml-4">HAPUS</button>
+           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Section 3: Publikasi Jurnal (Multi Field) -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden border-t-4 border-t-teal-600">
-        <div class="px-6 py-4 bg-teal-50/40 border-b border-gray-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-800 text-xs flex items-center justify-center font-bold">3</span>
-            <span class="font-bold text-sm text-gray-900">
-              Publikasi Jurnal & Makalah Ilmiah ({{ publikasiList.filter(s => s.trim()).length }} Judul)
-            </span>
-          </div>
-          <button 
-            type="button" 
-            @click="addPublikasi" 
-            class="flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah Judul Jurnal</span>
-          </button>
+      <!-- Section: Pengujian -->
+      <section class="border border-gray-200 bg-white mb-20">
+        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
+           <div class="flex items-center gap-4">
+             <span class="text-[10px] font-mono font-bold text-gray-500">05</span>
+             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Riwayat Pengujian</h2>
+           </div>
+           <button type="button" @click="addPengujian" class="text-[10px] font-mono font-bold text-teal-600 border border-teal-200 px-3 py-1 hover:bg-teal-50 bg-white">
+             + TAMBAH
+           </button>
+        </header>
+        <div class="p-0 divide-y divide-gray-200">
+           <div v-for="(item, idx) in pengujianList" :key="idx" class="flex items-center px-6 py-3 bg-white">
+             <span class="w-8 text-[10px] font-mono text-gray-400">#{{ idx + 1 }}</span>
+             <input type="text" v-model="pengujianList[idx]" class="flex-1 bg-transparent border-none text-sm focus:outline-none text-gray-900" placeholder="Judul Sidang Pengujian..." />
+             <button type="button" @click="removePengujian(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold font-mono ml-4">HAPUS</button>
+           </div>
         </div>
-        <div class="p-6 space-y-3">
-          <div v-for="(item, idx) in publikasiList" :key="idx" class="flex items-center gap-2.5">
-            <span class="px-2 py-1 bg-teal-50 text-teal-800 border border-teal-200 text-xs font-mono font-bold rounded shrink-0">
-              #{{ idx + 1 }}
-            </span>
-            <input 
-              type="text" 
-              v-model="publikasiList[idx]" 
-              placeholder="Masukkan judul publikasi jurnal atau paper ilmiah..." 
-              class="flex-1 px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all"
-            />
-            <button 
-              type="button" 
-              @click="removePublikasi(idx)" 
-              class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Hapus baris ini"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section 4: Riwayat Bimbingan Skripsi (Multi Field) -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden border-t-4 border-t-blue-600">
-        <div class="px-6 py-4 bg-blue-50/40 border-b border-gray-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-800 text-xs flex items-center justify-center font-bold">4</span>
-            <span class="font-bold text-sm text-gray-900">
-              Riwayat Bimbingan Tugas Akhir / Skripsi ({{ bimbinganList.filter(s => s.trim()).length }} Judul)
-            </span>
-          </div>
-          <button 
-            type="button" 
-            @click="addBimbingan" 
-            class="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah Judul Bimbingan</span>
-          </button>
-        </div>
-        <div class="p-6 space-y-3">
-          <div v-for="(item, idx) in bimbinganList" :key="idx" class="flex items-center gap-2.5">
-            <span class="px-2 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-mono font-bold rounded shrink-0">
-              #{{ idx + 1 }}
-            </span>
-            <input 
-              type="text" 
-              v-model="bimbinganList[idx]" 
-              placeholder="Masukkan judul tugas akhir / skripsi mahasiswa yang dibimbing..." 
-              class="flex-1 px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-            />
-            <button 
-              type="button" 
-              @click="removeBimbingan(idx)" 
-              class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Hapus baris ini"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section 5: Riwayat Pengujian Sidang (Multi Field) -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden border-t-4 border-t-purple-600">
-        <div class="px-6 py-4 bg-purple-50/40 border-b border-gray-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-800 text-xs flex items-center justify-center font-bold">5</span>
-            <span class="font-bold text-sm text-gray-900">
-              Riwayat Pengujian Sidang Skripsi ({{ pengujianList.filter(s => s.trim()).length }} Judul)
-            </span>
-          </div>
-          <button 
-            type="button" 
-            @click="addPengujian" 
-            class="flex items-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah Judul Pengujian</span>
-          </button>
-        </div>
-        <div class="p-6 space-y-3">
-          <div v-for="(item, idx) in pengujianList" :key="idx" class="flex items-center gap-2.5">
-            <span class="px-2 py-1 bg-purple-50 text-purple-800 border border-purple-200 text-xs font-mono font-bold rounded shrink-0">
-              #{{ idx + 1 }}
-            </span>
-            <input 
-              type="text" 
-              v-model="pengujianList[idx]" 
-              placeholder="Masukkan judul sidang skripsi yang diuji..." 
-              class="flex-1 px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-            />
-            <button 
-              type="button" 
-              @click="removePengujian(idx)" 
-              class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Hapus baris ini"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Footer -->
-      <div class="flex items-center justify-end gap-3 pt-2">
-        <router-link 
-          to="/admin/dosen" 
-          class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs rounded-lg transition-colors border border-gray-200"
-        >
-          Batal
-        </router-link>
-        <button 
-          type="submit" 
-          :disabled="isSaving" 
-          class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white px-6 py-2.5 rounded-lg text-xs font-semibold transition-colors shadow-sm"
-        >
-          <div v-if="isSaving" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-          <span>{{ isSaving ? 'Menyimpan Data...' : (isEditMode ? 'Simpan Perubahan Dosen' : 'Tambah Data Dosen') }}</span>
+      </section>
+      
+      <!-- Mobile Sticky Action -->
+      <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 md:hidden z-10 flex gap-4">
+        <router-link to="/admin/dosen" class="flex-1 text-center py-3 bg-gray-100 text-gray-700 font-bold text-xs rounded-[4px]">Batal</router-link>
+        <button type="submit" :disabled="isSaving" class="flex-1 py-3 bg-teal-600 text-white font-bold text-xs rounded-[4px]">
+          {{ isSaving ? 'Menyimpan...' : 'Simpan' }}
         </button>
       </div>
+
     </form>
   </div>
 </template>
@@ -482,7 +346,7 @@ const handleSubmit = async () => {
   animation: fade-in 0.3s ease-out forwards;
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>

@@ -12,16 +12,17 @@ const api = axios.create({
 // Request Interceptor
 api.interceptors.request.use(
   (config) => {
-    const adminToken = localStorage.getItem('siredo_admin_token')
-    if (adminToken) {
-      config.headers['Authorization'] = `Bearer ${adminToken}`
+    const token = localStorage.getItem('siredo_admin_token') || localStorage.getItem('siredo_client_token')
+    if (token && !config.headers['Authorization']) {
+      config.headers['Authorization'] = `Bearer ${token}`
     }
-    const apiKey = localStorage.getItem('siredo_admin_key')
-    if (apiKey) {
+    const apiKey = localStorage.getItem('siredo_admin_key') || localStorage.getItem('siredo_client_api_key') || import.meta.env.VITE_SIREDO_API_KEY
+    if (apiKey && !config.headers['X-API-Key']) {
       config.headers['X-API-Key'] = apiKey
     }
     return config
   },
+
   (error) => {
     return Promise.reject(error)
   }

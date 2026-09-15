@@ -11,7 +11,7 @@ const navGroups = [
     items: [
       { name: 'Dashboard', path: '/', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
       { name: 'Cari Rekomendasi', path: '/rekomendasi', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
-      { name: 'Informasi & Statistik Dosen', path: '/dosen', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+      { name: 'Informasi & Statistik', path: '/dosen', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
     ]
   },
   {
@@ -31,36 +31,34 @@ defineExpose({
 
 <template>
   <div class="relative z-40">
-    <!-- Backdrop for mobile -->
     <div 
       v-if="isMobileOpen"
       @click="isMobileOpen = false"
       class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm lg:hidden transition-opacity"
     ></div>
 
-    <!-- Sidebar component -->
     <aside 
       :class="isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-      class="fixed inset-y-0 left-0 w-[260px] bg-emerald-900 text-emerald-50 flex flex-col transition-transform duration-300 ease-in-out lg:z-0 z-50 shadow-xl border-r border-emerald-700"
+      class="fixed inset-y-0 left-0 w-[260px] bg-[#24263b] text-white flex flex-col transition-transform duration-300 ease-in-out lg:z-0 z-50 border-r border-[#2f324d]"
     >
       <!-- Logo Header -->
-      <div class="h-[74px] flex items-center px-5 border-b border-emerald-700 bg-emerald-900 shrink-0">
+      <div class="h-[74px] flex items-center px-6 border-b border-[#2f324d] shrink-0 bg-[#24263b]">
         <router-link to="/" class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg bg-teal-600 flex items-center justify-center text-white shadow-lg shadow-teal-900/40">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+          <div class="w-8 h-8 rounded-[4px] bg-teal-500 flex items-center justify-center text-[#24263b] font-bold shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
           </div>
           <div>
-            <h1 class="font-bold text-white tracking-wide text-[16px]">SiReDo Portal</h1>
-            <p class="text-[11px] text-emerald-300 font-mono tracking-widest mt-0.5">ADMIN v3.2</p>
+            <h1 class="font-bold text-white tracking-wide text-sm font-sans">Polibatam SiReDo</h1>
+            <p class="text-[10px] text-teal-400 font-mono tracking-widest mt-0.5">ADMIN v3.2</p>
           </div>
         </router-link>
       </div>
 
       <!-- Navigation -->
-      <div class="flex-1 overflow-y-auto py-6 custom-scrollbar bg-emerald-900">
+      <div class="flex-1 overflow-y-auto py-8 custom-scrollbar">
         <nav class="px-4 space-y-8">
-          <div v-for="(group, idx) in navGroups" :key="idx" class="space-y-2">
-            <h3 class="px-3 text-xs font-bold text-emerald-400/80 uppercase tracking-wider mb-3">{{ group.title }}</h3>
+          <div v-for="(group, idx) in navGroups" :key="idx" class="space-y-3">
+            <h3 class="px-3 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">{{ group.title }}</h3>
             
             <div class="space-y-1">
               <router-link
@@ -68,14 +66,14 @@ defineExpose({
                 :key="item.path"
                 :to="item.path"
                 @click="isMobileOpen = false"
-                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group"
+                class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors group relative rounded-[3px]"
                 :class="route.path === item.path || (item.path !== '/' && route.path.startsWith(item.path)) 
-                  ? 'bg-emerald-800 text-white shadow-sm' 
-                  : 'text-emerald-100/80 hover:text-white hover:bg-emerald-800/60'"
+                  ? 'text-teal-300 bg-teal-500/15 border border-teal-500/30' 
+                  : 'text-gray-300 hover:text-white hover:bg-white/5 border border-transparent'"
               >
                 <svg 
-                  class="w-5 h-5 transition-colors"
-                  :class="route.path === item.path || (item.path !== '/' && route.path.startsWith(item.path)) ? 'text-teal-400' : 'text-emerald-300/70 group-hover:text-teal-300'"
+                  class="w-4 h-4 transition-colors"
+                  :class="route.path === item.path || (item.path !== '/' && route.path.startsWith(item.path)) ? 'text-teal-400' : 'text-gray-400 group-hover:text-gray-200'"
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -90,10 +88,10 @@ defineExpose({
       </div>
 
       <!-- User/Status Footer -->
-      <div class="p-4 border-t border-emerald-700 bg-emerald-900">
-        <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-emerald-800/50 border border-emerald-700">
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse"></div>
-          <div class="text-xs text-emerald-100 font-medium truncate">API Server Online</div>
+      <div class="p-4 border-t border-[#2f324d] bg-[#1e2032]/60">
+        <div class="flex items-center gap-3 px-3 py-2 border border-[#2f324d] bg-[#24263b]/80 rounded-[3px]">
+          <div class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></div>
+          <div class="text-[11px] font-mono font-bold text-gray-300 truncate uppercase tracking-widest">Server Online</div>
         </div>
       </div>
     </aside>
@@ -102,16 +100,15 @@ defineExpose({
 
 <style scoped>
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #047857;
-  border-radius: 10px;
+  background: #2f324d;
 }
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: #059669;
+  background: #3d4163;
 }
 </style>

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue'
 import api from '../services/api'
 import * as XLSX from 'xlsx'
@@ -31,27 +31,36 @@ const uploadFile = async () => {
   
   const formData = new FormData()
   formData.append('file', file)
+  formData.append('k_rank', 3)
   formData.append('top_k', 3)
   
   loading.value = true
   error.value = null
   progress.value = 0
   
-  // Simulate progress
   const interval = setInterval(() => {
     if (progress.value < 90) progress.value += 5
-  }, 500)
+  }, 400)
   
+  const startTime = performance.now()
   try {
     const response = await api.post('/rekomendasi/batch/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
-    result.value = response.data.data
+    const durationMs = Math.round(performance.now() - startTime)
+    const rawData = response.data?.data
+    const list = Array.isArray(rawData) ? rawData : (rawData?.results || [])
+
+    result.value = {
+      results: list,
+      processing_time_ms: durationMs,
+      meta: response.data?.meta || { total_processed: list.length }
+    }
     progress.value = 100
   } catch (err) {
-    error.value = err.response?.data?.error || 'Terjadi kesalahan saat memproses file. Pastikan format sesuai.'
+    error.value = err.response?.data?.error || err.response?.data?.message || 'Terjadi kesalahan saat memproses file. Pastikan format sesuai.'
   } finally {
     clearInterval(interval)
     loading.value = false
@@ -59,17 +68,21 @@ const uploadFile = async () => {
 }
 
 const downloadResult = () => {
-  if (!result.value || !result.value.results) return
+  const list = result.value?.results || (Array.isArray(result.value) ? result.value : [])
+  if (!list.length) return
   
-  const data = result.value.results.map(row => {
+  const data = list.map((row, rowIdx) => {
     const flat = {
-      ID: row.mahasiswa_id,
-      Nama: row.nama_mahasiswa,
-      'Judul TA': row.judul_tugas_akhir
+      ID: row.id || row.mahasiswa_id || (rowIdx + 1),
+      Nama: row.nama || row.nama_mahasiswa || '-',
+      'Judul TA': row.judul || row.judul_tugas_akhir || '-'
     }
-    row.recommendations.forEach((rec, idx) => {
-      flat[`Rekomendasi ${idx + 1}`] = rec.nama_dosen
-      flat[`Skor ${idx + 1}`] = rec.hybrid_score.toFixed(4)
+    const recs = row.rekomendasi?.recommendations || row.recommendations || []
+    recs.forEach((rec, idx) => {
+      const namaDosen = rec.dosen?.nama || rec.nama_dosen || rec.nama || '-'
+      const score = rec.scores?.hybrid ?? rec.hybrid_score ?? rec.skor ?? 0
+      flat[`Rekomendasi ${idx + 1}`] = namaDosen
+      flat[`Skor ${idx + 1}`] = typeof score === 'number' ? score.toFixed(4) : score
     })
     return flat
   })
@@ -93,100 +106,183 @@ const downloadTemplate = () => {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto space-y-8 animate-fade-in">
-    <div class="border-b border-gray-200  pb-5">
-      <h1 class="text-2xl font-bold text-gray-900  flex items-center gap-2">
-        <svg class="w-7 h-7 text-blue-600 " fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-        Batch Recommendation
-      </h1>
-      <p class="mt-2 text-gray-600 ">
-        Fitur untuk Admin TA: proses puluhan atau ratusan data mahasiswa sekaligus menggunakan file Excel.
-      </p>
+  <div class="w-full min-h-full animate-in flex flex-col">
+    <!-- Header -->
+    <div class="py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 bg-white">
+      <div class="max-w-4xl flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">Batch Recommendation</h1>
+          <p class="text-sm text-gray-700 leading-relaxed m-0">
+            Pemrosesan massal proposal tugas akhir via Excel untuk rekomendasi dosen otomatis.
+          </p>
+        </div>
+        <button 
+          @click="downloadTemplate" 
+          class="text-xs text-gray-900 bg-white hover:bg-gray-50 px-4 py-2.5 rounded-[4px] border border-gray-300 font-semibold transition-colors flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download Template
+        </button>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Upload Panel -->
-      <div class="bg-white  rounded-xl p-6 border border-gray-100  shadow-sm">
-        <h2 class="text-lg font-semibold text-gray-900  mb-4">Upload File Excel</h2>
-        
-        <div class="mb-4">
-          <button @click="downloadTemplate" class="text-sm text-blue-600 hover:text-blue-700  font-medium flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            Download Template Excel
-          </button>
-        </div>
+    <!-- Metrics Row (Dense Tabular) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b border-gray-200 bg-white w-full">
+      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Format Berkas</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Excel (.xlsx)</div>
+      </div>
+      <div class="p-6 border-b lg:border-b-0 lg:border-r border-gray-200">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Kapasitas Proses</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Ratusan Data</div>
+      </div>
+      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Kandidat</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Top-3 Dosen</div>
+      </div>
+      <div class="p-6">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Sistem Skor</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Hybrid Scoring</div>
+      </div>
+    </div>
 
+    <!-- Main Workspace -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 w-full border-b border-gray-200 bg-white items-stretch">
+      
+      <!-- Upload Panel -->
+      <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50/50 p-6 lg:p-8 flex flex-col gap-6">
+        
+        <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Unggah Berkas</div>
+        
         <div 
           @click="triggerUpload"
-          class="border-2 border-dashed border-gray-300  rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 :border-blue-500 :bg-blue-900/10 transition-colors mb-6"
+          class="border border-dashed border-gray-400 bg-white rounded-[4px] p-8 flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-colors text-center"
         >
-          <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          <p class="text-sm font-medium text-gray-900  text-center">
-            {{ fileName ? fileName : 'Klik untuk memilih file Excel (.xlsx)' }}
-          </p>
-          <p v-if="!fileName" class="text-xs text-gray-500 mt-1 text-center">Pastikan format kolom sesuai template.</p>
+          <div class="text-sm font-bold text-gray-900 mb-1">
+            {{ fileName ? fileName : 'Pilih File Excel' }}
+          </div>
+          <div v-if="!fileName" class="text-xs text-gray-500">Klik atau drag & drop file</div>
           <input type="file" ref="fileInput" class="hidden" accept=".xlsx,.xls" @change="handleFileChange">
         </div>
 
         <button 
           @click="uploadFile" 
           :disabled="!fileName || loading"
-          class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold rounded-[4px] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
         >
-          {{ loading ? 'Memproses...' : 'Mulai Proses Batch' }}
+          <span v-if="loading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          {{ loading ? 'Memproses Batch...' : 'Mulai Proses Batch' }}
         </button>
-
-        <div v-if="error" class="mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100   ">
+        
+        <div v-if="error" class="p-4 bg-red-50 text-red-700 rounded-[4px] text-sm border border-red-200">
           {{ error }}
         </div>
+
+        <div class="mt-4 pt-6 border-t border-gray-200">
+          <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500 mb-3">Format Kolom Wajib</div>
+          <div class="border border-gray-200 rounded-sm divide-y divide-gray-200 bg-white text-xs">
+            <div class="flex justify-between p-3"><span class="font-mono font-bold">id</span><span class="text-gray-500">NIM Mahasiswa</span></div>
+            <div class="flex justify-between p-3"><span class="font-mono font-bold">nama</span><span class="text-gray-500">Nama Lengkap</span></div>
+            <div class="flex justify-between p-3"><span class="font-mono font-bold">judul</span><span class="text-gray-500">Judul Skripsi</span></div>
+            <div class="flex justify-between p-3"><span class="font-mono font-bold">abstrak</span><span class="text-gray-500">Ringkasan</span></div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Result Panel -->
-      <div class="bg-gray-50  rounded-xl p-6 border border-gray-100 ">
-        <h2 class="text-lg font-semibold text-gray-900  mb-4">Status & Hasil</h2>
+      <!-- Results Panel -->
+      <div class="lg:col-span-8 p-6 lg:p-8 flex flex-col">
         
-        <div v-if="loading" class="space-y-4 py-8">
-          <div class="flex justify-between text-sm font-medium text-gray-700 ">
-            <span>Memproses dokumen...</span>
-            <span>{{ progress }}%</span>
+        <div class="flex justify-between items-center mb-6">
+          <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Status & Hasil Pemrosesan</div>
+          <div v-if="result" class="text-[11px] font-mono font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-2.5 py-1 border border-teal-200">Selesai</div>
+          <div v-else-if="loading" class="text-[11px] font-mono font-bold uppercase tracking-widest text-amber-600 bg-amber-50 px-2.5 py-1 border border-amber-200 flex items-center gap-2">
+             <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Memproses
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2.5  overflow-hidden">
-            <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" :style="{ width: `${progress}%` }"></div>
-          </div>
-          <p class="text-xs text-gray-500 text-center animate-pulse">Menjalankan inferensi SBERT dan perhitungan BM25. Mohon tunggu...</p>
         </div>
-        
-        <div v-else-if="result" class="space-y-6">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white  p-4 rounded-lg border border-gray-200  text-center">
-              <div class="text-3xl font-bold text-gray-900 ">{{ result.results.length }}</div>
-              <div class="text-xs text-gray-500 uppercase font-semibold mt-1">Data Diproses</div>
-            </div>
-            <div class="bg-white  p-4 rounded-lg border border-gray-200  text-center">
-              <div class="text-3xl font-bold text-gray-900 ">{{ (result.processing_time_ms / 1000).toFixed(1) }}s</div>
-              <div class="text-xs text-gray-500 uppercase font-semibold mt-1">Waktu Eksekusi</div>
-            </div>
+
+        <!-- Empty / Loading State -->
+        <div v-if="!result" class="flex-1 border border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center p-12 min-h-[400px]">
+          <div v-if="loading" class="w-full max-w-md space-y-4">
+             <div class="flex justify-between text-xs font-bold text-gray-700 font-mono">
+               <span>Inferensi Model...</span>
+               <span>{{ progress }}%</span>
+             </div>
+             <div class="w-full h-1 bg-gray-200 overflow-hidden">
+               <div class="bg-teal-500 h-full transition-all" :style="{ width: progress + '%' }"></div>
+             </div>
           </div>
-          
-          <div class="bg-green-50  p-4 rounded-lg border border-green-100  flex items-start gap-3">
-            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <div>
-              <h4 class="text-sm font-semibold text-green-800 ">Proses Selesai</h4>
-              <p class="text-xs text-green-600  mt-1">Seluruh data telah berhasil dipetakan ke dosen pembimbing teratas.</p>
+          <div v-else class="text-sm font-bold text-gray-400 uppercase tracking-widest">
+            Panel Hasil Batch Kosong
+          </div>
+        </div>
+
+        <!-- Result Data -->
+        <div v-else class="space-y-6">
+          <div class="flex border border-gray-200 divide-x divide-gray-200">
+            <div class="flex-1 p-4 bg-gray-50 text-center">
+              <div class="text-3xl font-mono font-bold text-gray-900">{{ result.results?.length || 0 }}</div>
+              <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 mt-1">Data Diproses</div>
+            </div>
+            <div class="flex-1 p-4 bg-gray-50 text-center">
+              <div class="text-3xl font-mono font-bold text-gray-900">{{ (((result.processing_time_ms || 0) / 1000)).toFixed(1) }}s</div>
+              <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 mt-1">Waktu Total</div>
+            </div>
+            <div class="flex-1 p-4 bg-gray-50 text-center flex flex-col justify-center items-center">
+              <button @click="downloadResult" class="text-xs font-bold bg-teal-600 text-white px-4 py-2 hover:bg-teal-700 transition-colors">
+                Unduh Hasil (.xlsx)
+              </button>
             </div>
           </div>
 
-          <button @click="downloadResult" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex justify-center items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            Download Hasil Excel
-          </button>
+          <div>
+             <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500 mb-3">Preview Teratas</div>
+             <div class="border border-gray-200 bg-white overflow-x-auto">
+               <table class="w-full text-left text-xs">
+                 <thead class="bg-gray-50 border-b border-gray-200 font-mono text-[10px] uppercase tracking-widest text-gray-500">
+                   <tr>
+                     <th class="p-3">ID / Nama</th>
+                     <th class="p-3">Judul Skripsi</th>
+                     <th class="p-3">Rekomendasi #1</th>
+                     <th class="p-3 text-right">Skor</th>
+                   </tr>
+                 </thead>
+                 <tbody class="divide-y divide-gray-200">
+                   <tr v-for="(item, idx) in (result.results || []).slice(0, 5)" :key="idx" class="hover:bg-gray-50">
+                     <td class="p-3">
+                       <div class="font-bold text-gray-900">{{ item.nama || item.nama_mahasiswa || '-' }}</div>
+                       <div class="font-mono text-[10px] text-gray-500">{{ item.id || item.mahasiswa_id || '-' }}</div>
+                     </td>
+                     <td class="p-3 text-gray-600 max-w-[200px] truncate" :title="item.judul || item.judul_tugas_akhir">
+                       {{ item.judul || item.judul_tugas_akhir || '-' }}
+                     </td>
+                     <td class="p-3 font-bold text-teal-700">
+                       {{ (item.rekomendasi?.recommendations?.[0] || item.recommendations?.[0])?.dosen?.nama || (item.rekomendasi?.recommendations?.[0] || item.recommendations?.[0])?.nama_dosen || '-' }}
+                     </td>
+                     <td class="p-3 text-right font-mono font-bold text-gray-900 tabular-nums">
+                       {{ (((item.rekomendasi?.recommendations?.[0] || item.recommendations?.[0])?.scores?.hybrid ?? (item.rekomendasi?.recommendations?.[0] || item.recommendations?.[0])?.hybrid_score ?? 0)).toFixed(3) }}
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+             </div>
+          </div>
         </div>
-        
-        <div v-else class="h-40 flex flex-col items-center justify-center text-center">
-          <svg class="w-10 h-10 text-gray-300  mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          <p class="text-sm text-gray-500 ">Belum ada proses berjalan.</p>
-        </div>
+
       </div>
+
     </div>
   </div>
 </template>
+
+<style scoped>
+.animate-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>

@@ -13,19 +13,17 @@ const handleToggleSidebar = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 text-gray-900 font-sans flex">
+  <div class="min-h-screen bg-slate-100/80 text-gray-900 font-sans flex">
     
     <AppSidebar ref="sidebarRef" />
     
     <div class="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:ml-[260px]">
       <AppHeader @toggle-sidebar="handleToggleSidebar" />
       
-      <main class="flex-grow p-4 sm:p-6 lg:p-8">
-        <div class="max-w-7xl mx-auto">
-          <router-view v-slot="{ Component }">
-            <transition name="fade-slide" mode="out-in">
-              <component :is="Component" />
-            </transition>
+      <main class="flex-grow p-4 sm:p-6 lg:p-8 w-full min-w-0 box-border">
+        <div class="w-full min-w-0">
+          <router-view v-slot="{ Component, route }">
+            <component :is="Component" :key="route.fullPath" />
           </router-view>
         </div>
       </main>
@@ -34,18 +32,5 @@ const handleToggleSidebar = () => {
 </template>
 
 <style>
-/* Page transitions */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
+/* Global styles if needed */
 </style>

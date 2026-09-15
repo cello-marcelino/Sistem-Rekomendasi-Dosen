@@ -1,74 +1,190 @@
+<template>
+  <div class="w-full box-border font-sans flex flex-col gap-6 animate-in">
+    
+    <!-- CARD 1: HERO / OVERVIEW (Concise, solution-oriented, primary points) -->
+    <div class="bg-white border border-gray-200/90 rounded-lg p-6 lg:p-8 shadow-sm">
+      <div class="flex flex-col items-start max-w-4xl">
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-3 leading-tight font-sans">
+          Sistem Rekomendasi Dosen Pembimbing & Penguji
+        </h1>
+        
+        <p class="text-sm sm:text-base text-gray-700 leading-relaxed mb-6">
+          Pemetaan topik tugas akhir mahasiswa dengan kepakaran dosen secara akurat, <span class="text-teal-700 font-semibold">objektif</span>, dan <span class="text-teal-700 font-semibold">transparan</span> berbasis NLP.
+        </p>
+        
+        <div class="flex flex-wrap items-center gap-3">
+          <button 
+            @click="router.push('/rekomendasi')" 
+            class="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold rounded shadow-sm transition-colors flex items-center gap-2"
+          >
+            <span>Mulai Rekomendasi</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+          <button 
+            @click="router.push('/dosen')" 
+            class="px-5 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-700 text-sm font-semibold rounded shadow-sm transition-colors"
+          >
+            Eksplorasi Direktori Dosen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2: USER SOLUTION METRICS (No latency, zero downtime, or XAI engine jargon) -->
+    <div class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
+      <div class="px-6 py-3.5 border-b border-gray-200/90 bg-gray-50/60">
+        <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-gray-700">Ringkasan Kemampuan Sistem</h2>
+      </div>
+      
+      <div class="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-200/80">
+        <div class="p-5 lg:p-6 flex flex-col justify-between">
+          <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Kecepatan Analisis</div>
+          <div class="text-2xl lg:text-3xl font-bold font-mono text-gray-900">Instan</div>
+          <div class="text-xs text-gray-600 mt-2">Hasil rekomendasi langsung siap</div>
+        </div>
+
+        <div class="p-5 lg:p-6 flex flex-col justify-between">
+          <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Model NLP</div>
+          <div class="text-2xl lg:text-3xl font-bold font-mono text-gray-900">BM25 + SBERT</div>
+          <div class="text-xs text-gray-600 mt-2">Kecocokan kata kunci & makna topik</div>
+        </div>
+
+        <div class="p-5 lg:p-6 flex flex-col justify-between">
+          <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Penilaian Dosen</div>
+          <div class="text-2xl lg:text-3xl font-bold font-mono text-gray-900">Skor Terukur</div>
+          <div class="text-xs text-gray-600 mt-2">Berdasarkan data publikasi & bimbingan</div>
+        </div>
+
+        <div class="p-5 lg:p-6 flex flex-col justify-between bg-teal-50/30">
+          <div class="text-[11px] font-mono font-bold text-teal-700 uppercase tracking-widest mb-1.5">Transparansi Skor</div>
+          <div class="text-2xl lg:text-3xl font-bold font-mono text-teal-900">Jelas & Terbuka</div>
+          <div class="text-xs text-teal-800 mt-2">Alasan kecocokan dapat ditinjau</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS 3 & 4: CORE MODULES & NLP PIPELINE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      
+      <!-- CARD 3: CORE MODULES (Direct, no fluff badges) -->
+      <div class="lg:col-span-5 bg-white border border-gray-200/90 rounded-lg shadow-sm flex flex-col overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200/90 bg-gray-50/60">
+          <h2 class="text-sm font-bold text-gray-900 tracking-wide font-sans">Layanan Utama</h2>
+        </div>
+        
+        <div class="divide-y divide-gray-100 flex-1">
+          <div 
+            @click="router.push('/admin/batch')" 
+            class="p-5 hover:bg-slate-50 transition-colors cursor-pointer group flex items-start justify-between gap-4"
+          >
+            <div>
+              <h3 class="text-sm font-bold text-gray-900 group-hover:text-teal-700 transition-colors mb-1">
+                Batch Recommendation
+              </h3>
+              <p class="text-xs text-gray-600 leading-relaxed">
+                Pemrosesan banyak proposal sekaligus via Excel dengan plotting dosen otomatis.
+              </p>
+            </div>
+            <span class="text-xs font-mono font-bold text-gray-400 group-hover:text-teal-700 group-hover:translate-x-0.5 transition-all mt-0.5">&rarr;</span>
+          </div>
+
+          <div 
+            @click="router.push('/admin/penjadwalan')" 
+            class="p-5 hover:bg-slate-50 transition-colors cursor-pointer group flex items-start justify-between gap-4"
+          >
+            <div>
+              <h3 class="text-sm font-bold text-gray-900 group-hover:text-teal-700 transition-colors mb-1">
+                Auto-Penjadwalan Sidang
+              </h3>
+              <p class="text-xs text-gray-600 leading-relaxed">
+                Penetapan slot waktu, ruang, dan susunan penguji sidang tanpa jadwal bentrok.
+              </p>
+            </div>
+            <span class="text-xs font-mono font-bold text-gray-400 group-hover:text-teal-700 group-hover:translate-x-0.5 transition-all mt-0.5">&rarr;</span>
+          </div>
+
+          <div 
+            @click="router.push('/dosen')" 
+            class="p-5 hover:bg-slate-50 transition-colors cursor-pointer group flex items-start justify-between gap-4"
+          >
+            <div>
+              <h3 class="text-sm font-bold text-gray-900 group-hover:text-teal-700 transition-colors mb-1">
+                Direktori Dosen
+              </h3>
+              <p class="text-xs text-gray-600 leading-relaxed">
+                Pencarian profil dosen, bidang keahlian, riwayat publikasi, dan bimbingan.
+              </p>
+            </div>
+            <span class="text-xs font-mono font-bold text-gray-400 group-hover:text-teal-700 group-hover:translate-x-0.5 transition-all mt-0.5">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 4: NLP PIPELINE (Concise, primary points only) -->
+      <div class="lg:col-span-7 bg-white border border-gray-200/90 rounded-lg shadow-sm flex flex-col overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200/90 bg-gray-50/60">
+          <h2 class="text-sm font-bold text-gray-900 tracking-wide font-sans">Tahapan Analisis NLP</h2>
+        </div>
+
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-50/70 border-b border-gray-200/80 text-[10px] uppercase font-mono tracking-widest text-gray-700 font-bold">
+                <th class="py-3 px-4 w-14 text-center border-r border-gray-200/80">Tahap</th>
+                <th class="py-3 px-4 border-r border-gray-200/80">Komponen</th>
+                <th class="py-3 px-4">Fungsi Utama</th>
+              </tr>
+            </thead>
+            <tbody class="text-xs divide-y divide-gray-100">
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-3 px-4 text-center border-r border-gray-100 font-mono font-bold text-gray-500">01</td>
+                <td class="py-3 px-4 font-bold text-gray-900 border-r border-gray-100 whitespace-nowrap">Pembersihan Teks</td>
+                <td class="py-3 px-4 text-gray-600 leading-relaxed">Ekstraksi kata kunci dan pembersihan kata umum (stopwords).</td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-3 px-4 text-center border-r border-gray-100 font-mono font-bold text-gray-500">02</td>
+                <td class="py-3 px-4 font-bold text-gray-900 border-r border-gray-100 whitespace-nowrap">Ekspansi Sinonim</td>
+                <td class="py-3 px-4 text-gray-600 leading-relaxed">Penyelarasan istilah informatika dengan padanan kata baku.</td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-3 px-4 text-center border-r border-gray-100 font-mono font-bold text-gray-500">03</td>
+                <td class="py-3 px-4 font-bold text-gray-900 border-r border-gray-100 whitespace-nowrap">Filter BM25</td>
+                <td class="py-3 px-4 text-gray-600 leading-relaxed">Penyaringan awal berbasis kecocokan kata kunci eksak (skor leksikal).</td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-3 px-4 text-center border-r border-gray-100 font-mono font-bold text-gray-500">04</td>
+                <td class="py-3 px-4 font-bold text-gray-900 border-r border-gray-100 whitespace-nowrap">SBERT Semantik</td>
+                <td class="py-3 px-4 text-gray-600 leading-relaxed">Pencocokan makna kontekstual proposal dengan kepakaran dosen.</td>
+              </tr>
+              <tr class="bg-teal-50/40 hover:bg-teal-50/60 transition-colors">
+                <td class="py-3 px-4 text-center border-r border-teal-200/80 font-mono font-bold text-teal-700">05</td>
+                <td class="py-3 px-4 font-bold text-teal-900 border-r border-teal-200/80 whitespace-nowrap">Skor Rekomendasi</td>
+                <td class="py-3 px-4 text-teal-900 leading-relaxed">Penggabungan skor akhir untuk rekomendasi dosen pembimbing & penguji terbaik.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</template>
+
 <script setup>
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 </script>
 
-<template>
-  <div class="space-y-6 animate-in">
-    <!-- Welcome Banner -->
-    <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-white shadow-lg relative overflow-hidden">
-      <!-- Decorative background elements -->
-      <div class="absolute top-0 right-0 -translate-y-12 translate-x-1/3 opacity-20">
-        <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#ffffff" d="M45.7,-76.3C58.9,-69.3,68.9,-54.8,77.5,-40.4C86,-25.9,93,-11.4,91.8,2.5C90.6,16.5,81.1,30,71.2,42C61.3,54,51,64.4,38.1,72.1C25.2,79.7,9.7,84.5,-5.1,87.6C-19.9,90.6,-34.1,91.9,-47.1,86.2C-60.1,80.5,-72,67.7,-80.4,53.2C-88.8,38.6,-93.6,22.2,-93.6,6.3C-93.6,-9.7,-88.7,-25.3,-80.2,-38.7C-71.7,-52.1,-59.5,-63.3,-46.1,-70.3C-32.6,-77.3,-17.8,-80,-1.3,-77.9C15.2,-75.8,32.5,-83.4,45.7,-76.3Z" transform="translate(100 100)" />
-        </svg>
-      </div>
-      
-      <div class="relative z-10 max-w-2xl">
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-          Sistem Rekomendasi Dosen Pembimbing
-        </h1>
-        <p class="text-emerald-50 text-lg mb-8 leading-relaxed max-w-xl">
-          Temukan dosen pembimbing yang paling relevan dengan topik penelitian Anda menggunakan algoritma Hybrid AI (BM25 & SBERT).
-        </p>
-        <div class="flex flex-wrap gap-4">
-          <button @click="router.push('/rekomendasi')" class="px-6 py-2.5 bg-white text-emerald-700 hover:bg-emerald-50 font-bold rounded-lg transition-colors shadow-sm flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            Cari Rekomendasi
-          </button>
-          <button @click="router.push('/dosen')" class="px-6 py-2.5 bg-emerald-800/40 text-white hover:bg-emerald-800/60 font-bold rounded-lg border border-emerald-400/30 transition-colors backdrop-blur-sm">
-            Lihat Data Dosen
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Stats & Modules -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group" @click="router.push('/admin/batch')">
-        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-        </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-2">Batch Recommendation</h3>
-        <p class="text-sm text-gray-500 leading-relaxed">Proses pencarian rekomendasi massal menggunakan file Excel untuk puluhan mahasiswa sekaligus.</p>
-      </div>
-
-      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group" @click="router.push('/admin/penjadwalan')">
-        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-        </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-2">Auto-Penjadwalan</h3>
-        <p class="text-sm text-gray-500 leading-relaxed">Otomatiskan alokasi jadwal sidang dan plotting penguji berdasarkan relevansi topik tanpa bentrok.</p>
-      </div>
-
-      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group" @click="router.push('/statistik')">
-        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-        </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-2">Statistik Sistem</h3>
-        <p class="text-sm text-gray-500 leading-relaxed">Lihat sebaran topik penelitian mahasiswa dan beban kerja dosen secara visual dan real-time.</p>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
 .animate-in {
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>

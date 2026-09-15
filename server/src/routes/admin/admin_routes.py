@@ -6,48 +6,25 @@ from server.src.controllers.admin.admin_dosen_controller import AdminDosenContro
 from server.src.controllers.recommendation.recommendation_controller import RecommendationController
 from server.src.services.admin.admin_auth_service import AdminAuthService
 from server.src.exceptions.app_exceptions import AuthenticationError
+from server.src.middleware.security_middleware import extract_credential, verify_token_or_key
 
 admin_bp = Blueprint('admin', __name__)
 
 def require_admin_auth(f):
-    """Middleware decorator enforcing valid admin token or admin API key."""
+    """Middleware decorator enforcing valid admin token or admin/client API key."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        auth_header = request.headers.get("Authorization", "")
-        token = ""
-        if auth_header.startswith("Bearer "):
-            token = auth_header.split(" ", 1)[1]
-        elif request.headers.get("X-API-Key"):
-            token = request.headers.get("X-API-Key")
-            
+        token = extract_credential()
         if not token:
             raise AuthenticationError("Akses ditolak: Token otorisasi admin tidak ditemukan")
             
-        payload = AdminAuthService.verify_token(token)
-        if not payload:
-            from server.src.config.config import Config
-            if token == Config.ADMIN_API_KEY:
-                return f(*args, **kwargs)
-                
-            try:
-                from server.src.repositories.client.client_repository import ClientRepository
-                from server.src.services.client.client_auth_service import ClientAuthService
-                
-                # Check if it's a client API key
-                client = ClientRepository().get_by_api_key(token)
-                if client and client.is_active:
-                    return f(*args, **kwargs)
-                    
-                # Check if it's a client session token
-                if ClientAuthService().verify_token(token):
-                    return f(*args, **kwargs)
-            except Exception:
-                pass
-                
+        auth_info = verify_token_or_key(token)
+        if not auth_info:
             raise AuthenticationError("Akses ditolak: Sesi atau API Key admin tidak valid / kadaluarsa")
                 
         return f(*args, **kwargs)
     return decorated_function
+
 
 # --- Admin Authentication Routes ---
 @admin_bp.route('/auth/login', methods=['POST'])

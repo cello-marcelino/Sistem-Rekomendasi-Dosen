@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed } from 'vue'
 
 const props = defineProps({
@@ -17,23 +17,20 @@ const parseListItems = (str) => {
   if (!trimmed || trimmed === '-' || trimmed.toLowerCase() === 'nan' || trimmed.toLowerCase() === 'null') {
     return []
   }
-  // Quoted items
   const matches = trimmed.match(/"([^"]+)"/g)
   if (matches && matches.length > 0) {
     return matches
       .map(m => m.replace(/(^"|"$)/g, '').trim())
       .filter(j => j.length > 0 && j !== '-')
   }
-  // Array-like
   if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
     try {
       const parsed = JSON.parse(trimmed.replace(/'/g, '"'))
       if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean)
     } catch {}
   }
-  // Semicolon / newline separated
   return trimmed
-    .split(/\n|;|ΓÇó|\r/)
+    .split(/\n|;|•|\r/)
     .map(s => s.replace(/^[0-9]+[.)]\s*/, '').trim())
     .filter(s => s.length > 0 && s !== '-')
 }
@@ -104,18 +101,18 @@ const displayUjiList = computed(() => {
 </script>
 
 <template>
-  <div v-if="isOpen && dosen" class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-box">
+  <div v-if="isOpen && dosen" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-in" @click.self="$emit('close')">
+    <div class="bg-white border border-gray-300 w-full max-w-5xl max-h-[90vh] flex flex-col">
       <!-- Modal Header -->
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-badges">
-            <span class="prodi-badge">{{ dosen.program_studi }}</span>
-            <span v-if="dosen.nidn" class="nidn-badge">NIDN: {{ dosen.nidn }}</span>
+      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-start shrink-0">
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5">{{ dosen.program_studi }}</span>
+            <span v-if="dosen.nidn" class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5">NIDN: {{ dosen.nidn }}</span>
           </div>
-          <h3 class="modal-title">{{ dosen.nama }}</h3>
+          <h3 class="text-2xl font-bold text-gray-900 font-sans tracking-tight">{{ dosen.nama }}</h3>
         </div>
-        <button @click="$emit('close')" class="modal-close-btn" aria-label="Tutup modal">
+        <button @click="$emit('close')" class="p-1 hover:bg-gray-200 text-gray-500 transition-colors">
           <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -123,122 +120,110 @@ const displayUjiList = computed(() => {
       </div>
 
       <!-- Modal Body -->
-      <div class="modal-body">
+      <div class="p-6 overflow-y-auto flex-1 bg-white flex flex-col gap-8">
         
         <!-- 1. Bidang Keahlian & Pendidikan -->
-        <div class="xai-grid-2">
-          <div class="xai-card">
-            <h4 class="xai-label">Bidang Keahlian</h4>
-            <p class="xai-text font-medium">{{ dosen.bidang_keahlian || '-' }}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="border border-gray-200">
+            <div class="bg-gray-50 border-b border-gray-200 px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500">Bidang Keahlian</div>
+            <div class="p-4 text-sm font-bold text-gray-900">{{ dosen.bidang_keahlian || '-' }}</div>
           </div>
-          <div class="xai-card">
-            <h4 class="xai-label">Riwayat Pendidikan</h4>
-            <div v-if="pendidikanList.length" class="edu-timeline">
-              <div v-for="(edu, idx) in pendidikanList" :key="'edu'+idx" class="edu-item">
-                <div class="edu-dot"></div>
-                <div class="edu-content">
-                  <span class="edu-title">{{ edu }}</span>
-                </div>
-              </div>
+          <div class="border border-gray-200">
+            <div class="bg-gray-50 border-b border-gray-200 px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500">Riwayat Pendidikan</div>
+            <div class="p-0 divide-y divide-gray-200">
+              <div v-for="(edu, idx) in pendidikanList" :key="idx" class="px-4 py-3 text-xs font-mono text-gray-700 leading-relaxed">{{ edu }}</div>
+              <div v-if="!pendidikanList.length" class="p-4 text-xs italic text-gray-400">Belum ada data pendidikan.</div>
             </div>
-            <p v-else class="xai-empty">Belum ada data pendidikan.</p>
           </div>
         </div>
 
-        <!-- 2. XAI Explainability (BM25 + KeyBERT) -->
-        <div class="xai-card xai-card--brand">
-          <div class="xai-header-flex">
-            <h4 class="xai-label text-indigo-900">Alasan Rekomendasi (Explainable AI)</h4>
-            <button 
-              type="button" 
-              class="filter-toggle-btn"
-              @click="showAllRecords = !showAllRecords"
-            >
-              {{ showAllRecords ? 'Tampilkan Hanya Yang Relevan' : 'Tampilkan Semua Riwayat' }}
+        <!-- 2. Alasan Kesesuaian Rekomendasi -->
+        <div class="border border-teal-200">
+          <div class="bg-teal-50 border-b border-teal-200 px-4 py-2 flex justify-between items-center">
+            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-teal-800">Alasan Kesesuaian Rekomendasi</span>
+            <button @click="showAllRecords = !showAllRecords" class="text-[10px] font-mono font-bold uppercase text-teal-700 hover:underline">
+              {{ showAllRecords ? 'Tampilkan Yang Relevan Saja' : 'Tampilkan Semua Riwayat' }}
             </button>
           </div>
           
-          <div class="xai-reasons-grid">
-            <div>
-              <div class="xai-sub-label">Irisan Kata Kunci Eksak (BM25 Match):</div>
-              <div class="xai-tags">
-                <span v-for="kata in xai?.irisan_kata" :key="kata" class="xai-tag xai-tag--blue">
-                  <svg class="xai-check" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                  </svg>
+          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white">
+            <div class="flex flex-col gap-2">
+              <div class="text-[11px] font-bold text-gray-700 font-mono">Kecocokan Kata Kunci (BM25):</div>
+              <div class="flex flex-wrap gap-2">
+                <span v-for="kata in xai?.irisan_kata" :key="kata" class="text-[10px] font-mono font-bold border border-gray-300 bg-gray-50 px-2 py-1 text-gray-900">
                   {{ kata }}
                 </span>
-                <span v-if="!xai?.irisan_kata?.length" class="xai-empty">Tidak ada kata kunci yang cocok secara eksak.</span>
+                <span v-if="!xai?.irisan_kata?.length" class="text-xs text-gray-500 italic">Tidak ada kata kunci yang cocok secara langsung.</span>
               </div>
             </div>
 
-            <div>
-              <div class="xai-sub-label">Topik Semantik Dosen (KeyBERT):</div>
-              <div class="xai-tags">
-                <span v-for="topik in xai?.topik_dosen" :key="topik" class="xai-tag xai-tag--fuchsia">
+            <div class="flex flex-col gap-2">
+              <div class="text-[11px] font-bold text-gray-700 font-mono">Kecocokan Makna Topik (SBERT):</div>
+              <div class="flex flex-wrap gap-2">
+                <span v-for="topik in xai?.topik_dosen" :key="topik" class="text-[10px] font-mono font-bold border border-teal-200 bg-teal-50 px-2 py-1 text-teal-800">
                   {{ topik }}
                 </span>
-                <span v-if="!xai?.topik_dosen?.length" class="xai-empty">Belum ada topik semantik terdeteksi.</span>
+                <span v-if="!xai?.topik_dosen?.length" class="text-xs text-gray-500 italic">Belum ada topik semantik terdeteksi.</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 3. Riwayat Publikasi Jurnal Relevan -->
-        <div class="xai-section">
-          <div class="xai-section-header">
-            <h4 class="xai-label">
+        <!-- 3. Riwayat Publikasi Jurnal -->
+        <div class="border border-gray-200 bg-white">
+          <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 flex justify-between items-center">
+            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-700">
               {{ showAllRecords ? 'Seluruh Riwayat Publikasi Jurnal' : 'Riwayat Publikasi Jurnal Relevan' }}
-            </h4>
-            <span class="count-badge count-badge--brand">
+            </span>
+            <span class="text-[10px] font-mono font-bold bg-white border border-gray-200 px-2 py-0.5">
               {{ displayJurnalList.length }} / {{ allJurnalList.length }}
             </span>
           </div>
-          <ul v-if="displayJurnalList.length" class="xai-list-group">
-            <li v-for="(jurnal, idx) in displayJurnalList" :key="'j'+idx" class="xai-list-item">
-              <span class="item-num">{{ idx + 1 }}</span>
-              <span class="item-text">{{ jurnal }}</span>
-            </li>
-          </ul>
-          <p v-else class="xai-empty">Tidak ada riwayat publikasi jurnal yang memuat kata kunci topik input.</p>
+          <div class="p-0 divide-y divide-gray-200">
+            <div v-for="(jurnal, idx) in displayJurnalList" :key="idx" class="px-4 py-3 flex items-start gap-4 hover:bg-gray-50">
+              <span class="text-[10px] font-mono font-bold text-gray-400 w-6">#{{ idx + 1 }}</span>
+              <span class="text-sm text-gray-900 leading-relaxed">{{ jurnal }}</span>
+            </div>
+            <div v-if="!displayJurnalList.length" class="p-6 text-xs text-gray-400 italic text-center">Tidak ada riwayat publikasi jurnal yang memuat kata kunci topik input.</div>
+          </div>
         </div>
 
-        <!-- 4. Riwayat Bimbingan Mahasiswa Relevan -->
-        <div class="xai-section">
-          <div class="xai-section-header">
-            <h4 class="xai-label">
+        <!-- 4. Riwayat Bimbingan Mahasiswa -->
+        <div class="border border-gray-200 bg-white">
+          <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 flex justify-between items-center">
+            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-700">
               {{ showAllRecords ? 'Seluruh Riwayat Bimbingan' : 'Riwayat Bimbingan Mahasiswa Relevan' }}
-            </h4>
-            <span class="count-badge count-badge--green">
+            </span>
+            <span class="text-[10px] font-mono font-bold bg-white border border-gray-200 px-2 py-0.5">
               {{ displayBimbinganList.length }} / {{ allBimbinganList.length }}
             </span>
           </div>
-          <ul v-if="displayBimbinganList.length" class="xai-list-group">
-            <li v-for="(bimbing, idx) in displayBimbinganList" :key="'b'+idx" class="xai-list-item">
-              <span class="item-num item-num--green">{{ idx + 1 }}</span>
-              <span class="item-text">{{ bimbing }}</span>
-            </li>
-          </ul>
-          <p v-else class="xai-empty">Tidak ada riwayat bimbingan mahasiswa yang memuat kata kunci topik input.</p>
+          <div class="p-0 divide-y divide-gray-200">
+            <div v-for="(bimbing, idx) in displayBimbinganList" :key="idx" class="px-4 py-3 flex items-start gap-4 hover:bg-gray-50">
+              <span class="text-[10px] font-mono font-bold text-gray-400 w-6">#{{ idx + 1 }}</span>
+              <span class="text-sm text-gray-900 leading-relaxed">{{ bimbing }}</span>
+            </div>
+            <div v-if="!displayBimbinganList.length" class="p-6 text-xs text-gray-400 italic text-center">Tidak ada riwayat bimbingan mahasiswa yang memuat kata kunci topik input.</div>
+          </div>
         </div>
 
-        <!-- 5. Riwayat Pengujian Mahasiswa Relevan -->
-        <div class="xai-section">
-          <div class="xai-section-header">
-            <h4 class="xai-label">
+        <!-- 5. Riwayat Pengujian Mahasiswa -->
+        <div class="border border-gray-200 bg-white">
+          <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 flex justify-between items-center">
+            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-700">
               {{ showAllRecords ? 'Seluruh Riwayat Pengujian' : 'Riwayat Pengujian Sidang Relevan' }}
-            </h4>
-            <span class="count-badge count-badge--blue">
+            </span>
+            <span class="text-[10px] font-mono font-bold bg-white border border-gray-200 px-2 py-0.5">
               {{ displayUjiList.length }} / {{ allUjiList.length }}
             </span>
           </div>
-          <ul v-if="displayUjiList.length" class="xai-list-group">
-            <li v-for="(uji, idx) in displayUjiList" :key="'u'+idx" class="xai-list-item">
-              <span class="item-num item-num--blue">{{ idx + 1 }}</span>
-              <span class="item-text">{{ uji }}</span>
-            </li>
-          </ul>
-          <p v-else class="xai-empty">Tidak ada riwayat pengujian sidang yang memuat kata kunci topik input.</p>
+          <div class="p-0 divide-y divide-gray-200">
+            <div v-for="(uji, idx) in displayUjiList" :key="idx" class="px-4 py-3 flex items-start gap-4 hover:bg-gray-50">
+              <span class="text-[10px] font-mono font-bold text-gray-400 w-6">#{{ idx + 1 }}</span>
+              <span class="text-sm text-gray-900 leading-relaxed">{{ uji }}</span>
+            </div>
+            <div v-if="!displayUjiList.length" class="p-6 text-xs text-gray-400 italic text-center">Tidak ada riwayat pengujian sidang yang memuat kata kunci topik input.</div>
+          </div>
         </div>
         
       </div>
@@ -247,181 +232,11 @@ const displayUjiList = computed(() => {
 </template>
 
 <style scoped>
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(17, 17, 24, 0.45);
-  backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1.5rem; z-index: 200;
+.animate-in {
+  animation: fade-in 0.2s ease-out forwards;
 }
-
-.modal-box {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
-  width: 100%; max-width: 820px; max-height: 85vh; height: 85vh;
-  display: flex; flex-direction: column; overflow: hidden;
-  animation: modal-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes modal-up {
-  from { opacity: 0; transform: translateY(16px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-header {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex; justify-content: space-between; align-items: flex-start;
-  background: #ffffff;
-  flex-shrink: 0;
-}
-.modal-header-info { display: flex; flex-direction: column; gap: 0.35rem; }
-.modal-badges { display: flex; align-items: center; gap: 0.5rem; }
-.prodi-badge {
-  font-size: 0.72rem; font-weight: 700; color: #10b981;
-  background: #d1fae5; padding: 2px 8px; border-radius: 4px;
-}
-.nidn-badge {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.7rem; font-weight: 600;
-  color: #6b7280; background: #f3f4f6; padding: 2px 6px; border-radius: 4px;
-}
-.modal-title { font-size: 1.35rem; font-weight: 800; color: #111827; margin: 0; }
-
-.modal-close-btn {
-  background: #f3f4f6;
-  border: none; border-radius: 50%;
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  color: #6b7280;
-  cursor: pointer; transition: all 0.15s;
-}
-.modal-close-btn:hover { background: #fee2e2; color: #ef4444; }
-
-.modal-body {
-  padding: 2rem;
-  overflow-y: auto;
-  flex: 1;
-  min-height: 0;
-  background: #f9fafb;
-  display: flex; flex-direction: column; gap: 1.5rem;
-}
-
-.xai-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.xai-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: flex; flex-direction: column; gap: 0.5rem;
-}
-.xai-card--brand {
-  background: #fcfaff;
-  border-color: #ddd6fe;
-}
-
-.xai-header-flex {
-  display: flex; justify-content: space-between; align-items: center;
-}
-
-.filter-toggle-btn {
-  font-size: 0.72rem; font-weight: 600;
-  color: #10b981; background: #ffffff;
-  border: 1px solid #c4b5fd; border-radius: 4px;
-  padding: 0.25rem 0.6rem; cursor: pointer; transition: all 0.15s;
-}
-.filter-toggle-btn:hover {
-  background: #10b981; color: white;
-}
-
-.xai-label {
-  font-size: 0.72rem; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280;
-  margin: 0;
-}
-.xai-sub-label {
-  font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem;
-}
-.xai-text { font-size: 0.85rem; color: #111827; line-height: 1.5; margin: 0; }
-.xai-empty { font-size: 0.78rem; color: #6b7280; font-style: italic; margin: 0; }
-
-.edu-timeline { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.25rem; }
-.edu-item { display: flex; align-items: flex-start; gap: 0.75rem; }
-.edu-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; margin-top: 6px; flex-shrink: 0; box-shadow: 0 0 0 3px #d1fae5; }
-.edu-content { flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.4rem 0.6rem; }
-.edu-title { font-size: 0.78rem; font-weight: 600; color: #111827; line-height: 1.35; display: block; }
-
-.xai-reasons-grid {
-  display: flex; flex-direction: column; gap: 0.75rem;
-}
-
-.xai-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.xai-tag {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.72rem; font-weight: 700;
-  padding: 3px 8px; border-radius: 4px; border: 1px solid;
-}
-.xai-tag--fuchsia { background: #fae8ff; border-color: #f5d0fe; color: #d946ef; }
-.xai-tag--blue {
-  background: #dbeafe; border-color: #bfdbfe; color: #3b82f6;
-  display: flex; align-items: center; gap: 4px;
-}
-.xai-check { font-size: 0.65rem; }
-
-.xai-section {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: flex; flex-direction: column; gap: 0.75rem;
-}
-.xai-section-header {
-  display: flex; justify-content: space-between; align-items: center;
-}
-
-.count-badge {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.7rem; font-weight: 700;
-  padding: 2px 8px; border-radius: 99px;
-}
-.count-badge--brand { background: #d1fae5; color: #10b981; }
-.count-badge--green { background: #d1fae5; color: #10b981; }
-.count-badge--blue { background: #dbeafe; color: #3b82f6; }
-
-.xai-list-group {
-  list-style: none; padding: 0; margin: 0;
-  display: flex; flex-direction: column; gap: 0.5rem;
-}
-.xai-list-item {
-  display: flex; align-items: flex-start; gap: 0.75rem;
-  padding: 0.6rem 0.85rem;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-}
-.item-num {
-  display: flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: #d1fae5; color: #10b981;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.68rem; font-weight: 700;
-  flex-shrink: 0; margin-top: 1px;
-}
-.item-num--green { background: #d1fae5; color: #10b981; }
-.item-num--blue { background: #dbeafe; color: #3b82f6; }
-
-.item-text {
-  font-size: 0.825rem; color: #111827; line-height: 1.5;
-}
-
-@media (max-width: 768px) {
-  .xai-grid-2 { grid-template-columns: 1fr; }
-  .modal-header { padding: 1.25rem 1.5rem; }
-  .modal-body { padding: 1.25rem; }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>
-
-
