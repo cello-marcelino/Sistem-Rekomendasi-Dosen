@@ -89,39 +89,41 @@ const pengujianList = computed(() => parseListItems(dosen.value?.judul_uji || do
 </script>
 
 <template>
-  <div class="w-full min-h-full flex flex-col animate-in">
-    <!-- Header -->
-    <div class="py-6 lg:py-10 border-b border-gray-200 px-6 lg:px-8 bg-white flex flex-col lg:flex-row justify-between lg:items-end gap-6 shrink-0">
-      <div class="max-w-4xl">
-        <button 
-          @click="goBack" 
-          class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 hover:text-gray-900 mb-4 flex items-center gap-1"
-        >
-          &larr; KEMBALI
-        </button>
-        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-2 font-sans line-clamp-2">
-          {{ dosen ? dosen.nama : 'Profil Dosen' }}
-        </h1>
-        <div class="flex items-center gap-3 text-sm text-gray-500 font-mono">
-           <span v-if="dosen?.nidn">NIDN: {{ dosen.nidn }}</span>
-           <span v-if="dosen?.program_studi" class="border-l border-gray-300 pl-3 text-teal-700">{{ dosen.program_studi }}</span>
+  <div class="space-y-6 pb-12 animate-in">
+    <!-- Header Section (Canvas-First) -->
+    <div class="border-b border-gray-200 pb-5">
+      <button 
+        @click="goBack" 
+        class="text-xs font-mono font-bold text-gray-500 hover:text-gray-900 mb-3 inline-flex items-center gap-1.5 transition-colors"
+      >
+        &larr; KEMBALI
+      </button>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900 font-sans line-clamp-2">
+            {{ dosen ? dosen.nama : 'Profil Dosen' }}
+          </h1>
+          <div class="flex items-center gap-3 text-xs text-gray-500 font-mono mt-1">
+            <span v-if="dosen?.nidn">NIDN: {{ dosen.nidn }}</span>
+            <span v-if="dosen?.program_studi" class="border-l border-gray-300 pl-3 text-teal-800 font-semibold">{{ dosen.program_studi }}</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- State: Loading / Error -->
-    <div v-if="isLoading" class="flex-1 p-20 flex flex-col items-center justify-center bg-gray-50">
+    <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center bg-white border border-gray-200 rounded shadow-sm">
       <div class="w-8 h-8 border-2 border-gray-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
       <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Memuat Profil...</span>
     </div>
 
-    <div v-else-if="errorMessage" class="flex-1 p-12 bg-red-50 text-red-700 flex flex-col items-center justify-center">
+    <div v-else-if="errorMessage" class="p-8 bg-rose-50 border border-rose-200 rounded text-rose-700 flex flex-col items-center justify-center">
       <p class="font-bold text-sm mb-4">{{ errorMessage }}</p>
-      <button @click="goBack" class="px-4 py-2 border border-red-200 bg-white text-xs font-bold hover:bg-gray-50">Kembali</button>
+      <button @click="goBack" class="px-4 py-2 border border-rose-200 bg-white text-xs font-bold hover:bg-gray-50 rounded">Kembali</button>
     </div>
 
-    <!-- Split View Layout -->
-    <div v-else-if="dosen" class="flex-1 grid grid-cols-1 lg:grid-cols-12 bg-white">
+    <!-- Split View Layout (Elevated Card) -->
+    <div v-else-if="dosen" class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12">
       
       <!-- Left: Identity & Metadata (4 Cols) -->
       <aside class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50/50 p-6 lg:p-8 flex flex-col gap-10">

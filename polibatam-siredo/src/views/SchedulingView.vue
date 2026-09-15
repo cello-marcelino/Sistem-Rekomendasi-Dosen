@@ -128,21 +128,21 @@ const downloadTemplate = () => {
 </script>
 
 <template>
-  <div class="w-full min-h-full animate-in flex flex-col">
-    <!-- Header -->
-    <div class="py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 bg-white">
-      <div class="max-w-4xl flex justify-between items-start">
-        <div>
-          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">Jadwal Sidang & Penguji</h1>
-          <p class="text-sm text-gray-700 leading-relaxed m-0">
-            Penetapan jadwal sidang dan dosen penguji otomatis tanpa bentrok berbasis kecocokan topik NLP.
-          </p>
-        </div>
+  <div class="space-y-6 pb-12 animate-in">
+    <!-- Header Section (Canvas-First) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-sans">Jadwal Sidang & Penguji</h1>
+        <p class="text-sm text-gray-600 mt-1">
+          Penetapan jadwal sidang dan dosen penguji otomatis tanpa bentrok berbasis kecocokan topik NLP.
+        </p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
         <button 
           @click="downloadTemplate" 
-          class="text-xs text-gray-900 bg-white hover:bg-gray-50 px-4 py-2.5 rounded-[4px] border border-gray-300 font-semibold transition-colors flex items-center gap-2 shadow-sm"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors shadow-sm"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           Download Template
@@ -150,41 +150,43 @@ const downloadTemplate = () => {
       </div>
     </div>
 
-    <!-- KPI Metrics -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b border-gray-200 bg-white w-full">
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Slot Sesi</div>
+    <!-- KPI Metrics (Elevated Card) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200 rounded shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Slot Sesi</div>
         <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">4 Sesi / Hari</div>
       </div>
-      <div class="p-6 border-b lg:border-b-0 lg:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Kapasitas Ruang</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Kapasitas Ruang</div>
         <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">3 Ruang PBL</div>
       </div>
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Dosen Penguji</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Dosen Penguji</div>
         <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">2 Dosen / Mhs</div>
       </div>
-      <div class="p-6">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Jadwal Sidang</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Jadwal Sidang</div>
         <div class="text-2xl font-mono font-bold text-teal-800 tabular-nums">Bebas Bentrok</div>
       </div>
     </div>
 
-    <!-- Stepper Bar -->
-    <div class="flex border-b border-gray-200 bg-gray-50 w-full divide-x divide-gray-200">
-      <div class="flex-1 p-4 flex items-center gap-3" :class="step === 1 ? 'bg-white' : ''">
-        <div class="text-xs font-mono font-bold uppercase tracking-widest" :class="step === 1 ? 'text-teal-600' : 'text-gray-400'">01. Upload</div>
+    <!-- Main Workspace (Elevated Card with Stepper) -->
+    <div class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+      <!-- Stepper Bar -->
+      <div class="flex border-b border-gray-200 bg-gray-50 w-full divide-x divide-gray-200">
+        <div class="flex-1 p-3.5 flex items-center gap-3" :class="step === 1 ? 'bg-white' : ''">
+          <div class="text-xs font-mono font-bold uppercase tracking-widest" :class="step === 1 ? 'text-teal-700' : 'text-gray-400'">01. Upload</div>
+        </div>
+        <div class="flex-1 p-3.5 flex items-center gap-3" :class="step === 2 ? 'bg-white' : ''">
+          <div class="text-xs font-mono font-bold uppercase tracking-widest" :class="step === 2 ? 'text-teal-700' : 'text-gray-400'">02. Alokasi NLP</div>
+        </div>
+        <div class="flex-1 p-3.5 flex items-center gap-3" :class="step === 3 ? 'bg-white' : ''">
+          <div class="text-xs font-mono font-bold uppercase tracking-widest" :class="step === 3 ? 'text-teal-700' : 'text-gray-400'">03. Jadwal Final</div>
+        </div>
       </div>
-      <div class="flex-1 p-4 flex items-center gap-3" :class="step === 2 ? 'bg-white' : ''">
-        <div class="text-xs font-mono font-bold uppercase tracking-widest" :class="step === 2 ? 'text-teal-600' : 'text-gray-400'">02. Alokasi NLP</div>
-      </div>
-      <div class="flex-1 p-4 flex items-center gap-3" :class="step === 3 ? 'bg-white' : ''">
-        <div class="text-xs font-mono font-bold uppercase tracking-widest" :class="step === 3 ? 'text-teal-600' : 'text-gray-400'">03. Jadwal Final</div>
-      </div>
-    </div>
 
-    <!-- Main Workspace -->
-    <div class="w-full bg-white flex-1 relative">
+      <!-- Content Area -->
+      <div class="w-full bg-white relative">
       
       <!-- Step 1 -->
       <div v-if="step === 1" class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 h-full">
@@ -290,5 +292,6 @@ const downloadTemplate = () => {
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>

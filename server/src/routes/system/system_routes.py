@@ -23,12 +23,25 @@ def get_status():
 def get_config():
     return SystemController.get_config()
 
-
 @system_bp.route('/system/config', methods=['PATCH', 'PUT'])
 @system_bp.route('/config', methods=['PATCH', 'PUT'])
 @require_admin_key
 def update_config():
     return SystemController.update_config()
+
+# Sandbox simulation endpoint (Protected with API key)
+@system_bp.route('/system/config/simulate', methods=['POST'])
+@system_bp.route('/config/simulate', methods=['POST'])
+@require_api_key
+def simulate_config():
+    return SystemController.simulate_config()
+
+# Reset configuration endpoint (Protected with Admin key)
+@system_bp.route('/system/config/reset', methods=['POST'])
+@system_bp.route('/config/reset', methods=['POST'])
+@require_admin_key
+def reset_config():
+    return SystemController.reset_config()
 
 # System reload endpoint
 @system_bp.route('/system/reload', methods=['POST'])

@@ -7,6 +7,7 @@ import RecommendationView from '../views/RecommendationView.vue'
 import BatchRecommendationView from '../views/BatchRecommendationView.vue'
 import SchedulingView from '../views/SchedulingView.vue'
 import AdminDosenListView from '../views/AdminDosenListView.vue'
+import AdminConfigView from '../views/AdminConfigView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,9 +22,9 @@ const router = createRouter({
     { path: '/admin/dosen/create', name: 'DosenCreate', component: DosenFormView },
     { path: '/admin/dosen/:id', redirect: '/admin/dosen' },
     { path: '/admin/dosen/:id/edit', name: 'DosenEdit', component: DosenFormView },
+    { path: '/admin/konfigurasi', name: 'AdminConfig', component: AdminConfigView },
     { path: '/statistik', redirect: '/dosen' },
   ]
 })
 
 export default router
-

@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 from server.src.services.nlp.stopwords import STOPWORDS
 from server.src.services.nlp.kamus_ekspansi import KAMUS_EKSPANSI
 
@@ -84,7 +84,19 @@ class Preprocessor:
         return Preprocessor.clean_text(text)
 
     @staticmethod
-    def build_corpus_text(dosen) -> Tuple[str, str]:
+    def build_corpus_text(dosen, weights: Dict[str, Any] = None) -> Tuple[str, str]:
+        if weights is None:
+            try:
+                from server.src.services.system.config_service import ConfigService
+                weights = ConfigService.get_config()
+            except Exception:
+                weights = {}
+                
+        w_bidang = int(weights.get('weight_keahlian', 5))
+        w_jurnal = int(weights.get('weight_publikasi', 2))
+        w_bimbing = int(weights.get('weight_bimbingan', 1))
+        w_uji = int(weights.get('weight_pengujian', 1))
+
         # Parse and deduplicate historical titles
         judul_bimbing = Preprocessor._parse_dan_dedup_judul(dosen.judul_bimbing, 12)
         judul_uji = Preprocessor._parse_dan_dedup_judul(dosen.judul_uji, 8)
@@ -93,14 +105,15 @@ class Preprocessor:
         jurnal = dosen.jurnal or ""
         pendidikan = dosen.pendidikan or ""
         
-        # Weighted text for BM25 (repetition weighting based on expertise level)
-        inti = (bidang + " ") * 5 + \
-               (jurnal + " ") * 2 + \
-               (judul_bimbing + " ") + \
-               (judul_uji + " ")
+        # Weighted text for BM25 (repetition weighting based on configured weights)
+        inti = (bidang + " ") * max(0, w_bidang) + \
+               (jurnal + " ") * max(0, w_jurnal) + \
+               (judul_bimbing + " ") * max(0, w_bimbing) + \
+               (judul_uji + " ") * max(0, w_uji)
         teks_terbobot = inti + pendidikan
         
         # Normal text for SBERT Semantic encoding & KeyBERT (unweighted)
         teks_normal = f"{pendidikan} {bidang} {jurnal} {judul_uji} {judul_bimbing}"
         
         return teks_terbobot, teks_normal
+

@@ -89,60 +89,67 @@ const filteredDosen = computed(() => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col animate-in">
-    <!-- Header -->
-    <div class="py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 bg-white flex justify-between items-end">
-      <div class="max-w-3xl">
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">Master Data Dosen</h1>
-        <p class="text-sm text-gray-700 leading-relaxed m-0">
+  <div class="space-y-6 pb-12 animate-in">
+    <!-- Header Section (Canvas-First) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-sans">Master Data Dosen</h1>
+        <p class="text-sm text-gray-600 mt-1">
           Pengelolaan data profil, publikasi, dan keahlian dosen pengajar.
         </p>
       </div>
-      <router-link to="/admin/dosen/create" class="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold rounded-[4px] transition-colors shadow-sm">
-        + Tambah Data
-      </router-link>
-    </div>
-
-    <!-- Metrics Row -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b border-gray-200 bg-white w-full">
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Populasi Master</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
-      </div>
-      <div class="p-6 border-b lg:border-b-0 lg:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Total Publikasi</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
-      </div>
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Riwayat Bimbingan</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
-      </div>
-      <div class="p-6">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Riwayat Ujian</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
+      <div class="flex items-center gap-2 shrink-0">
+        <router-link 
+          to="/admin/dosen/create" 
+          class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-700 rounded hover:bg-teal-800 transition-colors shadow-sm"
+        >
+          + Tambah Data
+        </router-link>
       </div>
     </div>
 
-    <!-- Filter & Search Bar -->
-    <div class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex gap-4 items-center">
-      <input 
-        type="text" 
-        v-model="search" 
-        placeholder="Cari berdasarkan nama, NIDN, atau keahlian..." 
-        class="w-full max-w-md bg-white border border-gray-300 rounded-[4px] px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-500"
-      />
-      <select 
-        v-model="selectedProdi" 
-        class="w-full max-w-[200px] bg-white border border-gray-300 rounded-[4px] px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-500"
-      >
-        <option value="">Semua Prodi</option>
-        <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
-      </select>
+    <!-- Metrics Row (Elevated Card) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200 rounded shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Populasi Master</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
+      </div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Total Publikasi</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
+      </div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Riwayat Bimbingan</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
+      </div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Riwayat Ujian</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
+      </div>
     </div>
 
-    <!-- Table Workspace -->
-    <div class="flex-1 bg-white overflow-y-auto">
-      <table class="w-full text-left text-xs">
+    <!-- Table Workspace (Elevated Card) -->
+    <div class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+      <!-- Filter & Search Bar -->
+      <div class="border-b border-gray-200 bg-gray-50/70 px-6 py-3.5 flex flex-col sm:flex-row gap-3 items-center">
+        <input 
+          type="text" 
+          v-model="search" 
+          placeholder="Cari berdasarkan nama, NIDN, atau keahlian..." 
+          class="w-full max-w-md bg-white border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-teal-700"
+        />
+        <select 
+          v-model="selectedProdi" 
+          class="w-full sm:w-52 bg-white border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-teal-700"
+        >
+          <option value="">Semua Prodi</option>
+          <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
         <thead class="bg-white border-b border-gray-200 font-mono text-[10px] uppercase tracking-widest text-gray-700 font-bold sticky top-0">
           <tr>
             <th class="p-4 border-r border-gray-200 w-12 text-center">No</th>
@@ -187,6 +194,7 @@ const filteredDosen = computed(() => {
         </tbody>
       </table>
     </div>
+  </div>
   </div>
 </template>
 

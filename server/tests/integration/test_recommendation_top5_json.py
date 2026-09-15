@@ -50,6 +50,7 @@ def test_collect_top5_recommendations_for_all_theses_json(client):
     """
     collected_results = []
     
+    headers = {"X-API-Key": "test-admin-key"}
     for thesis in HARDCODED_THESIS_DATASET:
         payload = {
             "judul": thesis["judul"],
@@ -58,7 +59,7 @@ def test_collect_top5_recommendations_for_all_theses_json(client):
         }
         
         # 1. Eksekusi request API rekomendasi
-        response = client.post('/api/recommendations', json=payload)
+        response = client.post('/api/recommendations', json=payload, headers=headers)
         assert response.status_code == 200
         
         body = response.get_json()
@@ -145,7 +146,7 @@ def test_batch_collect_top5_recommendations_json(client):
         ]
     }
     
-    response = client.post('/api/recommendations/batch', json=batch_payload)
+    response = client.post('/api/recommendations/batch', json=batch_payload, headers={"X-API-Key": "test-admin-key"})
     assert response.status_code == 200
     
     body = response.get_json()

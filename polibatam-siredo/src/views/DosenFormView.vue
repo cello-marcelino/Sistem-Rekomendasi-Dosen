@@ -181,44 +181,52 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col animate-in bg-white h-full">
-    <!-- Header -->
-    <div class="py-6 lg:py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 flex justify-between items-end bg-white">
-      <div class="max-w-3xl">
-        <router-link to="/admin/dosen" class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 hover:text-gray-900 mb-4 inline-flex items-center gap-1">
-          &larr; KEMBALI
-        </router-link>
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">
-          {{ isEditMode ? 'Edit Data Dosen' : 'Registrasi Dosen' }}
-        </h1>
-        <p class="text-sm text-gray-600 m-0 font-mono">
-          {{ isEditMode ? formData.nidn || 'ID: ' + dosenId : 'Penambahan master data dosen dan portfolio keahlian' }}
-        </p>
-      </div>
-      <button 
-        @click="handleSubmit"
-        :disabled="isSaving" 
-        class="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white text-sm font-semibold rounded-[4px] transition-colors shadow-sm hidden md:block"
+  <div class="space-y-6 pb-12 animate-in">
+    <!-- Header Section (Canvas-First) -->
+    <div class="border-b border-gray-200 pb-5">
+      <router-link 
+        to="/admin/dosen" 
+        class="text-xs font-mono font-bold text-gray-500 hover:text-gray-900 mb-3 inline-flex items-center gap-1.5 transition-colors"
       >
-        {{ isSaving ? 'Menyimpan...' : (isEditMode ? 'Simpan Perubahan' : 'Tambah Data') }}
-      </button>
+        &larr; KEMBALI
+      </router-link>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900 font-sans">
+            {{ isEditMode ? 'Edit Data Dosen' : 'Registrasi Dosen' }}
+          </h1>
+          <p class="text-xs text-gray-600 font-mono mt-1">
+            {{ isEditMode ? formData.nidn || 'ID: ' + dosenId : 'Penambahan master data dosen dan portofolio keahlian' }}
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button 
+            @click="handleSubmit"
+            :disabled="isSaving" 
+            type="button"
+            class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-700 rounded hover:bg-teal-800 disabled:opacity-50 transition-colors shadow-sm"
+          >
+            {{ isSaving ? 'Menyimpan...' : (isEditMode ? 'Simpan Perubahan' : 'Tambah Data') }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex-1 flex flex-col items-center justify-center p-20 min-h-[400px]">
+    <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center bg-white border border-gray-200 rounded shadow-sm">
       <div class="w-8 h-8 border-2 border-gray-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
       <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Memuat Data...</span>
     </div>
 
     <!-- Form Area -->
-    <form v-else @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto px-6 lg:px-8 py-8 flex flex-col gap-8 bg-gray-50">
+    <form v-else @submit.prevent="handleSubmit" class="space-y-6">
       
       <div v-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-[4px] text-xs font-bold font-mono">
         {{ errorMessage }}
       </div>
 
       <!-- Section: Identitas -->
-      <section class="border border-gray-200 bg-white">
+      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-4">
            <span class="text-[10px] font-mono font-bold text-gray-500">01</span>
            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Identitas Utama</h2>
@@ -244,7 +252,7 @@ const handleSubmit = async () => {
       </section>
 
       <!-- Section: Pendidikan -->
-      <section class="border border-gray-200 bg-white">
+      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-4">
            <span class="text-[10px] font-mono font-bold text-gray-500">02</span>
            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Riwayat Pendidikan</h2>
@@ -270,7 +278,7 @@ const handleSubmit = async () => {
       </section>
 
       <!-- Section: Publikasi -->
-      <section class="border border-gray-200 bg-white">
+      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
            <div class="flex items-center gap-4">
              <span class="text-[10px] font-mono font-bold text-gray-500">03</span>
@@ -290,7 +298,7 @@ const handleSubmit = async () => {
       </section>
 
       <!-- Section: Bimbingan -->
-      <section class="border border-gray-200 bg-white">
+      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
            <div class="flex items-center gap-4">
              <span class="text-[10px] font-mono font-bold text-gray-500">04</span>
@@ -310,7 +318,7 @@ const handleSubmit = async () => {
       </section>
 
       <!-- Section: Pengujian -->
-      <section class="border border-gray-200 bg-white mb-20">
+      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden mb-12">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
            <div class="flex items-center gap-4">
              <span class="text-[10px] font-mono font-bold text-gray-500">05</span>

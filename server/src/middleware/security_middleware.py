@@ -79,6 +79,9 @@ def require_api_key(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        if request.method == 'OPTIONS':
+            return current_app.make_default_options_response()
+
         credential = extract_credential()
         if not credential:
             raise AuthenticationError("Akses ditolak: Token atau API Key diperlukan (sediakan header 'X-API-Key' atau 'Authorization: Bearer <token>')")
@@ -98,6 +101,9 @@ def require_admin_key(f):
     """Decorator to require master admin key or valid admin/client credential."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        if request.method == 'OPTIONS':
+            return current_app.make_default_options_response()
+
         credential = extract_credential()
         if not credential:
             raise AuthenticationError("Akses ditolak: Kredensial otentikasi diperlukan")

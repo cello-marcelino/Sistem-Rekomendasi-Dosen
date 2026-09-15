@@ -1,12 +1,14 @@
 import json
 
+AUTH_HEADER = {"X-API-Key": "test-admin-key"}
+
 def test_single_recommendation_success(client):
     payload = {
         "judul": "Penerapan Natural Language Processing untuk Ekstraksi Informasi",
         "abstrak": "Penelitian menggunakan model BERT dan Text Mining untuk analisis teks bahasa Indonesia",
         "k_rank": 3
     }
-    response = client.post('/api/recommendations', json=payload)
+    response = client.post('/api/recommendations', json=payload, headers=AUTH_HEADER)
     assert response.status_code == 200
     data = response.get_json()
     assert data["success"] is True
@@ -16,7 +18,7 @@ def test_single_recommendation_success(client):
     assert "pipeline" in data["data"]
 
 def test_single_recommendation_empty_input(client):
-    response = client.post('/api/recommendations', json={"judul": "", "abstrak": ""})
+    response = client.post('/api/recommendations', json={"judul": "", "abstrak": ""}, headers=AUTH_HEADER)
     assert response.status_code == 400
     data = response.get_json()
     assert data["success"] is False
@@ -29,7 +31,7 @@ def test_batch_recommendation_success(client):
             {"id": "P02", "judul": "Deteksi Objek YOLO", "abstrak": "Computer vision untuk citra medis"}
         ]
     }
-    response = client.post('/api/recommendations/batch', json=payload)
+    response = client.post('/api/recommendations/batch', json=payload, headers=AUTH_HEADER)
     assert response.status_code == 200
     data = response.get_json()
     assert data["success"] is True
@@ -42,7 +44,7 @@ def test_batch_recommendation_limit_exceeded(client):
         {"id": f"P{i}", "judul": f"Judul {i}", "abstrak": f"Abstrak {i}"}
         for i in range(10)
     ]
-    response = client.post('/api/recommendations/batch', json={"proposals": oversized_proposals})
+    response = client.post('/api/recommendations/batch', json={"proposals": oversized_proposals}, headers=AUTH_HEADER)
     assert response.status_code == 400
     data = response.get_json()
     assert data["success"] is False

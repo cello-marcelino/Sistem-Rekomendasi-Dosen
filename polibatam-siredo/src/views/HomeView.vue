@@ -1,34 +1,32 @@
 <template>
-  <div class="w-full box-border font-sans flex flex-col gap-6 animate-in">
-    
-    <!-- CARD 1: HERO / OVERVIEW (Concise, solution-oriented, primary points) -->
-    <div class="bg-white border border-gray-200/90 rounded-lg p-6 lg:p-8 shadow-sm">
-      <div class="flex flex-col items-start max-w-4xl">
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-3 leading-tight font-sans">
+  <div class="space-y-6 pb-12 animate-in font-sans">
+    <!-- Header Section (Canvas-First Hero) -->
+    <div class="border-b border-gray-200 pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div class="max-w-3xl">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2 leading-tight font-sans">
           Sistem Rekomendasi Dosen Pembimbing & Penguji
         </h1>
-        
-        <p class="text-sm sm:text-base text-gray-700 leading-relaxed mb-6">
-          Pemetaan topik tugas akhir mahasiswa dengan kepakaran dosen secara akurat, <span class="text-teal-700 font-semibold">objektif</span>, dan <span class="text-teal-700 font-semibold">transparan</span> berbasis NLP.
+        <p class="text-sm text-gray-600 leading-relaxed m-0">
+          Pemetaan topik tugas akhir mahasiswa dengan kepakaran dosen secara akurat, <span class="text-teal-800 font-semibold">objektif</span>, dan <span class="text-teal-800 font-semibold">transparan</span> berbasis NLP.
         </p>
-        
-        <div class="flex flex-wrap items-center gap-3">
-          <button 
-            @click="router.push('/rekomendasi')" 
-            class="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold rounded shadow-sm transition-colors flex items-center gap-2"
-          >
-            <span>Mulai Rekomendasi</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
-          <button 
-            @click="router.push('/dosen')" 
-            class="px-5 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-700 text-sm font-semibold rounded shadow-sm transition-colors"
-          >
-            Eksplorasi Direktori Dosen
-          </button>
-        </div>
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+        <button 
+          @click="router.push('/rekomendasi')" 
+          class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded shadow-sm transition-colors inline-flex items-center gap-1.5"
+        >
+          <span>Mulai Rekomendasi</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+        <button 
+          @click="router.push('/dosen')" 
+          class="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-xs font-semibold rounded shadow-sm transition-colors"
+        >
+          Eksplorasi Direktori
+        </button>
       </div>
     </div>
 

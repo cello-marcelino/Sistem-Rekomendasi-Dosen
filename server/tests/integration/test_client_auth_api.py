@@ -1,9 +1,11 @@
-﻿import pytest
+import uuid
+import pytest
 
 def test_client_registration(client):
+    unique_email = f"john_{uuid.uuid4().hex[:8]}@test.com"
     response = client.post("/api/clients/register", json={
         "name": "John Doe",
-        "email": "john@test.com",
+        "email": unique_email,
         "organization": "Test Corp",
         "password": "password123"
     })
@@ -14,19 +16,21 @@ def test_client_registration(client):
     assert "token" in data["data"]
 
 def test_client_login(client):
+    unique_email = f"jane_{uuid.uuid4().hex[:8]}@test.com"
     client.post("/api/clients/register", json={
         "name": "Jane Doe",
-        "email": "jane@test.com",
+        "email": unique_email,
         "organization": "Test Corp",
         "password": "password123"
     })
     
     response = client.post("/api/clients/login", json={
-        "email": "jane@test.com",
+        "email": unique_email,
         "password": "password123"
     })
     assert response.status_code == 200
     data = response.get_json()
     assert data["success"] is True
     assert "token" in data["data"]
+
 

@@ -3,7 +3,7 @@ import pytest
 from server.src.config.config import Config
 
 def test_admin_dosen_crud_full_lifecycle(client):
-    headers = {"X-API-Key": Config.ADMIN_API_KEY}
+    headers = {"X-API-Key": "test-admin-key"}
     
     # 1. CREATE
     create_payload = {

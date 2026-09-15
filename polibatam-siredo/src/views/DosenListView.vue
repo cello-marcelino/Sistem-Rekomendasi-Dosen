@@ -101,42 +101,44 @@ const toggleProdiFilter = (prodi) => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col animate-in">
-    <!-- Header -->
-    <div class="py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 bg-white flex justify-between items-end">
-      <div class="max-w-3xl">
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">Direktori Dosen</h1>
-        <p class="text-sm text-gray-700 leading-relaxed m-0">
+  <div class="space-y-6 pb-12 animate-in">
+    <!-- Header Section (Canvas-First) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-sans">Direktori Dosen</h1>
+        <p class="text-sm text-gray-600 mt-1">
           Daftar profil, bidang keahlian, dan riwayat akademik dosen pengajar.
         </p>
       </div>
-      <div class="hidden md:flex text-[11px] font-mono font-bold uppercase tracking-widest text-teal-600 border border-teal-200 px-3 py-1.5 bg-teal-50">
-        {{ filteredDosen.length }} / {{ stats.totalDosen }} Dosen
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="inline-flex items-center px-2.5 py-1 text-xs font-mono font-bold text-teal-800 bg-teal-50 border border-teal-200 rounded">
+          {{ filteredDosen.length }} / {{ stats.totalDosen }} Dosen
+        </span>
       </div>
     </div>
 
-    <!-- Metrics Row -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b border-gray-200 bg-white w-full">
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Total Populasi</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
+    <!-- Metrics Row (Elevated Card) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200 rounded shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Total Populasi</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
       </div>
-      <div class="p-6 border-b lg:border-b-0 lg:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Publikasi</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Publikasi</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
       </div>
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Bimbingan</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Bimbingan</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
       </div>
-      <div class="p-6">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Pengujian</div>
-        <div class="text-3xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Pengujian</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
       </div>
     </div>
 
-    <!-- Filter & Search Bar -->
-    <div class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+    <!-- Filter & Search Bar (Elevated Card) -->
+    <div class="bg-white border border-gray-200 rounded p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
       <div class="flex gap-4 w-full md:w-auto">
         <input 
           type="text" 

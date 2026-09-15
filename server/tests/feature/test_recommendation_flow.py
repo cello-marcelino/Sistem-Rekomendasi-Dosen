@@ -1,11 +1,13 @@
 def test_full_recommendation_feature_flow(client):
     """Feature test simulating end-to-end user recommendation flow."""
+    headers = {"X-API-Key": "test-admin-key"}
+
     # 1. Health check
     health_res = client.get('/health')
     assert health_res.status_code == 200
     
     # 2. Get Lecturer Catalog
-    dosen_res = client.get('/api/dosen')
+    dosen_res = client.get('/api/dosen', headers=headers)
     assert dosen_res.status_code == 200
     assert len(dosen_res.get_json()["data"]) > 0
     
@@ -14,7 +16,7 @@ def test_full_recommendation_feature_flow(client):
         "judul": "Analisis Sentimen Menggunakan Deep Learning Transformer BERT",
         "abstrak": "Penelitian teks mining klasifikasi opini publik pada media sosial",
         "k_rank": 2
-    })
+    }, headers=headers)
     assert rec_res.status_code == 200
     data = rec_res.get_json()["data"]
     assert len(data["recommendations"]) <= 2
@@ -22,3 +24,4 @@ def test_full_recommendation_feature_flow(client):
     assert top_candidate["rank"] == 1
     assert "scores" in top_candidate
     assert "xai" in top_candidate
+

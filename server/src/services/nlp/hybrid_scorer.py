@@ -5,15 +5,17 @@ class HybridEngine:
     """Combines lexical and semantic scoring with adaptive weighting and XAI enrichment."""
     
     @staticmethod
-    def compute_adaptive_alpha(num_query_tokens: int, threshold: int = 15) -> Tuple[float, float]:
+    def compute_adaptive_alpha(num_query_tokens: int, threshold: int = 15, short_alpha: float = 0.70, long_alpha: float = 0.35) -> Tuple[float, float]:
         """
         Adaptive scenario: Dynamic weighting based on query length.
-        - Short query (< threshold tokens): Keyword mode (BM25 dominant: alpha=0.70, beta=0.30)
-        - Long query (>= threshold tokens): Abstract mode (SBERT dominant: alpha=0.35, beta=0.65)
+        - Short query (< threshold tokens): Keyword mode (BM25 dominant: alpha=short_alpha, beta=1-short_alpha)
+        - Long query (>= threshold tokens): Abstract mode (SBERT dominant: alpha=long_alpha, beta=1-long_alpha)
         """
         if num_query_tokens < threshold:
-            return 0.70, 0.30
-        return 0.35, 0.65
+            a = float(short_alpha)
+        else:
+            a = float(long_alpha)
+        return round(a, 4), round(1.0 - a, 4)
 
     @staticmethod
     def rank(skor_lex: np.ndarray, skor_sem: np.ndarray, bobot_lex: float, bobot_sem: float, k_rank: int) -> Tuple[np.ndarray, np.ndarray]:

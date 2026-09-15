@@ -106,21 +106,21 @@ const downloadTemplate = () => {
 </script>
 
 <template>
-  <div class="w-full min-h-full animate-in flex flex-col">
-    <!-- Header -->
-    <div class="py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 bg-white">
-      <div class="max-w-4xl flex justify-between items-start">
-        <div>
-          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">Batch Recommendation</h1>
-          <p class="text-sm text-gray-700 leading-relaxed m-0">
-            Pemrosesan massal proposal tugas akhir via Excel untuk rekomendasi dosen otomatis.
-          </p>
-        </div>
+  <div class="space-y-6 pb-12 animate-in">
+    <!-- Header Section (Canvas-First) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-sans">Batch Recommendation</h1>
+        <p class="text-sm text-gray-600 mt-1">
+          Pemrosesan massal proposal tugas akhir via Excel untuk rekomendasi dosen otomatis.
+        </p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
         <button 
           @click="downloadTemplate" 
-          class="text-xs text-gray-900 bg-white hover:bg-gray-50 px-4 py-2.5 rounded-[4px] border border-gray-300 font-semibold transition-colors flex items-center gap-2"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors shadow-sm"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           Download Template
@@ -128,28 +128,28 @@ const downloadTemplate = () => {
       </div>
     </div>
 
-    <!-- Metrics Row (Dense Tabular) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b border-gray-200 bg-white w-full">
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Format Berkas</div>
+    <!-- Metrics Row (Elevated Card) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200 rounded shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Format Berkas</div>
         <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Excel (.xlsx)</div>
       </div>
-      <div class="p-6 border-b lg:border-b-0 lg:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Kapasitas Proses</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Kapasitas Proses</div>
         <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Ratusan Data</div>
       </div>
-      <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Kandidat</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Kandidat</div>
         <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Top-3 Dosen</div>
       </div>
-      <div class="p-6">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-2">Sistem Skor</div>
+      <div class="p-5">
+        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Sistem Skor</div>
         <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">Hybrid Scoring</div>
       </div>
     </div>
 
-    <!-- Main Workspace -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 w-full border-b border-gray-200 bg-white items-stretch">
+    <!-- Main Workspace (Elevated Card) -->
+    <div class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 w-full items-stretch">
       
       <!-- Upload Panel -->
       <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50/50 p-6 lg:p-8 flex flex-col gap-6">

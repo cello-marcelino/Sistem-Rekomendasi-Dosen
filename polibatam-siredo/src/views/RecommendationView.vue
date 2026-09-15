@@ -102,19 +102,19 @@ const closeXai = () => {
 </script>
 
 <template>
-  <div class="flex flex-col min-h-full animate-in">
-    <!-- Header -->
-    <div class="py-10 border-b border-gray-200 shrink-0 w-full px-6 lg:px-8 bg-white">
-      <div class="max-w-4xl">
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 font-sans">Rekomendasi Dosen</h1>
-        <p class="text-sm text-gray-700 leading-relaxed m-0">
+  <div class="space-y-6 pb-12 animate-in">
+    <!-- Header Section (Canvas-First) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-sans">Rekomendasi Dosen</h1>
+        <p class="text-sm text-gray-600 mt-1">
           Analisis kecocokan topik tugas akhir mahasiswa dengan kepakaran dosen berbasis model NLP (BM25 & SBERT).
         </p>
       </div>
     </div>
 
-    <!-- Body Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 border-b border-gray-200 w-full items-start box-border bg-white">
+    <!-- Elevated Content Card (Input + Results) -->
+    <div class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 w-full items-start box-border">
       
       <!-- Left: Input Panel (4 Cols) -->
       <aside class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50/50 p-6 lg:p-8 relative">

@@ -12,13 +12,14 @@ class RecommendationService:
     """Core recommendation orchestrator combining NLP lexical, semantic, and hybrid pipeline."""
     
     @staticmethod
-    def get_recommendations(judul: str, abstrak: str, k_rank: Optional[int] = None) -> Dict[str, Any]:
+    def get_recommendations(judul: str, abstrak: str, k_rank: Optional[int] = None, override_config: Optional[Dict[str, Any]] = None, program_studi: Optional[str] = None) -> Dict[str, Any]:
         cache = CacheService.get_instance()
-        config = ConfigService.get_config()
+        base_config = ConfigService.get_config()
+        config = {**base_config, **(override_config or {})}
         
         # Proper k_rank resolution and boundary checking
         if k_rank is None or k_rank <= 0:
-            k_rank = Config.DEFAULT_K_RANK
+            k_rank = int(config.get('top_k', Config.DEFAULT_K_RANK))
         else:
             k_rank = min(int(k_rank), Config.MAX_K_RANK)
         
@@ -30,7 +31,9 @@ class RecommendationService:
         adaptive_threshold = config.get('adaptive_alpha_threshold', 15)
         
         if is_adaptive:
-            alpha, beta = HybridEngine.compute_adaptive_alpha(num_query_tokens, adaptive_threshold) if num_query_tokens > 0 else (0.5, 0.5)
+            short_alpha = config.get('adaptive_short_alpha', 0.70)
+            long_alpha = config.get('adaptive_long_alpha', 0.35)
+            alpha, beta = HybridEngine.compute_adaptive_alpha(num_query_tokens, adaptive_threshold, short_alpha, long_alpha) if num_query_tokens > 0 else (0.5, 0.5)
         else:
             alpha = float(config.get('manual_alpha', 0.7))
             beta = 1.0 - alpha
@@ -114,6 +117,10 @@ class RecommendationService:
                 continue
                 
             dosen = cache.dosen_list[idx]
+            
+            if config.get('strict_prodi', False) and program_studi:
+                if dosen.program_studi and program_studi.lower() not in dosen.program_studi.lower():
+                    continue
             
             # XAI Details
             dosen_tokens = cache.bm25.corpus_tokens[idx] if idx < len(cache.bm25.corpus_tokens) else []
