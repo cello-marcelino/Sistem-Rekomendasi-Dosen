@@ -282,73 +282,66 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Active Re-indexing / Syncing Live Banner (Real-time Progress) -->
+    <!-- Pembaruan Indeks — banner aktif saat re-indexing berlangsung -->
     <div
       v-if="isSyncing"
-      class="p-4 rounded border border-amber-300 bg-amber-50 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
+      class="px-4 py-3 rounded border border-amber-300 bg-amber-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
     >
-      <div class="flex items-center gap-3">
-        <svg class="w-5 h-5 text-amber-700 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+      <div class="flex items-start gap-3">
+        <svg class="w-4 h-4 text-amber-700 animate-spin shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
         <div>
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-mono">
-              Syncing Index
-            </span>
-            <span class="text-xs font-semibold text-amber-900">
-              {{ systemStatus?.warmup_status?.message || 'Menyinkronkan indeks NLP Engine...' }}
-            </span>
-          </div>
+          <p class="text-xs font-semibold text-amber-900">
+            {{ systemStatus?.warmup_status?.message || 'Memperbarui indeks kesesuaian dosen...' }}
+          </p>
           <p class="text-[11px] text-amber-700 mt-0.5">
-            {{ systemStatus?.warmup_status?.detail || 'Layanan rekomendasi tetap aktif melayani traffic (Zero Downtime)' }}
+            Rekomendasi tetap dapat diakses selama proses ini berjalan.
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3 shrink-0">
-        <div class="w-28 bg-amber-200 rounded-full h-2 overflow-hidden">
+      <div class="flex items-center gap-3 shrink-0 pl-7 sm:pl-0">
+        <div class="w-24 bg-amber-200 rounded-full h-1 overflow-hidden">
           <div
-            class="bg-amber-600 h-2 transition-all duration-300"
+            class="bg-amber-600 h-1 transition-all duration-500"
             :style="{ width: (systemStatus?.warmup_status?.progress_pct || 20) + '%' }"
           ></div>
         </div>
         <button
           @click="showStatusModal = true"
           type="button"
-          class="px-2.5 py-1 text-xs font-semibold bg-white border border-amber-300 text-amber-800 rounded hover:bg-amber-100 transition-colors shadow-sm"
+          class="text-xs font-semibold text-amber-800 hover:text-amber-900 hover:underline"
         >
-          Lihat Log Live
+          Lihat Detail
         </button>
       </div>
     </div>
 
-    <!-- Engine Ready / Zero-Downtime Summary Bar -->
+    <!-- Status Engine — siap -->
     <div
       v-else-if="systemStatus"
-      class="px-4 py-2.5 rounded border border-gray-200 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+      class="px-4 py-2.5 rounded border border-gray-200 bg-gray-50 flex items-center justify-between gap-2 text-xs"
     >
-      <div class="flex items-center gap-3 text-gray-700">
-        <span class="inline-flex items-center gap-1.5 font-medium">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          AI Engine: <span class="font-bold text-gray-900 font-mono">Siap & Aktif</span>
-        </span>
-        <span class="text-gray-300">|</span>
-        <span>Device: <strong class="font-mono text-gray-800">{{ systemStatus?.device || 'CPU' }}</strong></span>
-        <span class="text-gray-300">|</span>
-        <span>Korpus: <strong class="font-mono text-gray-800">{{ systemStatus?.total_dosen || 89 }} Dosen</strong></span>
-        <span class="text-gray-300 hidden md:inline">|</span>
-        <span class="text-emerald-700 font-medium hidden md:inline">Zero-Downtime Double Buffering</span>
+      <div class="flex items-center gap-2.5 text-gray-600">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+        <span class="font-medium text-gray-800">Mesin Rekomendasi Aktif</span>
+        <span class="text-gray-300">·</span>
+        <span class="font-mono text-gray-500">{{ systemStatus?.device || 'CPU' }}</span>
+        <span class="text-gray-300">·</span>
+        <span class="font-mono text-gray-500">{{ systemStatus?.total_dosen || 89 }} dosen terindeks</span>
       </div>
 
       <button
         @click="showStatusModal = true"
         type="button"
-        class="text-xs text-teal-700 hover:text-teal-900 font-semibold self-start sm:self-auto hover:underline inline-flex items-center gap-1"
+        class="text-xs text-teal-700 hover:text-teal-900 font-semibold hover:underline inline-flex items-center gap-1 shrink-0"
       >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.5m6 4a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        Status & Log Engine
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        Log Proses
       </button>
     </div>
 
@@ -875,7 +868,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Warm-up & Engine Status Live Modal -->
+    <!-- Modal Log Proses -->
     <div
       v-if="showStatusModal"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
@@ -885,130 +878,142 @@ onUnmounted(() => {
         <!-- Modal Header -->
         <div class="flex items-start justify-between border-b border-gray-100 pb-4">
           <div>
-            <div class="flex items-center gap-2">
-              <h2 class="text-base font-bold text-gray-900 font-sans">
-                Status & Log Engine NLP (SiReDo V3)
+            <div class="flex items-center gap-2.5">
+              <h2 class="text-sm font-bold text-gray-900 font-sans">
+                Log Pembaruan Indeks
               </h2>
               <span
-                class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider"
-                :class="isSyncing ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold"
+                :class="isSyncing ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'"
               >
-                {{ isSyncing ? 'Menyinkronkan' : 'Ready & Idle' }}
+                <span
+                  class="w-1.5 h-1.5 rounded-full shrink-0"
+                  :class="isSyncing ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'"
+                ></span>
+                {{ isSyncing ? 'Memperbarui' : 'Siap' }}
               </span>
             </div>
-            <p class="text-xs text-gray-500 mt-1">
-              Zero-Downtime Double Buffering aktif. Request rekomendasi tidak pernah terblokir saat re-indexing.
+            <p class="text-[11px] text-gray-500 mt-1">
+              Pembaruan indeks berjalan di latar belakang. Rekomendasi tetap aktif selama proses ini.
             </p>
           </div>
 
           <button
             @click="showStatusModal = false"
             type="button"
-            class="text-gray-400 hover:text-gray-600 text-xl font-bold p-1 leading-none"
+            aria-label="Tutup modal"
+            class="text-gray-400 hover:text-gray-700 p-1 rounded transition-colors"
           >
-            &times;
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
           </button>
         </div>
 
-        <!-- System Engine Metrics -->
-        <div class="grid grid-cols-3 gap-3">
-          <div class="p-3 bg-gray-50 border border-gray-200 rounded">
-            <div class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Device Komputasi</div>
-            <div class="text-sm font-bold font-mono text-gray-900 mt-0.5">{{ systemStatus?.device || 'CPU' }}</div>
+        <!-- Info baris (tanpa card soup) -->
+        <div class="flex items-center gap-5 text-xs divide-x divide-gray-100 border-b border-gray-100 pb-4">
+          <div>
+            <div class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-0.5">Perangkat</div>
+            <div class="font-bold font-mono text-gray-800">{{ systemStatus?.device || 'CPU' }}</div>
           </div>
-          <div class="p-3 bg-gray-50 border border-gray-200 rounded">
-            <div class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Total Dosen</div>
-            <div class="text-sm font-bold font-mono text-gray-900 mt-0.5">{{ systemStatus?.total_dosen || 89 }} Terindeks</div>
+          <div class="pl-5">
+            <div class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-0.5">Dosen Terindeks</div>
+            <div class="font-bold font-mono text-gray-800">{{ systemStatus?.total_dosen || 89 }}</div>
           </div>
-          <div class="p-3 bg-gray-50 border border-gray-200 rounded">
-            <div class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Durasi Warmup</div>
-            <div class="text-sm font-bold font-mono text-teal-800 mt-0.5">
-              {{ systemStatus?.warmup_status?.elapsed_seconds ? systemStatus.warmup_status.elapsed_seconds + ' detik' : '< 1 detik' }}
+          <div class="pl-5">
+            <div class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-0.5">Durasi Terakhir</div>
+            <div class="font-bold font-mono text-teal-700">
+              {{ systemStatus?.warmup_status?.elapsed_seconds ? systemStatus.warmup_status.elapsed_seconds + 's' : '—' }}
             </div>
+          </div>
+          <div class="pl-5">
+            <div class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-0.5">Progres</div>
+            <div class="font-bold font-mono text-gray-800">{{ systemStatus?.warmup_status?.progress_pct || 100 }}%</div>
           </div>
         </div>
 
-        <!-- 5-Step Pipeline Stepper -->
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-xs font-bold text-gray-800 border-b border-gray-100 pb-2">
-            <span>Tahapan Pipeline Warm-up & Indexing</span>
-            <span class="font-mono text-[11px] text-gray-500">
-              Progress: {{ systemStatus?.warmup_status?.progress_pct || 100 }}%
-            </span>
+        <!-- Langkah Pembaruan -->
+        <div class="space-y-2">
+          <div class="text-[10px] font-mono font-semibold text-gray-400 uppercase tracking-wider">
+            Langkah Pembaruan
           </div>
 
-          <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+          <div class="space-y-1 max-h-72 overflow-y-auto pr-1">
             <div
               v-for="step in warmupSteps"
               :key="step.id"
-              class="p-3 rounded border text-xs transition-all"
+              class="flex items-start gap-3 px-3 py-2.5 rounded text-xs transition-all"
               :class="[
-                step.status === 'completed' ? 'border-emerald-200 bg-emerald-50/50 text-gray-800' :
-                step.status === 'running' ? 'border-amber-400 bg-amber-50 text-amber-900 ring-1 ring-amber-400' :
-                step.status === 'error' ? 'border-rose-300 bg-rose-50 text-rose-900' :
-                'border-gray-200 bg-gray-50/60 text-gray-400'
+                step.status === 'completed' ? 'bg-emerald-50/60' :
+                step.status === 'running'   ? 'bg-amber-50 border border-amber-200' :
+                step.status === 'error'     ? 'bg-rose-50 border border-rose-200' :
+                'bg-gray-50/80'
               ]"
             >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <div
-                    class="w-5 h-5 rounded-full flex items-center justify-center font-mono font-bold text-[10px] shrink-0"
-                    :class="[
-                      step.status === 'completed' ? 'bg-emerald-600 text-white' :
-                      step.status === 'running' ? 'bg-amber-600 text-white animate-pulse' :
-                      step.status === 'error' ? 'bg-rose-600 text-white' :
-                      'bg-gray-200 text-gray-600'
-                    ]"
-                  >
-                    <span v-if="step.status === 'completed'">✓</span>
-                    <span v-else-if="step.status === 'running'">...</span>
-                    <span v-else>{{ step.id }}</span>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-900">{{ step.title }}</div>
-                    <div class="text-[11px] text-gray-500">{{ step.desc }}</div>
-                  </div>
-                </div>
-
-                <div class="text-right shrink-0">
-                  <span
-                    v-if="step.status === 'completed'"
-                    class="font-mono font-semibold text-[11px] text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded"
-                  >
-                    {{ step.duration_ms }} ms
-                  </span>
-                  <span
-                    v-else-if="step.status === 'running'"
-                    class="font-mono font-semibold text-[10px] text-amber-800 bg-amber-200 px-1.5 py-0.5 rounded animate-pulse"
-                  >
-                    BERJALAN
-                  </span>
-                  <span
-                    v-else
-                    class="font-mono text-[10px] text-gray-400"
-                  >
-                    PENDING
-                  </span>
-                </div>
+              <!-- Status icon: SVG only, no unicode -->
+              <div
+                class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-px"
+                :class="[
+                  step.status === 'completed' ? 'bg-emerald-600' :
+                  step.status === 'running'   ? 'bg-amber-500 animate-pulse' :
+                  step.status === 'error'     ? 'bg-rose-600' :
+                  'bg-gray-200'
+                ]"
+              >
+                <!-- Completed: check SVG -->
+                <svg v-if="step.status === 'completed'" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <!-- Running: spinner dot -->
+                <span v-else-if="step.status === 'running'" class="w-1.5 h-1.5 rounded-full bg-white block"></span>
+                <!-- Error: × SVG -->
+                <svg v-else-if="step.status === 'error'" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <!-- Pending: step number -->
+                <span v-else class="text-[9px] font-bold font-mono text-gray-500">{{ step.id }}</span>
               </div>
 
-              <div v-if="step.detail" class="mt-2 pl-7 text-[11px] text-gray-600 font-mono">
-                &rsaquo; {{ step.detail }}
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline justify-between gap-2">
+                  <span
+                    class="font-semibold truncate"
+                    :class="step.status === 'completed' ? 'text-gray-800' : step.status === 'running' ? 'text-amber-900' : step.status === 'error' ? 'text-rose-800' : 'text-gray-400'"
+                  >{{ step.title }}</span>
+                  <span
+                    v-if="step.status === 'completed'"
+                    class="font-mono text-[10px] text-emerald-700 shrink-0 tabular-nums"
+                  >{{ step.duration_ms }}ms</span>
+                  <span
+                    v-else-if="step.status === 'running'"
+                    class="font-mono text-[10px] text-amber-700 shrink-0 animate-pulse"
+                  >berjalan</span>
+                  <span
+                    v-else-if="step.status !== 'error'"
+                    class="font-mono text-[10px] text-gray-300 shrink-0"
+                  >menunggu</span>
+                </div>
+                <div
+                  v-if="step.desc || step.detail"
+                  class="text-[11px] text-gray-400 mt-0.5 truncate"
+                >{{ step.detail || step.desc }}</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Modal Footer -->
-        <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-          <span class="text-[11px] text-gray-400 font-mono">
-            Terakhir disinkronkan: {{ systemStatus?.warmup_status?.completed_at ? new Date(systemStatus.warmup_status.completed_at).toLocaleTimeString('id-ID') : 'Aktif' }}
+        <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+          <span class="text-[10px] text-gray-400 font-mono">
+            {{ systemStatus?.warmup_status?.completed_at
+              ? 'Selesai ' + new Date(systemStatus.warmup_status.completed_at).toLocaleTimeString('id-ID')
+              : 'Belum ada riwayat pembaruan' }}
           </span>
 
           <button
             @click="showStatusModal = false"
             type="button"
-            class="px-4 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors shadow-sm"
+            class="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
           >
             Tutup
           </button>
