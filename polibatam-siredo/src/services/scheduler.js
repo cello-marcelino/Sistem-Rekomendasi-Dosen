@@ -123,90 +123,114 @@ export function scheduleDefenses(proposals = [], options = {}) {
     }
   }
 
-  let slotPointer = 0
-
   for (let pIdx = 0; pIdx < proposals.length; pIdx++) {
     const item = proposals[pIdx]
-    const mhsId = item.id || item.mahasiswa_id || item.nim || `MHS${1001 + pIdx}`
-    const mhsNama = item.nama || item.nama_mahasiswa || `Mahasiswa #${pIdx + 1}`
-    const judul = item.judul || item.judul_tugas_akhir || item.title || 'Topik Tugas Akhir'
-    const pembimbing = item.pembimbing || item.dosen_pembimbing || ''
+    const mhsId = item.id || item.mahasiswa_id || item.nim || item.ID || `MHS${1001 + pIdx}`
+    const mhsNama = item.nama || item.nama_mahasiswa || item.Nama || `Mahasiswa #${pIdx + 1}`
+    const judul = item.judul || item.judul_tugas_akhir || item['Judul TA'] || item.title || 'Topik Tugas Akhir'
+    const pembimbing = item.pembimbing || item.dosen_pembimbing || item['Dosen Pembimbing'] || ''
 
-    // Ambil list kandidat penguji dari hasil rekomendasi NLP
+    // 1. Ekstrak list rekomendasi dosen dari berbagai format (JSON / Excel hasil batch)
     let recList = []
     if (item.rekomendasi?.recommendations) {
       recList = item.rekomendasi.recommendations
     } else if (item.recommendations) {
       recList = item.recommendations
-    } else if (item.penguji_1 && item.penguji_2) {
-      recList = [
-        { dosen: { nama: item.penguji_1 }, scores: { hybrid: 1.0 } },
-        { dosen: { nama: item.penguji_2 }, scores: { hybrid: 0.9 } }
-      ]
     }
 
-    // Normalisasi nama-nama dosen kandidat
-    const candidateList = recList.map((r, rankIdx) => ({
-      nama: r.dosen?.nama || r.nama_dosen || r.nama || `Dosen Candidate ${rankIdx + 1}`,
-      rank: rankIdx + 1,
-      score: r.scores?.hybrid || 0
-    })).filter(c => c.nama && c.nama.toLowerCase() !== pembimbing.toLowerCase())
+    // Jika belum ada dari objek API, periksa kolom file Excel: 'Rekomendasi 1', 'Rekomendasi 2', dsb.
+    if (recList.length === 0) {
+      const keys = Object.keys(item)
+      for (let i = 1; i <= 10; i++) {
+        const rekKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === `rekomendasi${i}`)
+        const skorKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === `skor${i}`)
+        if (rekKey && item[rekKey] && String(item[rekKey]).trim() !== '-' && String(item[rekKey]).trim() !== '') {
+          recList.push({
+            dosen: { nama: String(item[rekKey]).trim() },
+            scores: { hybrid: skorKey && item[skorKey] ? parseFloat(item[skorKey]) : (1 - (i * 0.05)) }
+          })
+        }
+      }
+    }
+
+    if (recList.length === 0 && (item.penguji_1 || item.penguji_2)) {
+      if (item.penguji_1) recList.push({ dosen: { nama: item.penguji_1 }, scores: { hybrid: 1.0 } })
+      if (item.penguji_2) recList.push({ dosen: { nama: item.penguji_2 }, scores: { hybrid: 0.9 } })
+    }
+
+    // Normalisasi kandidat dosen (buang duplikat & pembimbing)
+    const seenCand = new Set()
+    const candidateList = []
+    for (let rIdx = 0; rIdx < recList.length; rIdx++) {
+      const r = recList[rIdx]
+      const name = String(r.dosen?.nama || r.nama_dosen || r.nama || '').trim()
+      if (name && name !== '-' && !seenCand.has(name.toLowerCase()) && name.toLowerCase() !== pembimbing.toLowerCase()) {
+        seenCand.add(name.toLowerCase())
+        candidateList.push({
+          nama: name,
+          rank: rIdx + 1,
+          score: r.scores?.hybrid ?? r.hybrid_score ?? 1.0
+        })
+      }
+    }
 
     let isAssigned = false
 
-    // Cari slot waktu dan pasangan penguji terbaik yang memenuhi constraint
-    for (let sIdx = 0; sIdx < availableSlots.length; sIdx++) {
-      const slot = availableSlots[(slotPointer + sIdx) % availableSlots.length]
-      
-      // Jika ruangan di slot ini sudah terisi, lewati
-      if (roomOccupancy[slot.roomKey]) continue
-
-      const date = slot.date
-      const slotKey = slot.slotKey
-
-      if (!slotOccupancy[slotKey]) {
-        slotOccupancy[slotKey] = new Set()
+    // Bangun pasangan penguji berurutan berdasarkan prioritas ranking: (0,1), (0,2), (1,2), (0,3), (1,3)...
+    const candidatePairs = []
+    for (let i = 0; i < candidateList.length; i++) {
+      for (let j = i + 1; j < candidateList.length; j++) {
+        candidatePairs.push({
+          p1: candidateList[i],
+          p2: candidateList[j],
+          combinedRank: candidateList[i].rank + candidateList[j].rank
+        })
       }
+    }
+    // Urutkan pasangan penguji berdasarkan kombinasi rank terendah (terbaik)
+    candidatePairs.sort((a, b) => a.combinedRank - b.combinedRank)
 
-      // Cari 2 dosen dari kandidat yang valid pada slot ini
-      let penguji1 = null
-      let penguji2 = null
+    // Cari slot waktu (Date x Session x Room) dan pasangan penguji terbaik
+    for (const pair of candidatePairs) {
+      const p1Name = pair.p1.nama
+      const p2Name = pair.p2.nama
 
-      for (let i = 0; i < candidateList.length; i++) {
-        const cand = candidateList[i]
-        const dName = cand.nama
+      // Cek kuota periode (max 10 TA per periode)
+      if ((periodCount[p1Name] || 0) >= maxPerPeriod) continue
+      if ((periodCount[p2Name] || 0) >= maxPerPeriod) continue
 
-        // Cek bentrok jam sesi yang sama
-        if (slotOccupancy[slotKey].has(dName)) continue
+      // Cari slot ruangan & jam yang kosong di hari di mana kedua dosen belum mencapai max 2 TA/hari
+      for (let sIdx = 0; sIdx < availableSlots.length; sIdx++) {
+        const slot = availableSlots[sIdx]
 
-        // Cek kuota harian (max 2 TA per hari)
-        const curDaily = dailyCount[date][dName] || 0
-        if (curDaily >= maxPerDay) continue
+        // Jika ruangan pada slot jam tersebut sudah dipakai
+        if (roomOccupancy[slot.roomKey]) continue
 
-        // Cek kuota periode (max 10 TA per periode)
-        const curPeriod = periodCount[dName] || 0
-        if (curPeriod >= maxPerPeriod) continue
+        const date = slot.date
+        const slotKey = slot.slotKey
 
-        if (!penguji1) {
-          penguji1 = cand
-        } else if (!penguji2 && cand.nama !== penguji1.nama) {
-          penguji2 = cand
-          break // Pasangan ditemukan!
+        // Inisialisasi slot occupancy
+        if (!slotOccupancy[slotKey]) {
+          slotOccupancy[slotKey] = new Set()
         }
-      }
 
-      // Jika menemukan pasangan penguji 1 & penguji 2 yang valid
-      if (penguji1 && penguji2) {
-        // Alokasikan ke slot ini
+        // Cek apakah dosen sedang menguji di ruangan lain pada sesi jam yang sama (bentrok)
+        if (slotOccupancy[slotKey].has(p1Name) || slotOccupancy[slotKey].has(p2Name)) continue
+
+        // Cek kuota harian kedua dosen (max 2 TA/hari)
+        if ((dailyCount[date][p1Name] || 0) >= maxPerDay) continue
+        if ((dailyCount[date][p2Name] || 0) >= maxPerDay) continue
+
+        // ALOKASI BERHASIL!
         roomOccupancy[slot.roomKey] = mhsId
-        slotOccupancy[slotKey].add(penguji1.nama)
-        slotOccupancy[slotKey].add(penguji2.nama)
+        slotOccupancy[slotKey].add(p1Name)
+        slotOccupancy[slotKey].add(p2Name)
 
-        dailyCount[date][penguji1.nama] = (dailyCount[date][penguji1.nama] || 0) + 1
-        dailyCount[date][penguji2.nama] = (dailyCount[date][penguji2.nama] || 0) + 1
+        dailyCount[date][p1Name] = (dailyCount[date][p1Name] || 0) + 1
+        dailyCount[date][p2Name] = (dailyCount[date][p2Name] || 0) + 1
 
-        periodCount[penguji1.nama] = (periodCount[penguji1.nama] || 0) + 1
-        periodCount[penguji2.nama] = (periodCount[penguji2.nama] || 0) + 1
+        periodCount[p1Name] = (periodCount[p1Name] || 0) + 1
+        periodCount[p2Name] = (periodCount[p2Name] || 0) + 1
 
         scheduled.push({
           id: `SCH-${1000 + pIdx}`,
@@ -214,10 +238,10 @@ export function scheduleDefenses(proposals = [], options = {}) {
           nama_mahasiswa: mhsNama,
           judul_tugas_akhir: judul,
           pembimbing: pembimbing || '-',
-          penguji_1: penguji1.nama,
-          penguji_2: penguji2.nama,
-          penguji_1_rank: penguji1.rank,
-          penguji_2_rank: penguji2.rank,
+          penguji_1: p1Name,
+          penguji_2: p2Name,
+          penguji_1_rank: pair.p1.rank,
+          penguji_2_rank: pair.p2.rank,
           tanggal: date,
           tanggal_indo: formatIndoDate(date),
           sesi_id: slot.session.id,
@@ -227,10 +251,11 @@ export function scheduleDefenses(proposals = [], options = {}) {
           period_id: periodId
         })
 
-        slotPointer = (slotPointer + sIdx + 1) % availableSlots.length
         isAssigned = true
         break
       }
+
+      if (isAssigned) break
     }
 
     if (!isAssigned) {
@@ -238,7 +263,9 @@ export function scheduleDefenses(proposals = [], options = {}) {
         mahasiswa_id: mhsId,
         nama_mahasiswa: mhsNama,
         judul_tugas_akhir: judul,
-        reason: 'Seluruh kandidat penguji telah mencapai batas kuota harian (2 TA) / periode (10 TA) atau slot waktu penuh.'
+        reason: candidateList.length < 2 
+          ? 'Jumlah dosen rekomendasi pada berkas kurang dari 2 orang.' 
+          : 'Dosen rekomendasi telah mencapai kuota harian (2 TA) / periode (10 TA) atau semua slot ruangan penuh.'
       })
     }
   }

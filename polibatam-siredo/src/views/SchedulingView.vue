@@ -75,24 +75,58 @@ const processScheduling = async () => {
   error.value = null
 
   try {
-    // 1. Kirim file ke backend untuk scoring rekomendasi NLP batch jika belum ada rekomendasi
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('top_k', 8) // Ambil 8 kandidat teratas untuk fleksibilitas constraint
+    // 1. Baca isi file Excel di frontend menggunakan library XLSX
+    const data = await file.arrayBuffer()
+    const workbook = XLSX.read(data, { type: 'array' })
+    const firstSheetName = workbook.SheetNames[0]
+    const worksheet = workbook.Sheets[firstSheetName]
+    const jsonRows = XLSX.utils.sheet_to_json(worksheet)
 
-    const response = await api.post('/rekomendasi/batch/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    if (!jsonRows || jsonRows.length === 0) {
+      throw new Error("File Excel kosong atau tidak memiliki data baris.")
+    }
 
-    const rawData = response.data?.data
-    const batchProposals = Array.isArray(rawData) ? rawData : (rawData?.results || [])
+    // Cek apakah file sudah memiliki kolom hasil rekomendasi (seperti file Hasil_Batch_Rekomendasi.xlsx)
+    const firstRowKeys = Object.keys(jsonRows[0]).map(k => k.toLowerCase().replace(/[^a-z0-9]/g, ''))
+    const hasExistingRecommendations = firstRowKeys.some(k => k.startsWith('rekomendasi'))
 
-    if (batchProposals.length === 0) {
+    let proposalsToSchedule = []
+
+    if (hasExistingRecommendations) {
+      // Langsung gunakan data rekomendasi yang ada di dalam berkas Excel
+      proposalsToSchedule = jsonRows.map((row, index) => {
+        const keys = Object.keys(row)
+        const idKey = keys.find(k => ['id', 'nim', 'no'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+        const namaKey = keys.find(k => ['nama', 'namamahasiswa', 'mahasiswa', 'name'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+        const judulKey = keys.find(k => ['judul', 'judultugasakhir', 'judulta', 'title', 'topik'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+
+        return {
+          ...row,
+          id: idKey && row[idKey] ? row[idKey] : (index + 1),
+          nama: namaKey && row[namaKey] ? row[namaKey] : `Mahasiswa #${index + 1}`,
+          judul: judulKey && row[judulKey] ? row[judulKey] : 'Topik Tugas Akhir'
+        }
+      })
+    } else {
+      // Jika file masih berupa proposal mentah tanpa rekomendasi, kirim ke backend API untuk scoring batch
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('top_k', 8) // Ambil 8 kandidat teratas untuk fleksibilitas constraint
+
+      const response = await api.post('/rekomendasi/batch/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      const rawData = response.data?.data
+      proposalsToSchedule = Array.isArray(rawData) ? rawData : (rawData?.results || [])
+    }
+
+    if (proposalsToSchedule.length === 0) {
       throw new Error("Tidak ada data proposal yang valid ditemukan dalam file Excel.")
     }
 
     // 2. Jalankan algoritma penjadwalan cerdas berbasis kuota (Max 2 TA/hari & Max 10 TA/periode)
-    const result = scheduleDefenses(batchProposals, {
+    const result = scheduleDefenses(proposalsToSchedule, {
       periodId: activePeriod.value.id,
       startDate: activePeriod.value.startDate,
       endDate: activePeriod.value.endDate,
@@ -417,6 +451,19 @@ const downloadTemplate = () => {
           <div>
             <strong>Total Berhasil Dijadwalkan:</strong> {{ scheduleResult.totalScheduled }} / {{ scheduleResult.totalRequested }} Mahasiswa
           </div>
+        </div>
+
+        <!-- Warning banner if any unassigned -->
+        <div v-if="scheduleResult.totalUnassigned > 0" class="p-4 bg-amber-50 border-b border-amber-200 text-xs text-amber-900">
+          <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            {{ scheduleResult.totalUnassigned }} Mahasiswa Belum Terjadwal
+          </div>
+          <ul class="list-disc list-inside space-y-0.5 text-amber-700 pl-1">
+            <li v-for="u in scheduleResult.unassigned" :key="u.mahasiswa_id">
+              <strong>{{ u.nama_mahasiswa }} ({{ u.mahasiswa_id }}):</strong> {{ u.reason }}
+            </li>
+          </ul>
         </div>
 
         <!-- View 1: Tabel Jadwal -->
