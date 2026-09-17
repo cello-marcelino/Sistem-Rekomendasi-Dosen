@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const port = parseInt(env.VITE_PORT || '5173', 10)
-  const target = env.VITE_DEV_API_TARGET || 'http://localhost:5000'
+  const target = env.VITE_DEV_API_TARGET || 'http://localhost:5001'
 
   return {
     plugins: [vue(), tailwindcss()],
