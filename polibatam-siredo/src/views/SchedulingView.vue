@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import api from '../services/api'
 import * as XLSX from 'xlsx'
 import { PERIOD_PRESETS, DEFAULT_SESSIONS, DEFAULT_ROOMS, scheduleDefenses, formatIndoDate } from '../services/scheduler'
@@ -60,6 +60,23 @@ const selectedExaminerFilter = ref('')
 // Result State
 const scheduleResult = ref(null)
 
+// Master Dosen List from DB/API
+const masterDosenList = ref([])
+const fetchMasterDosen = async () => {
+  try {
+    const res = await api.get('/dosen')
+    if (res.data?.data) {
+      masterDosenList.value = res.data.data.map(d => d.nama).filter(Boolean)
+    }
+  } catch (e) {
+    console.warn('Failed to fetch master dosen list, using local data', e)
+  }
+}
+
+onMounted(() => {
+  fetchMasterDosen()
+})
+
 // All available rooms (from customRooms + any in scheduled results)
 const allRoomsList = computed(() => {
   const set = new Set(customRooms.value)
@@ -70,6 +87,35 @@ const allRoomsList = computed(() => {
   }
   return Array.from(set)
 })
+
+// All available examiners list (master + results)
+const allAvailableExaminers = computed(() => {
+  const set = new Set(masterDosenList.value)
+  if (scheduleResult.value?.allExaminers) {
+    scheduleResult.value.allExaminers.forEach(name => set.add(name))
+  }
+  if (scheduleResult.value?.scheduled) {
+    scheduleResult.value.scheduled.forEach(row => {
+      if (row.penguji_1) set.add(row.penguji_1)
+      if (row.penguji_2) set.add(row.penguji_2)
+      if (row.candidates) row.candidates.forEach(c => set.add(c.nama))
+    })
+  }
+  return Array.from(set).sort((a, b) => a.localeCompare(b))
+})
+
+// Helper to get candidate info for a specific dosen on a row
+const getCandidateInfo = (row, dosenName) => {
+  if (!row?.candidates || !dosenName) return null
+  return row.candidates.find(c => c.nama.toLowerCase().trim() === dosenName.toLowerCase().trim()) || null
+}
+
+// Helper to get all lecturers not in the top recommendation list for a student
+const getNonCandidateDosens = (row) => {
+  if (!row?.candidates) return allAvailableExaminers.value
+  const candidateNames = new Set(row.candidates.map(c => c.nama.toLowerCase().trim()))
+  return allAvailableExaminers.value.filter(name => !candidateNames.has(name.toLowerCase().trim()))
+}
 
 const activePeriod = computed(() => {
   if (isCustomDate.value) {
@@ -216,10 +262,55 @@ const filteredSchedule = computed(() => {
   })
 })
 
+// Real-Time Recalculated Examiner Workload (Responds to inline examiner changes)
+const currentWorkload = computed(() => {
+  if (!scheduleResult.value?.scheduled || !scheduleResult.value?.period) return []
+
+  const workingDays = scheduleResult.value.period.workingDays || []
+  const periodCount = {}
+  const dailyCount = {}
+  workingDays.forEach(d => { dailyCount[d] = {} })
+
+  scheduleResult.value.scheduled.forEach(row => {
+    const date = row.tanggal
+    const p1 = row.penguji_1
+    const p2 = row.penguji_2
+
+    if (p1) {
+      periodCount[p1] = (periodCount[p1] || 0) + 1
+      if (dailyCount[date]) dailyCount[date][p1] = (dailyCount[date][p1] || 0) + 1
+    }
+    if (p2) {
+      periodCount[p2] = (periodCount[p2] || 0) + 1
+      if (dailyCount[date]) dailyCount[date][p2] = (dailyCount[date][p2] || 0) + 1
+    }
+  })
+
+  const allNames = new Set([
+    ...Object.keys(periodCount),
+    ...(scheduleResult.value.examinerWorkload || []).map(w => w.nama)
+  ])
+
+  return Array.from(allNames).map(nama => {
+    const total = periodCount[nama] || 0
+    const perDay = {}
+    workingDays.forEach(d => {
+      perDay[d] = dailyCount[d]?.[nama] || 0
+    })
+
+    return {
+      nama,
+      total,
+      maxPeriod: maxPerPeriod.value,
+      percentage: Math.min(100, Math.round((total / maxPerPeriod.value) * 100)),
+      perDay
+    }
+  }).sort((a, b) => b.total - a.total)
+})
+
 // Unique Examiners list for filter dropdown
 const uniqueExaminers = computed(() => {
-  if (!scheduleResult.value?.examinerWorkload) return []
-  return scheduleResult.value.examinerWorkload.map(e => e.nama)
+  return currentWorkload.value.map(e => e.nama)
 })
 
 // Download Schedule Excel
@@ -242,7 +333,7 @@ const downloadSchedule = () => {
     'Periode': activePeriod.value.name
   }))
 
-  const dataWorkload = scheduleResult.value.examinerWorkload.map((w, idx) => ({
+  const dataWorkload = currentWorkload.value.map((w, idx) => ({
     'No': idx + 1,
     'Nama Dosen': w.nama,
     'Total Menguji (Periode Ini)': w.total,
@@ -518,7 +609,7 @@ const downloadTemplate = () => {
               class="px-3 py-1.5 text-xs font-semibold rounded transition-all"
               :class="activeTab === 'workload' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
             >
-              Beban Penguji ({{ scheduleResult.examinerWorkload.length }})
+              Beban Penguji ({{ currentWorkload.length }})
             </button>
           </div>
 
@@ -539,6 +630,11 @@ const downloadTemplate = () => {
             <select v-model="selectedRoomFilter" class="px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none bg-white font-mono">
               <option value="">Semua Ruang</option>
               <option v-for="r in allRoomsList" :key="r" :value="r">{{ r }}</option>
+            </select>
+
+            <select v-model="selectedExaminerFilter" class="px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none bg-white max-w-[160px]">
+              <option value="">Semua Dosen</option>
+              <option v-for="ex in uniqueExaminers" :key="ex" :value="ex">{{ ex }}</option>
             </select>
 
             <button 
@@ -583,10 +679,10 @@ const downloadTemplate = () => {
                 <th class="p-3.5 border-b border-gray-200">No</th>
                 <th class="p-3.5 border-b border-gray-200">Mahasiswa</th>
                 <th class="p-3.5 border-b border-gray-200">Topik Tugas Akhir</th>
-                <th class="p-3.5 border-b border-gray-200">Penguji 1</th>
-                <th class="p-3.5 border-b border-gray-200">Penguji 2</th>
+                <th class="p-3.5 border-b border-gray-200 min-w-[220px]">Penguji 1 (Bisa Diganti)</th>
+                <th class="p-3.5 border-b border-gray-200 min-w-[220px]">Penguji 2 (Bisa Diganti)</th>
                 <th class="p-3.5 border-b border-gray-200">Jadwal & Waktu</th>
-                <th class="p-3.5 border-b border-gray-200">Ruangan (Manual Edit)</th>
+                <th class="p-3.5 border-b border-gray-200">Ruangan</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
@@ -599,14 +695,111 @@ const downloadTemplate = () => {
                 <td class="p-3.5 text-gray-700 max-w-sm align-top">
                   <div class="line-clamp-2" :title="row.judul_tugas_akhir">{{ row.judul_tugas_akhir }}</div>
                 </td>
+                
+                <!-- Penguji 1: Editable Dropdown with Recommendations & Scores -->
                 <td class="p-3.5 align-top">
-                  <div class="font-semibold text-gray-900">{{ row.penguji_1 }}</div>
-                  <div class="text-[10px] font-mono text-teal-700">Rank Rekomendasi #{{ row.penguji_1_rank || 1 }}</div>
+                  <div class="space-y-1 max-w-[240px]">
+                    <select 
+                      v-model="row.penguji_1" 
+                      class="w-full text-xs font-semibold px-2.5 py-1.5 bg-white border rounded focus:ring-1 focus:outline-none transition-colors cursor-pointer"
+                      :class="row.penguji_1 === row.penguji_2 ? 'border-red-400 bg-red-50/50 text-red-900 focus:ring-red-400' : 'border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500'"
+                      title="Pilih Dosen Penguji 1"
+                    >
+                      <optgroup label="🌟 Rekomendasi Sistem (Topik TA)">
+                        <option 
+                          v-for="cand in (row.candidates || [])" 
+                          :key="cand.nama" 
+                          :value="cand.nama"
+                        >
+                          #{{ cand.rank }}: {{ cand.nama }} ({{ Math.round((cand.score || 0) * 100) }}%)
+                        </option>
+                      </optgroup>
+                      <optgroup v-if="getNonCandidateDosens(row).length > 0" label="📋 Dosen Lainnya (Pilihan Manual)">
+                        <option 
+                          v-for="dName in getNonCandidateDosens(row)" 
+                          :key="dName" 
+                          :value="dName"
+                        >
+                          {{ dName }}
+                        </option>
+                      </optgroup>
+                    </select>
+
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span 
+                        v-if="getCandidateInfo(row, row.penguji_1)" 
+                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                        Rank #{{ getCandidateInfo(row, row.penguji_1).rank }} ({{ Math.round((getCandidateInfo(row, row.penguji_1).score || 0) * 100) }}% Cocok)
+                      </span>
+                      <span 
+                        v-else 
+                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Pilihan Manual
+                      </span>
+                    </div>
+
+                    <div v-if="row.penguji_1 === row.penguji_2" class="text-[10px] font-semibold text-red-600">
+                      ⚠️ Penguji 1 & 2 tidak boleh sama
+                    </div>
+                  </div>
                 </td>
+
+                <!-- Penguji 2: Editable Dropdown with Recommendations & Scores -->
                 <td class="p-3.5 align-top">
-                  <div class="font-semibold text-gray-900">{{ row.penguji_2 }}</div>
-                  <div class="text-[10px] font-mono text-teal-700">Rank Rekomendasi #{{ row.penguji_2_rank || 2 }}</div>
+                  <div class="space-y-1 max-w-[240px]">
+                    <select 
+                      v-model="row.penguji_2" 
+                      class="w-full text-xs font-semibold px-2.5 py-1.5 bg-white border rounded focus:ring-1 focus:outline-none transition-colors cursor-pointer"
+                      :class="row.penguji_1 === row.penguji_2 ? 'border-red-400 bg-red-50/50 text-red-900 focus:ring-red-400' : 'border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500'"
+                      title="Pilih Dosen Penguji 2"
+                    >
+                      <optgroup label="🌟 Rekomendasi Sistem (Topik TA)">
+                        <option 
+                          v-for="cand in (row.candidates || [])" 
+                          :key="cand.nama" 
+                          :value="cand.nama"
+                        >
+                          #{{ cand.rank }}: {{ cand.nama }} ({{ Math.round((cand.score || 0) * 100) }}%)
+                        </option>
+                      </optgroup>
+                      <optgroup v-if="getNonCandidateDosens(row).length > 0" label="📋 Dosen Lainnya (Pilihan Manual)">
+                        <option 
+                          v-for="dName in getNonCandidateDosens(row)" 
+                          :key="dName" 
+                          :value="dName"
+                        >
+                          {{ dName }}
+                        </option>
+                      </optgroup>
+                    </select>
+
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span 
+                        v-if="getCandidateInfo(row, row.penguji_2)" 
+                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                        Rank #{{ getCandidateInfo(row, row.penguji_2).rank }} ({{ Math.round((getCandidateInfo(row, row.penguji_2).score || 0) * 100) }}% Cocok)
+                      </span>
+                      <span 
+                        v-else 
+                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Pilihan Manual
+                      </span>
+                    </div>
+
+                    <div v-if="row.penguji_1 === row.penguji_2" class="text-[10px] font-semibold text-red-600">
+                      ⚠️ Penguji 1 & 2 tidak boleh sama
+                    </div>
+                  </div>
                 </td>
+
                 <td class="p-3.5 font-mono align-top whitespace-nowrap">
                   <div class="font-bold text-gray-900">{{ row.tanggal_indo }}</div>
                   <div class="text-[11px] text-gray-500">{{ row.sesi_label }} ({{ row.waktu }})</div>
@@ -639,7 +832,7 @@ const downloadTemplate = () => {
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div 
-              v-for="w in scheduleResult.examinerWorkload" 
+              v-for="w in currentWorkload" 
               :key="w.nama"
               class="p-4 bg-white border border-gray-200 rounded shadow-sm flex flex-col justify-between"
             >

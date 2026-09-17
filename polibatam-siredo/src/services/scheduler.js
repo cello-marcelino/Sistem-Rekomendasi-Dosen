@@ -106,6 +106,7 @@ export function scheduleDefenses(proposals = [], options = {}) {
 
   const scheduled = []
   const unassigned = []
+  const allExaminersSet = new Set()
 
   // Siapkan seluruh slot waktu berurutan (Date x Session x Room)
   const availableSlots = []
@@ -169,8 +170,9 @@ export function scheduleDefenses(proposals = [], options = {}) {
         candidateList.push({
           nama: name,
           rank: rIdx + 1,
-          score: r.scores?.hybrid ?? r.hybrid_score ?? 1.0
+          score: r.scores?.hybrid ?? r.hybrid_score ?? (1 - (rIdx * 0.05))
         })
+        allExaminersSet.add(name)
       }
     }
 
@@ -242,6 +244,7 @@ export function scheduleDefenses(proposals = [], options = {}) {
           penguji_2: p2Name,
           penguji_1_rank: pair.p1.rank,
           penguji_2_rank: pair.p2.rank,
+          candidates: candidateList,
           tanggal: date,
           tanggal_indo: formatIndoDate(date),
           sesi_id: slot.session.id,
@@ -263,6 +266,7 @@ export function scheduleDefenses(proposals = [], options = {}) {
         mahasiswa_id: mhsId,
         nama_mahasiswa: mhsNama,
         judul_tugas_akhir: judul,
+        candidates: candidateList,
         reason: candidateList.length < 2 
           ? 'Jumlah dosen rekomendasi pada berkas kurang dari 2 orang.' 
           : 'Dosen rekomendasi telah mencapai kuota harian (2 TA) / periode (10 TA) atau semua slot ruangan penuh.'
@@ -308,6 +312,7 @@ export function scheduleDefenses(proposals = [], options = {}) {
     scheduled,
     unassigned,
     examinerWorkload,
+    allExaminers: Array.from(allExaminersSet),
     constraints: {
       maxPerDay,
       maxPerPeriod
