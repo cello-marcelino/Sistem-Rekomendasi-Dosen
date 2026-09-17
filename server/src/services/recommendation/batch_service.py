@@ -27,17 +27,27 @@ class BatchService:
             if not isinstance(p, dict):
                 continue
                 
-            id_ = str(p.get('id', index + 1))
-            judul = str(p.get('judul', '') or '')
-            abstrak = str(p.get('abstrak', '') or '')
+            id_ = str(p.get('id') or p.get('nim') or (index + 1))
+            nama = str(p.get('nama') or p.get('nama_mahasiswa') or p.get('name') or '').strip()
+            judul = str(p.get('judul') or p.get('judul_tugas_akhir') or p.get('title') or '').strip()
+            abstrak = str(p.get('abstrak') or p.get('abstract') or '').strip()
+            pembimbing = str(p.get('pembimbing') or p.get('dosen_pembimbing') or '').strip()
+            prodi = str(p.get('program_studi') or p.get('prodi') or '').strip()
             k_rank = p.get('k_rank') or global_k_rank or BatchService.DEFAULT_BATCH_K_RANK
             
-            recom = RecommendationService.get_recommendations(judul, abstrak, k_rank)
+            recom = RecommendationService.get_recommendations(judul, abstrak, k_rank, program_studi=prodi)
             
-            results.append({
+            item_res = {
                 "id": id_,
+                "nama": nama,
                 "judul": judul,
                 "rekomendasi": recom
-            })
+            }
+            if pembimbing:
+                item_res["pembimbing"] = pembimbing
+            if prodi:
+                item_res["program_studi"] = prodi
+                
+            results.append(item_res)
             
         return results

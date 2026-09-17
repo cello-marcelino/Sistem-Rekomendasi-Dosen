@@ -79,18 +79,24 @@ class RecommendationController:
             cols = {str(c).lower().strip(): c for c in df.columns}
             
             proposals = []
-            id_col = cols.get('id')
-            judul_col = cols.get('judul')
-            abstrak_col = cols.get('abstrak')
+            id_col = cols.get('id') or cols.get('nim') or cols.get('no')
+            nama_col = cols.get('nama') or cols.get('nama_mahasiswa') or cols.get('mahasiswa') or cols.get('name')
+            judul_col = cols.get('judul') or cols.get('judul_tugas_akhir') or cols.get('judul_ta') or cols.get('title') or cols.get('topik')
+            abstrak_col = cols.get('abstrak') or cols.get('abstract') or cols.get('ringkasan')
+            pembimbing_col = cols.get('pembimbing') or cols.get('dosen_pembimbing')
+            prodi_col = cols.get('program_studi') or cols.get('prodi')
             
             for index, row in df.iterrows():
                 proposals.append({
-                    "id": str(row[id_col]) if id_col and pd.notna(row[id_col]) else str(index + 1),
-                    "judul": str(row[judul_col]) if judul_col and pd.notna(row[judul_col]) else "",
-                    "abstrak": str(row[abstrak_col]) if abstrak_col and pd.notna(row[abstrak_col]) else ""
+                    "id": str(row[id_col]).strip() if id_col and pd.notna(row[id_col]) else str(index + 1),
+                    "nama": str(row[nama_col]).strip() if nama_col and pd.notna(row[nama_col]) else "",
+                    "judul": str(row[judul_col]).strip() if judul_col and pd.notna(row[judul_col]) else "",
+                    "abstrak": str(row[abstrak_col]).strip() if abstrak_col and pd.notna(row[abstrak_col]) else "",
+                    "pembimbing": str(row[pembimbing_col]).strip() if pembimbing_col and pd.notna(row[pembimbing_col]) else "",
+                    "program_studi": str(row[prodi_col]).strip() if prodi_col and pd.notna(row[prodi_col]) else ""
                 })
                 
-            k_rank_str = request.form.get('k_rank')
+            k_rank_str = request.form.get('k_rank') or request.form.get('top_k')
             global_k_rank = int(k_rank_str) if k_rank_str and k_rank_str.isdigit() else None
             
             results = BatchService.process_batch(proposals, global_k_rank=global_k_rank)
