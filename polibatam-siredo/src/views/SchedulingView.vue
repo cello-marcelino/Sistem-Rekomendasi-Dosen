@@ -20,6 +20,37 @@ const customEndDate = ref('2026-10-09')
 const maxPerDay = ref(2)
 const maxPerPeriod = ref(10)
 
+// Ruangan Configuration State (Setting Manual)
+const customRooms = ref([...DEFAULT_ROOMS])
+const newRoomInput = ref('')
+const roomError = ref('')
+
+const addRoom = () => {
+  const roomName = newRoomInput.value.trim()
+  if (!roomName) return
+  if (customRooms.value.some(r => r.toLowerCase() === roomName.toLowerCase())) {
+    roomError.value = `Ruangan "${roomName}" sudah ada dalam daftar.`
+    return
+  }
+  customRooms.value.push(roomName)
+  newRoomInput.value = ''
+  roomError.value = ''
+}
+
+const removeRoom = (index) => {
+  if (customRooms.value.length <= 1) {
+    roomError.value = 'Minimal harus ada 1 ruangan sidang.'
+    return
+  }
+  customRooms.value.splice(index, 1)
+  roomError.value = ''
+}
+
+const resetRooms = () => {
+  customRooms.value = [...DEFAULT_ROOMS]
+  roomError.value = ''
+}
+
 // Search & Filter State
 const searchQuery = ref('')
 const selectedRoomFilter = ref('')
@@ -28,6 +59,17 @@ const selectedExaminerFilter = ref('')
 
 // Result State
 const scheduleResult = ref(null)
+
+// All available rooms (from customRooms + any in scheduled results)
+const allRoomsList = computed(() => {
+  const set = new Set(customRooms.value)
+  if (scheduleResult.value?.scheduled) {
+    scheduleResult.value.scheduled.forEach(row => {
+      if (row.ruangan) set.add(row.ruangan)
+    })
+  }
+  return Array.from(set)
+})
 
 const activePeriod = computed(() => {
   if (isCustomDate.value) {
@@ -67,6 +109,11 @@ const processScheduling = async () => {
   const file = fileInput.value?.files[0]
   if (!file) {
     error.value = "Pilih file Excel daftar mahasiswa / proposal terlebih dahulu."
+    return
+  }
+
+  if (customRooms.value.length === 0) {
+    error.value = "Tentukan minimal 1 ruangan sidang terlebih dahulu."
     return
   }
 
@@ -125,13 +172,13 @@ const processScheduling = async () => {
       throw new Error("Tidak ada data proposal yang valid ditemukan dalam file Excel.")
     }
 
-    // 2. Jalankan algoritma penjadwalan cerdas berbasis kuota (Max 2 TA/hari & Max 10 TA/periode)
+    // 2. Jalankan algoritma penjadwalan cerdas berbasis kuota & ruangan kustom
     const result = scheduleDefenses(proposalsToSchedule, {
       periodId: activePeriod.value.id,
       startDate: activePeriod.value.startDate,
       endDate: activePeriod.value.endDate,
       sessions: DEFAULT_SESSIONS,
-      rooms: DEFAULT_ROOMS,
+      rooms: customRooms.value,
       maxPerDay: maxPerDay.value,
       maxPerPeriod: maxPerPeriod.value
     })
@@ -281,8 +328,8 @@ const downloadTemplate = () => {
       </div>
       <div class="p-5">
         <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1">Kapasitas Sesi</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">4 Sesi × 3 Ruangan</div>
-        <div class="text-[11px] text-gray-500 mt-1">12 Slot Sidang per Hari</div>
+        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">4 Sesi × {{ customRooms.length }} Ruang</div>
+        <div class="text-[11px] text-gray-500 mt-1">{{ 4 * customRooms.length }} Slot Sidang per Hari</div>
       </div>
       <div class="p-5">
         <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1">Jadwal Penguji</div>
@@ -345,9 +392,73 @@ const downloadTemplate = () => {
           </div>
         </div>
 
-        <!-- 2. File Upload Box -->
+        <!-- 2. Pengaturan Ruangan Sidang (Manual / Fleksibel) -->
+        <div class="bg-gray-50/70 border border-gray-200 rounded p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider">2. Pengaturan Ruangan Sidang (Setting Manual)</h2>
+              <p class="text-xs text-gray-600 mt-0.5">Tentukan ruangan sidang yang tersedia. Anda dapat menambah ruangan baru atau menghapus ruangan.</p>
+            </div>
+            <button 
+              @click="resetRooms" 
+              type="button"
+              class="text-xs font-mono font-semibold text-teal-700 hover:text-teal-800 underline self-start sm:self-auto"
+            >
+              Reset ke Default
+            </button>
+          </div>
+
+          <!-- Chip list of active rooms -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div 
+              v-for="(room, idx) in customRooms" 
+              :key="room" 
+              class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-teal-200 rounded text-xs font-mono font-bold text-teal-900 shadow-xs group"
+            >
+              <span>{{ room }}</span>
+              <button 
+                @click="removeRoom(idx)" 
+                type="button" 
+                title="Hapus ruangan" 
+                class="w-4 h-4 rounded-full flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+              >
+                &times;
+              </button>
+            </div>
+          </div>
+
+          <!-- Add new room input -->
+          <div class="flex items-center gap-2 max-w-md pt-1">
+            <input 
+              v-model="newRoomInput" 
+              @keyup.enter="addRoom"
+              type="text" 
+              placeholder="Tambah ruang baru (contoh: R. PBL 104, Lab AI)..." 
+              class="flex-1 px-3 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none bg-white font-sans" 
+            />
+            <button 
+              @click="addRoom" 
+              type="button"
+              class="px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded text-xs font-semibold shadow-xs transition-colors shrink-0"
+            >
+              + Tambah Ruangan
+            </button>
+          </div>
+
+          <div v-if="roomError" class="text-xs text-red-600 font-medium">
+            {{ roomError }}
+          </div>
+
+          <div class="text-[11px] font-mono text-gray-500 flex flex-wrap items-center gap-3 pt-1 border-t border-gray-200/60">
+            <span>Kapasitas Harian: <strong>{{ 4 * customRooms.length }} Slot</strong> (4 Sesi × {{ customRooms.length }} Ruangan)</span>
+            <span>•</span>
+            <span>Total Kapasitas Periode: <strong>{{ 4 * customRooms.length * 5 }} Slot</strong> (5 Hari)</span>
+          </div>
+        </div>
+
+        <!-- 3. File Upload Box -->
         <div>
-          <h2 class="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider mb-3">2. Unggah Berkas Peserta Sidang (.xlsx)</h2>
+          <h2 class="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider mb-3">3. Unggah Berkas Peserta Sidang (.xlsx)</h2>
           <div 
             @click="triggerUpload"
             class="border-2 border-dashed border-gray-300 bg-gray-50 rounded p-8 flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/30 transition-all text-center group"
@@ -356,7 +467,7 @@ const downloadTemplate = () => {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <div class="text-sm font-bold text-gray-900 mb-1">{{ fileName || 'Klik untuk memilih file Excel peserta sidang' }}</div>
-            <div class="text-xs text-gray-500">Format kolom: <code>id / nim</code>, <code>nama</code>, <code>judul</code>, <code>abstrak</code></div>
+            <div class="text-xs text-gray-500">Format file: File hasil batch rekomendasi atau daftar proposal mahasiswa</div>
             <input type="file" ref="fileInput" class="hidden" accept=".xlsx,.xls" @change="handleFileChange">
           </div>
 
@@ -383,7 +494,7 @@ const downloadTemplate = () => {
         <div class="w-12 h-12 border-3 border-gray-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
         <h3 class="text-lg font-bold text-gray-900 mb-1">Menyusun Jadwal Sidang Bebas Bentrok...</h3>
         <p class="text-xs text-gray-600 max-w-md">
-          Mengevaluasi kecocokan topik dengan kepakaran dosen, membatasi kuota harian (max 2 TA) & kuota periode (max 10 TA), serta menempatkan ruangan sidang.
+          Mengevaluasi kecocokan topik dengan kepakaran dosen, membatasi kuota harian (max 2 TA) & kuota periode (max 10 TA), serta menempatkan ruangan sidang yang telah diatur.
         </p>
       </div>
 
@@ -420,16 +531,14 @@ const downloadTemplate = () => {
               class="px-3 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none w-52 bg-white" 
             />
 
-            <select v-model="selectedDateFilter" class="px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none bg-white">
+            <select v-model="selectedDateFilter" class="px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none bg-white font-mono">
               <option value="">Semua Tanggal</option>
               <option v-for="d in scheduleResult.period.workingDays" :key="d" :value="d">{{ formatIndoDate(d) }}</option>
             </select>
 
-            <select v-model="selectedRoomFilter" class="px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none bg-white">
+            <select v-model="selectedRoomFilter" class="px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:border-teal-500 focus:outline-none bg-white font-mono">
               <option value="">Semua Ruang</option>
-              <option value="R. PBL 101">R. PBL 101</option>
-              <option value="R. PBL 102">R. PBL 102</option>
-              <option value="R. PBL 103">R. PBL 103</option>
+              <option v-for="r in allRoomsList" :key="r" :value="r">{{ r }}</option>
             </select>
 
             <button 
@@ -477,7 +586,7 @@ const downloadTemplate = () => {
                 <th class="p-3.5 border-b border-gray-200">Penguji 1</th>
                 <th class="p-3.5 border-b border-gray-200">Penguji 2</th>
                 <th class="p-3.5 border-b border-gray-200">Jadwal & Waktu</th>
-                <th class="p-3.5 border-b border-gray-200">Ruangan</th>
+                <th class="p-3.5 border-b border-gray-200">Ruangan (Manual Edit)</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
@@ -503,9 +612,13 @@ const downloadTemplate = () => {
                   <div class="text-[11px] text-gray-500">{{ row.sesi_label }} ({{ row.waktu }})</div>
                 </td>
                 <td class="p-3.5 align-top whitespace-nowrap">
-                  <span class="inline-block px-2.5 py-1 font-mono text-[11px] font-bold text-teal-800 bg-teal-50 border border-teal-200 rounded">
-                    {{ row.ruangan }}
-                  </span>
+                  <select 
+                    v-model="row.ruangan" 
+                    class="px-2.5 py-1 font-mono text-[11px] font-bold text-teal-800 bg-teal-50/80 border border-teal-200 rounded hover:border-teal-400 focus:border-teal-600 focus:outline-none cursor-pointer transition-colors"
+                    title="Ubah ruangan sidang untuk jadwal ini"
+                  >
+                    <option v-for="r in allRoomsList" :key="r" :value="r">{{ r }}</option>
+                  </select>
                 </td>
               </tr>
               <tr v-if="filteredSchedule.length === 0">
