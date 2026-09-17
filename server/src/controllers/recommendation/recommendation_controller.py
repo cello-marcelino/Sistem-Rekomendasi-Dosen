@@ -20,9 +20,10 @@ class RecommendationController:
         if not data or not isinstance(data, dict):
             raise ValidationError("Request body harus berupa JSON object")
             
-        judul = str(data.get('judul', '') or '').strip()
-        abstrak = str(data.get('abstrak', '') or '').strip()
-        k_rank = data.get('k_rank')
+        judul = str(data.get('judul') or data.get('judul_tugas_akhir') or data.get('title') or '').strip()
+        abstrak = str(data.get('abstrak') or data.get('abstract') or '').strip()
+        k_rank = data.get('k_rank') or data.get('top_k')
+        program_studi = data.get('program_studi') or data.get('prodi')
         
         if not judul and not abstrak:
             raise ValidationError("Judul atau abstrak penelitian harus diisi")
@@ -31,7 +32,7 @@ class RecommendationController:
         if not cache.is_ready:
             raise ServiceUnavailableError("Model NLP sedang inisialisasi / warm-up")
             
-        result = RecommendationService.get_recommendations(judul, abstrak, k_rank)
+        result = RecommendationService.get_recommendations(judul, abstrak, k_rank, program_studi=program_studi)
         return ResponseFormatter.success(data=result, message="Rekomendasi berhasil dibuat")
 
     @staticmethod
