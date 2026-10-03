@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import api from '../services/api'
 
 export const useClientSessionStore = defineStore('clientSession', {
@@ -73,7 +73,7 @@ export const useClientSessionStore = defineStore('clientSession', {
       this.token = token
       this.apiKey = apiKey
       this.client = client
-      
+
       localStorage.setItem('siredo_client_token', token)
       localStorage.setItem('siredo_client_api_key', apiKey)
       localStorage.setItem('siredo_client_data', JSON.stringify(client))
@@ -83,7 +83,7 @@ export const useClientSessionStore = defineStore('clientSession', {
       this.token = null
       this.apiKey = null
       this.client = null
-      
+
       localStorage.removeItem('siredo_client_token')
       localStorage.removeItem('siredo_client_api_key')
       localStorage.removeItem('siredo_client_data')

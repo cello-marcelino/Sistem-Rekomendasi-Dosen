@@ -3,10 +3,12 @@
  * Mematuhi batasan kuota harian (max 2 TA/hari) & kuota periode (max 10 TA/periode).
  */
 
-export const PERIOD_PRESETS = [
+export const DEFAULT_PERIODS = [
   {
     id: 'periode-1',
     name: 'Sidang Periode 1',
+    title: 'Oktober 2026 (Periode September 2026)',
+    academicYear: 'Ganjil 2026-2027',
     startDate: '2026-10-05',
     endDate: '2026-10-09',
     description: 'Pelaksanaan Sidang: 05 Oktober – 09 Oktober 2026'
@@ -14,11 +16,15 @@ export const PERIOD_PRESETS = [
   {
     id: 'periode-2',
     name: 'Sidang Periode 2',
+    title: 'November 2026 (Periode Oktober 2026)',
+    academicYear: 'Ganjil 2026-2027',
     startDate: '2026-11-09',
     endDate: '2026-11-13',
     description: 'Pelaksanaan Sidang: 09 November – 13 November 2026'
   }
 ]
+
+export const PERIOD_PRESETS = DEFAULT_PERIODS
 
 export const DEFAULT_SESSIONS = [
   { id: 1, label: 'Sesi 1', time: '08:30 - 10:00' },
@@ -77,6 +83,10 @@ export function formatIndoDate(dateStr) {
 export function scheduleDefenses(proposals = [], options = {}) {
   const {
     periodId = 'periode-1',
+    periodName = 'Sidang Periode 1',
+    periodTitle = 'Oktober 2026 (Periode September 2026)',
+    academicYear = 'Ganjil 2026-2027',
+    jenisSidang = 'Sidang TA2',
     startDate = '2026-10-05',
     endDate = '2026-10-09',
     sessions = DEFAULT_SESSIONS,
@@ -126,10 +136,20 @@ export function scheduleDefenses(proposals = [], options = {}) {
 
   for (let pIdx = 0; pIdx < proposals.length; pIdx++) {
     const item = proposals[pIdx]
-    const mhsId = item.id || item.mahasiswa_id || item.nim || item.ID || `MHS${1001 + pIdx}`
-    const mhsNama = item.nama || item.nama_mahasiswa || item.Nama || `Mahasiswa #${pIdx + 1}`
-    const judul = item.judul || item.judul_tugas_akhir || item['Judul TA'] || item.title || 'Topik Tugas Akhir'
-    const pembimbing = item.pembimbing || item.dosen_pembimbing || item['Dosen Pembimbing'] || ''
+    const keys = Object.keys(item)
+    const idKey = keys.find(k => ['id', 'nim', 'no', 'nomorinduk', 'nomor'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+    const namaKey = keys.find(k => ['nama', 'namamahasiswa', 'mahasiswa', 'name'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+    const judulKey = keys.find(k => ['judul', 'judultugasakhir', 'judulta', 'title', 'topik'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+    const pembimbingKey = keys.find(k => ['pembimbing', 'dosenpembimbing', 'pembimbing1', 'dosbing'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+    const waKey = keys.find(k => ['nowa', 'wa', 'nohp', 'hp', 'telepon', 'notelp', 'telp', 'phone', 'whatsapp', 'handphone'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+    const usulanKey = keys.find(k => ['jenisusulan', 'jenis_usulan', 'jenissidang', 'jenis_sidang', 'usulan', 'tipe'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+
+    const mhsId = idKey && item[idKey] ? item[idKey] : (item.id || item.mahasiswa_id || item.nim || `MHS${1001 + pIdx}`)
+    const mhsNama = namaKey && item[namaKey] ? item[namaKey] : (item.nama || item.nama_mahasiswa || `Mahasiswa #${pIdx + 1}`)
+    const judul = judulKey && item[judulKey] ? item[judulKey] : (item.judul || item.judul_tugas_akhir || 'Topik Tugas Akhir')
+    const pembimbing = pembimbingKey && item[pembimbingKey] ? item[pembimbingKey] : (item.pembimbing || item.dosen_pembimbing || '')
+    const noWa = (waKey && item[waKey] != null && String(item[waKey]).trim() !== '-') ? String(item[waKey]).trim() : (item.no_wa || item.no_hp || '')
+    const jenisUsulan = (usulanKey && item[usulanKey] && String(item[usulanKey]).trim() !== '-') ? String(item[usulanKey]).trim() : (item.jenis_usulan || jenisSidang || 'Sidang TA2')
 
     // 1. Ekstrak list rekomendasi dosen dari berbagai format (JSON / Excel hasil batch)
     let recList = []
@@ -141,7 +161,6 @@ export function scheduleDefenses(proposals = [], options = {}) {
 
     // Jika belum ada dari objek API, periksa kolom file Excel: 'Rekomendasi 1', 'Rekomendasi 2', dsb.
     if (recList.length === 0) {
-      const keys = Object.keys(item)
       for (let i = 1; i <= 10; i++) {
         const rekKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === `rekomendasi${i}`)
         const skorKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === `skor${i}`)
@@ -165,7 +184,7 @@ export function scheduleDefenses(proposals = [], options = {}) {
     for (let rIdx = 0; rIdx < recList.length; rIdx++) {
       const r = recList[rIdx]
       const name = String(r.dosen?.nama || r.nama_dosen || r.nama || '').trim()
-      if (name && name !== '-' && !seenCand.has(name.toLowerCase()) && name.toLowerCase() !== pembimbing.toLowerCase()) {
+      if (name && name !== '-' && !seenCand.has(name.toLowerCase()) && name.toLowerCase() !== String(pembimbing).toLowerCase()) {
         seenCand.add(name.toLowerCase())
         candidateList.push({
           nama: name,
@@ -238,6 +257,8 @@ export function scheduleDefenses(proposals = [], options = {}) {
           id: `SCH-${1000 + pIdx}`,
           mahasiswa_id: mhsId,
           nama_mahasiswa: mhsNama,
+          no_wa: noWa,
+          jenis_usulan: jenisUsulan,
           judul_tugas_akhir: judul,
           pembimbing: pembimbing || '-',
           penguji_1: p1Name,
@@ -265,6 +286,8 @@ export function scheduleDefenses(proposals = [], options = {}) {
       unassigned.push({
         mahasiswa_id: mhsId,
         nama_mahasiswa: mhsNama,
+        no_wa: noWa,
+        jenis_usulan: jenisUsulan,
         judul_tugas_akhir: judul,
         candidates: candidateList,
         reason: candidateList.length < 2 
@@ -301,11 +324,15 @@ export function scheduleDefenses(proposals = [], options = {}) {
   return {
     period: {
       id: periodId,
+      name: periodName,
+      title: periodTitle,
+      academicYear,
       startDate,
       endDate,
       totalDays: workingDays.length,
       workingDays
     },
+    jenisSidang,
     totalRequested: proposals.length,
     totalScheduled: scheduled.length,
     totalUnassigned: unassigned.length,

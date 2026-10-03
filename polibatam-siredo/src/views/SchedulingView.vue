@@ -2,7 +2,14 @@
 import { ref, computed, onMounted } from 'vue'
 import api from '../services/api'
 import * as XLSX from 'xlsx'
-import { PERIOD_PRESETS, DEFAULT_SESSIONS, DEFAULT_ROOMS, scheduleDefenses, formatIndoDate } from '../services/scheduler'
+import { 
+  DEFAULT_PERIODS, 
+  DEFAULT_SESSIONS, 
+  DEFAULT_ROOMS, 
+  scheduleDefenses, 
+  formatIndoDate, 
+  getWorkingDays 
+} from '../services/scheduler'
 
 // State
 const fileInput = ref(null)
@@ -12,13 +19,87 @@ const fileName = ref('')
 const fileSize = ref('')
 const isDragging = ref(false)
 const step = ref(1) // 1: Konfigurasi & Upload, 2: Processing, 3: Hasil Jadwal
-const activeTab = ref('table') // 'table' | 'matrix' | 'workload'
+const activeTab = ref('table') // 'table' | 'workload'
 
-// Periode Configuration State
-const selectedPreset = ref('periode-1')
-const isCustomDate = ref(false)
-const customStartDate = ref('2026-10-05')
-const customEndDate = ref('2026-10-09')
+// Pilihan Jenis Usulan Sidang (Sidang TA 1 atau Sidang TA 2)
+const selectedJenisSidang = ref('Sidang TA2') // 'Sidang TA1' | 'Sidang TA2'
+
+// Pengaturan Informasi Kop/Periode Laporan
+const periodTitle = ref('Oktober 2026 (Periode September 2026)')
+const academicYear = ref('Ganjil 2026-2027')
+
+// Daftar Periode (Bisa diubah, ditambah, atau dikurangi jumlah periodenya)
+const periods = ref(JSON.parse(JSON.stringify(DEFAULT_PERIODS)))
+const selectedPeriodId = ref('periode-1')
+
+// Periode aktif
+const activePeriod = computed(() => {
+  return periods.value.find(p => p.id === selectedPeriodId.value) || periods.value[0] || {
+    id: 'periode-1',
+    name: 'Sidang Periode 1',
+    startDate: '2026-10-05',
+    endDate: '2026-10-09'
+  }
+})
+
+// Hari kerja aktif untuk periode terpilih
+const activeWorkingDays = computed(() => {
+  if (!activePeriod.value?.startDate || !activePeriod.value?.endDate) return []
+  try {
+    return getWorkingDays(activePeriod.value.startDate, activePeriod.value.endDate)
+  } catch {
+    return []
+  }
+})
+
+// Fungsi Tambah Periode Baru
+const addPeriod = () => {
+  const nextNum = periods.value.length + 1
+  const newId = `periode-${Date.now()}`
+  
+  // Hitung tanggal default bulan berikutnya
+  let nextStart = '2026-12-07'
+  let nextEnd = '2026-12-11'
+  if (periods.value.length > 0) {
+    const lastP = periods.value[periods.value.length - 1]
+    try {
+      const d = new Date(lastP.endDate)
+      d.setDate(d.getDate() + 28) // kira-kira 4 minggu setelahnya
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      nextStart = `${year}-${month}-07`
+      nextEnd = `${year}-${month}-11`
+    } catch {}
+  }
+
+  periods.value.push({
+    id: newId,
+    name: `Sidang Periode ${nextNum}`,
+    title: `Periode Sidang ${nextNum}`,
+    academicYear: academicYear.value,
+    startDate: nextStart,
+    endDate: nextEnd,
+    description: `Pelaksanaan Sidang: Periode ${nextNum}`
+  })
+  selectedPeriodId.value = newId
+}
+
+// Fungsi Hapus Periode
+const removePeriod = (id) => {
+  if (periods.value.length <= 1) {
+    error.value = 'Minimal harus ada 1 periode sidang aktif.'
+    return
+  }
+  const idx = periods.value.findIndex(p => p.id === id)
+  if (idx !== -1) {
+    periods.value.splice(idx, 1)
+    if (selectedPeriodId.value === id) {
+      selectedPeriodId.value = periods.value[0].id
+    }
+  }
+}
+
+// Batas Beban Menguji Dosen
 const maxPerDay = ref(2)
 const maxPerPeriod = ref(10)
 
@@ -58,6 +139,7 @@ const searchQuery = ref('')
 const selectedRoomFilter = ref('')
 const selectedDateFilter = ref('')
 const selectedExaminerFilter = ref('')
+const selectedUsulanFilter = ref('')
 
 // Result State
 const scheduleResult = ref(null)
@@ -119,29 +201,6 @@ const getNonCandidateDosens = (row) => {
   return allAvailableExaminers.value.filter(name => !candidateNames.has(name.toLowerCase().trim()))
 }
 
-const activePeriod = computed(() => {
-  if (isCustomDate.value) {
-    return {
-      id: 'custom',
-      name: 'Periode Kustom',
-      startDate: customStartDate.value,
-      endDate: customEndDate.value,
-      description: `Pelaksanaan: ${formatIndoDate(customStartDate.value)} – ${formatIndoDate(customEndDate.value)}`
-    }
-  }
-  return PERIOD_PRESETS.find(p => p.id === selectedPreset.value) || PERIOD_PRESETS[0]
-})
-
-const handlePresetChange = (presetId) => {
-  selectedPreset.value = presetId
-  isCustomDate.value = false
-  const p = PERIOD_PRESETS.find(x => x.id === presetId)
-  if (p) {
-    customStartDate.value = p.startDate
-    customEndDate.value = p.endDate
-  }
-}
-
 const triggerUpload = () => {
   fileInput.value.click()
 }
@@ -201,6 +260,11 @@ const processScheduling = async () => {
     return
   }
 
+  if (activeWorkingDays.value.length === 0) {
+    error.value = "Periode sidang yang dipilih tidak memiliki hari kerja (Senin-Jumat). Silakan sesuaikan tanggal mulai dan selesai."
+    return
+  }
+
   step.value = 2
   loading.value = true
   error.value = null
@@ -227,15 +291,24 @@ const processScheduling = async () => {
       // Langsung gunakan data rekomendasi yang ada di dalam berkas Excel
       proposalsToSchedule = jsonRows.map((row, index) => {
         const keys = Object.keys(row)
-        const idKey = keys.find(k => ['id', 'nim', 'no'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+        const idKey = keys.find(k => ['id', 'nim', 'no', 'nomorinduk', 'nomor'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
         const namaKey = keys.find(k => ['nama', 'namamahasiswa', 'mahasiswa', 'name'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
         const judulKey = keys.find(k => ['judul', 'judultugasakhir', 'judulta', 'title', 'topik'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+        const pembimbingKey = keys.find(k => ['pembimbing', 'dosenpembimbing', 'pembimbing1', 'dosbing'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+        const waKey = keys.find(k => ['nowa', 'wa', 'nohp', 'hp', 'telepon', 'notelp', 'telp', 'phone', 'whatsapp', 'handphone'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+        const usulanKey = keys.find(k => ['jenisusulan', 'jenis_usulan', 'jenissidang', 'jenis_sidang', 'usulan', 'tipe'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+
+        const noWa = (waKey && row[waKey] != null && String(row[waKey]).trim() !== '-') ? String(row[waKey]).trim() : (row.no_wa || '')
+        const jenisUsulan = (usulanKey && row[usulanKey] && String(row[usulanKey]).trim() !== '-') ? String(row[usulanKey]).trim() : selectedJenisSidang.value
 
         return {
           ...row,
-          id: idKey && row[idKey] ? row[idKey] : (index + 1),
-          nama: namaKey && row[namaKey] ? row[namaKey] : `Mahasiswa #${index + 1}`,
-          judul: judulKey && row[judulKey] ? row[judulKey] : 'Topik Tugas Akhir'
+          id: idKey && row[idKey] ? row[idKey] : (row.id || index + 1),
+          nama: namaKey && row[namaKey] ? row[namaKey] : (row.nama || `Mahasiswa #${index + 1}`),
+          judul: judulKey && row[judulKey] ? row[judulKey] : (row.judul || 'Topik Tugas Akhir'),
+          pembimbing: pembimbingKey && row[pembimbingKey] ? row[pembimbingKey] : (row.pembimbing || '-'),
+          no_wa: noWa,
+          jenis_usulan: jenisUsulan
         }
       })
     } else {
@@ -249,16 +322,34 @@ const processScheduling = async () => {
       })
 
       const rawData = response.data?.data
-      proposalsToSchedule = Array.isArray(rawData) ? rawData : (rawData?.results || [])
+      const resultsFromApi = Array.isArray(rawData) ? rawData : (rawData?.results || [])
+
+      // Merge kembali No WA dan Jenis Usulan dari baris Excel original
+      proposalsToSchedule = resultsFromApi.map((p, idx) => {
+        const origRow = jsonRows[idx] || {}
+        const origKeys = Object.keys(origRow)
+        const waKey = origKeys.find(k => ['nowa', 'wa', 'nohp', 'hp', 'telepon', 'notelp', 'telp', 'phone', 'whatsapp', 'handphone'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+        const usulanKey = origKeys.find(k => ['jenisusulan', 'jenis_usulan', 'jenissidang', 'jenis_sidang', 'usulan', 'tipe'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+
+        return {
+          ...p,
+          no_wa: p.no_wa || (waKey && origRow[waKey] != null && String(origRow[waKey]).trim() !== '-' ? String(origRow[waKey]).trim() : ''),
+          jenis_usulan: p.jenis_usulan || (usulanKey && origRow[usulanKey] && String(origRow[usulanKey]).trim() !== '-' ? String(origRow[usulanKey]).trim() : selectedJenisSidang.value)
+        }
+      })
     }
 
     if (proposalsToSchedule.length === 0) {
       throw new Error("Tidak ada data proposal yang valid ditemukan dalam file Excel.")
     }
 
-    // 2. Jalankan algoritma penjadwalan cerdas berbasis kuota & ruangan kustom
+    // 2. Jalankan algoritma penjadwalan cerdas berbasis kuota, periode, & ruangan kustom
     const result = scheduleDefenses(proposalsToSchedule, {
       periodId: activePeriod.value.id,
+      periodName: activePeriod.value.name,
+      periodTitle: periodTitle.value || activePeriod.value.title,
+      academicYear: academicYear.value,
+      jenisSidang: selectedJenisSidang.value,
       startDate: activePeriod.value.startDate,
       endDate: activePeriod.value.endDate,
       sessions: DEFAULT_SESSIONS,
@@ -286,6 +377,8 @@ const filteredSchedule = computed(() => {
     const matchQuery = !q ||
       row.nama_mahasiswa.toLowerCase().includes(q) ||
       String(row.mahasiswa_id).toLowerCase().includes(q) ||
+      (row.no_wa && row.no_wa.toLowerCase().includes(q)) ||
+      (row.jenis_usulan && row.jenis_usulan.toLowerCase().includes(q)) ||
       row.penguji_1.toLowerCase().includes(q) ||
       row.penguji_2.toLowerCase().includes(q) ||
       row.judul_tugas_akhir.toLowerCase().includes(q)
@@ -295,8 +388,9 @@ const filteredSchedule = computed(() => {
     const matchExaminer = !selectedExaminerFilter.value ||
       row.penguji_1 === selectedExaminerFilter.value ||
       row.penguji_2 === selectedExaminerFilter.value
+    const matchUsulan = !selectedUsulanFilter.value || row.jenis_usulan === selectedUsulanFilter.value
 
-    return matchQuery && matchRoom && matchDate && matchExaminer
+    return matchQuery && matchRoom && matchDate && matchExaminer && matchUsulan
   })
 })
 
@@ -357,32 +451,75 @@ const resetFilters = () => {
   selectedDateFilter.value = ''
   selectedRoomFilter.value = ''
   selectedExaminerFilter.value = ''
+  selectedUsulanFilter.value = ''
 }
 
 const hasActiveFilters = computed(() => {
-  return !!(searchQuery.value || selectedDateFilter.value || selectedRoomFilter.value || selectedExaminerFilter.value)
+  return !!(searchQuery.value || selectedDateFilter.value || selectedRoomFilter.value || selectedExaminerFilter.value || selectedUsulanFilter.value)
 })
 
-// Download Schedule Excel
+// Download Schedule Excel (Sesuai format resmi gambar Polibatam)
 const downloadSchedule = () => {
   if (!scheduleResult.value?.scheduled) return
 
-  const dataJadwal = scheduleResult.value.scheduled.map((row, idx) => ({
-    'No': idx + 1,
-    'NIM': row.mahasiswa_id,
-    'Nama Mahasiswa': row.nama_mahasiswa,
-    'Judul Tugas Akhir': row.judul_tugas_akhir,
-    'Dosen Pembimbing': row.pembimbing,
-    'Penguji 1': row.penguji_1,
-    'Penguji 2': row.penguji_2,
-    'Tanggal Sidang': row.tanggal,
-    'Hari': row.tanggal_indo,
-    'Sesi': row.sesi_label,
-    'Jam': row.waktu,
-    'Ruangan': row.ruangan,
-    'Periode': activePeriod.value.name
-  }))
+  const pTitle = periodTitle.value || activePeriod.value.title || 'Oktober 2026 (Periode September 2026)'
+  const aYear = academicYear.value || 'Ganjil 2026-2027'
 
+  // Format array-of-arrays sesuai struktur resmi
+  const wsData = [
+    [pTitle],
+    [aYear],
+    [], // Baris kosong pemisah
+    [
+      'Hari dan Ruang Sidang',
+      'Jam Sidang',
+      'No',
+      'Jenis Usulan',
+      'NIM',
+      'Nama Mahasiswa',
+      'No WA',
+      'Judul Tugas Akhir',
+      'Penguji'
+    ]
+  ]
+
+  scheduleResult.value.scheduled.forEach((row, idx) => {
+    wsData.push([
+      `${row.tanggal_indo} - ${row.ruangan}`,
+      row.waktu,
+      idx + 1,
+      row.jenis_usulan || selectedJenisSidang.value,
+      String(row.mahasiswa_id),
+      row.nama_mahasiswa,
+      row.no_wa || '', // Kolom No WA selalu ada walaupun kosong
+      row.judul_tugas_akhir,
+      `1. ${row.penguji_1}\n2. ${row.penguji_2}`
+    ])
+  })
+
+  // Sheet 1: Jadwal Sidang TA
+  const ws1 = XLSX.utils.aoa_to_sheet(wsData)
+
+  // Merge cell untuk judul kop baris 1 dan baris 2
+  ws1['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } }
+  ]
+
+  // Lebar kolom
+  ws1['!cols'] = [
+    { wch: 30 }, // Hari dan Ruang Sidang
+    { wch: 16 }, // Jam Sidang
+    { wch: 6 },  // No
+    { wch: 15 }, // Jenis Usulan
+    { wch: 15 }, // NIM
+    { wch: 30 }, // Nama Mahasiswa
+    { wch: 16 }, // No WA
+    { wch: 55 }, // Judul Tugas Akhir
+    { wch: 40 }  // Penguji
+  ]
+
+  // Sheet 2: Rekap Beban Penguji
   const dataWorkload = currentWorkload.value.map((w, idx) => ({
     'No': idx + 1,
     'Nama Dosen': w.nama,
@@ -390,15 +527,13 @@ const downloadSchedule = () => {
     'Batas Maksimal Periode': w.maxPeriod,
     'Persentase Beban': `${w.percentage}%`
   }))
-
-  const wb = XLSX.utils.book_new()
-  const ws1 = XLSX.utils.json_to_sheet(dataJadwal)
   const ws2 = XLSX.utils.json_to_sheet(dataWorkload)
 
+  const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws1, "Jadwal Sidang TA")
   XLSX.utils.book_append_sheet(wb, ws2, "Rekap Beban Penguji")
 
-  const safeFileName = `Jadwal_Sidang_${activePeriod.value.name.replace(/\s+/g, '_')}.xlsx`
+  const safeFileName = `Jadwal_${selectedJenisSidang.value.replace(/\s+/g, '_')}_${activePeriod.value.name.replace(/\s+/g, '_')}.xlsx`
   XLSX.writeFile(wb, safeFileName)
 }
 
@@ -406,25 +541,37 @@ const downloadSchedule = () => {
 const downloadTemplate = () => {
   const templateData = [
     {
-      id: '3312011001',
-      nama: 'Budi Santoso',
-      judul: 'Penerapan Deep Learning Convolutional Neural Network untuk Klasifikasi Cacat PCB Elektronik',
-      abstrak: 'Penelitian ini mengembangkan arsitektur CNN ResNet-50 untuk mendeteksi cacat soldering pada manufaktur PCB.'
+      'No': 1,
+      'Jenis Usulan': selectedJenisSidang.value,
+      'NIM': '3312311099',
+      'Nama Mahasiswa': 'Henokh Iglessias Hutasoit',
+      'No WA': '087763560323',
+      'Judul Tugas Akhir': 'Sistem Pendukung Keputusan Penilaian Kinerja Karyawan Berbasis Web',
+      'Dosen Pembimbing': 'Dosen Pembimbing, M.Kom',
+      'Abstrak': 'Penelitian ini mengembangkan sistem pendukung keputusan penilaian kinerja karyawan...'
     },
     {
-      id: '3312011002',
-      nama: 'Siti Aminah',
-      judul: 'Sistem Monitoring Kualitas Udara Ruang Laboratorium Berbasis ESP32 dan Protokol MQTT',
-      abstrak: 'Implementasi IoT untuk pemantauan suhu, kelembaban, dan partikulat debu secara real-time terintegrasi dashboard.'
-    },
-    {
-      id: '3312011003',
-      nama: 'Rian Pratama',
-      judul: 'Rancang Bangun Sistem Informasi Pengelolaan Logistik Gudang Berbasis Web Menggunakan Node.js',
-      abstrak: 'Membangun aplikasi manajemen inventory dengan pelacakan barcode dan estimasi restock otomatis.'
+      'No': 2,
+      'Jenis Usulan': selectedJenisSidang.value,
+      'NIM': '3312311100',
+      'Nama Mahasiswa': 'Siti Aminah',
+      'No WA': '081234567890',
+      'Judul Tugas Akhir': 'Sistem Monitoring Kualitas Udara Ruang Laboratorium Berbasis IoT dan MQTT',
+      'Dosen Pembimbing': 'Dosen Pembimbing 2, M.T.',
+      'Abstrak': 'Implementasi IoT untuk pemantauan suhu, kelembaban, dan partikulat debu secara real-time...'
     }
   ]
   const ws = XLSX.utils.json_to_sheet(templateData)
+  ws['!cols'] = [
+    { wch: 6 },
+    { wch: 14 },
+    { wch: 15 },
+    { wch: 28 },
+    { wch: 16 },
+    { wch: 50 },
+    { wch: 30 },
+    { wch: 50 }
+  ]
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, "Data Peserta Sidang")
   XLSX.writeFile(wb, "Template_Peserta_Sidang_Polibatam.xlsx")
@@ -444,7 +591,7 @@ const downloadTemplate = () => {
           Penjadwalan Otomatis Sidang TA
         </h1>
         <p class="text-base text-gray-700 mt-1 max-w-2xl leading-relaxed font-normal">
-          Alokasi jadwal sidang, penempatan ruangan, dan 2 dosen penguji bebas bentrok berbasis kecocokan topik NLP serta batas kuota harian & periode.
+          Alokasi jadwal sidang, penempatan ruangan, dan 2 penguji bebas bentrok dengan batasan kuota harian & periode serta format laporan resmi Polibatam.
         </p>
       </div>
 
@@ -453,7 +600,7 @@ const downloadTemplate = () => {
           v-if="step === 3" 
           @click="resetAll" 
           type="button"
-          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-300 rounded-[4px] hover:bg-gray-50 transition-all shadow-xs font-sans"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-300 rounded-[4px] hover:bg-gray-50 transition-all shadow-xs font-sans cursor-pointer"
         >
           <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -464,7 +611,7 @@ const downloadTemplate = () => {
         <button 
           @click="downloadTemplate" 
           type="button"
-          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-300 rounded-[4px] hover:bg-gray-50 hover:border-gray-400 transition-all shadow-xs group font-sans"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-300 rounded-[4px] hover:bg-gray-50 hover:border-gray-400 transition-all shadow-xs group font-sans cursor-pointer"
         >
           <svg class="w-3.5 h-3.5 text-teal-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -517,14 +664,14 @@ const downloadTemplate = () => {
 
       <div class="bg-white border border-gray-200/90 rounded-lg p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider">Integritas Jadwal</span>
+          <span class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider">Format Laporan</span>
           <span class="p-1.5 rounded-[4px] bg-teal-50 text-teal-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
           </span>
         </div>
         <div>
-          <div class="text-h1 font-bold font-sans text-teal-800">Bebas Bentrok</div>
-          <p class="text-base text-gray-600 mt-1 font-sans">Penguji 1 ≠ Penguji 2 & Ruang Unik</p>
+          <div class="text-h1 font-bold font-sans text-teal-800">{{ selectedJenisSidang }}</div>
+          <p class="text-base text-gray-600 mt-1 font-sans">Format Resmi Polibatam (+No WA)</p>
         </div>
       </div>
     </div>
@@ -535,7 +682,7 @@ const downloadTemplate = () => {
         <button 
           @click="step = 1" 
           type="button"
-          class="p-4 flex items-center gap-3 transition-all text-left" 
+          class="p-4 flex items-center gap-3 transition-all text-left cursor-pointer" 
           :class="step === 1 ? 'bg-white font-bold text-teal-800 shadow-xs ring-1 ring-inset ring-teal-500/20' : 'text-gray-500 hover:bg-gray-100/70'"
         >
           <span 
@@ -570,7 +717,7 @@ const downloadTemplate = () => {
           :disabled="!scheduleResult"
           @click="scheduleResult && (step = 3)" 
           type="button"
-          class="p-4 flex items-center gap-3 transition-all text-left disabled:cursor-not-allowed disabled:opacity-60" 
+          class="p-4 flex items-center gap-3 transition-all text-left disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer" 
           :class="step === 3 ? 'bg-white font-bold text-teal-800 shadow-xs ring-1 ring-inset ring-teal-500/20' : 'text-gray-500 hover:bg-gray-100/70'"
         >
           <span 
@@ -588,51 +735,196 @@ const downloadTemplate = () => {
 
       <!-- Step 1: Configuration & File Upload -->
       <div v-if="step === 1" class="p-6 md:p-8 space-y-8">
-        <!-- 1. Periode Sidang Selection -->
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-              1. Pilih Periode Pelaksanaan Sidang
-            </h2>
-            <span class="text-base text-gray-500 font-sans">5 Hari Kerja per Periode</span>
+        
+        <!-- 1. Pilihan Jenis Sidang & Informasi Kop Laporan -->
+        <div class="bg-teal-50/40 border border-teal-200/80 rounded-xl p-5 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+                1. Jenis Sidang & Identitas Laporan
+              </h2>
+              <p class="text-base text-gray-600 mt-0.5 font-sans">
+                Tentukan jenis usulan sidang (TA 1 / TA 2) serta kop judul untuk tabel dan berkas Excel.
+              </p>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div 
-              v-for="preset in PERIOD_PRESETS" 
-              :key="preset.id"
-              @click="handlePresetChange(preset.id)"
-              class="p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between group hover:shadow-xs"
-              :class="selectedPreset === preset.id && !isCustomDate ? 'border-teal-600 bg-teal-50/40 shadow-xs ring-1 ring-teal-500/30' : 'border-gray-200 bg-white hover:border-gray-300'"
-            >
-              <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2">
-                  <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors" :class="selectedPreset === preset.id && !isCustomDate ? 'border-teal-600 bg-teal-600' : 'border-gray-300 bg-white'">
-                    <span v-if="selectedPreset === preset.id && !isCustomDate" class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                  </span>
-                  <span class="font-bold text-h3 text-gray-900 group-hover:text-teal-800 transition-colors font-sans">{{ preset.name }}</span>
-                </div>
-                <span v-if="selectedPreset === preset.id && !isCustomDate" class="text-tiny font-sans font-bold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-300/60">
-                  Terpilih
-                </span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+            <!-- Pilihan Sidang TA 1 atau TA 2 -->
+            <div>
+              <label class="block text-tiny font-sans font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                Jenis Usulan Sidang
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  @click="selectedJenisSidang = 'Sidang TA1'"
+                  class="py-2 px-3 text-base font-semibold rounded-lg border text-center transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  :class="selectedJenisSidang === 'Sidang TA1' ? 'bg-teal-700 text-white border-teal-700 shadow-xs' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'"
+                >
+                  <span class="w-2 h-2 rounded-full" :class="selectedJenisSidang === 'Sidang TA1' ? 'bg-white' : 'bg-gray-300'"></span>
+                  Sidang TA 1
+                </button>
+                <button
+                  type="button"
+                  @click="selectedJenisSidang = 'Sidang TA2'"
+                  class="py-2 px-3 text-base font-semibold rounded-lg border text-center transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  :class="selectedJenisSidang === 'Sidang TA2' ? 'bg-teal-700 text-white border-teal-700 shadow-xs' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'"
+                >
+                  <span class="w-2 h-2 rounded-full" :class="selectedJenisSidang === 'Sidang TA2' ? 'bg-white' : 'bg-gray-300'"></span>
+                  Sidang TA 2
+                </button>
               </div>
-              <p class="text-base text-gray-600 pl-6 mb-3 leading-relaxed font-sans">{{ preset.description }}</p>
-              <div class="text-base text-gray-500 pl-6 flex items-center gap-2 font-sans">
-                <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                Senin – Jumat (4 Sesi / Hari)
-              </div>
+              <p class="text-tiny text-gray-500 mt-1">Otomatis dimasukkan ke kolom "Jenis Usulan"</p>
+            </div>
+
+            <!-- Judul Kop Periode -->
+            <div>
+              <label class="block text-tiny font-sans font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                Judul Periode (Baris 1 Kop)
+              </label>
+              <input 
+                v-model="periodTitle"
+                type="text" 
+                placeholder="Contoh: Oktober 2026 (Periode September 2026)" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none bg-white font-sans shadow-2xs"
+              />
+              <p class="text-tiny text-gray-500 mt-1">Teks judul di bagian paling atas tabel Excel</p>
+            </div>
+
+            <!-- Tahun Akademik & Semester -->
+            <div>
+              <label class="block text-tiny font-sans font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                Semester / T.A. (Baris 2 Kop)
+              </label>
+              <input 
+                v-model="academicYear"
+                type="text" 
+                placeholder="Contoh: Ganjil 2026-2027" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none bg-white font-sans shadow-2xs"
+              />
+              <p class="text-tiny text-gray-500 mt-1">Subjudul akademik di bawah judul periode</p>
             </div>
           </div>
         </div>
 
-        <!-- 2. Pengaturan Ruangan Sidang (Manual / Fleksibel) -->
+        <!-- 2. Manajemen Periode Sidang (Waktu Bisa Diubah & Bisa Pilih Berapa Periode) -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+                2. Pilihan & Waktu Periode Sidang
+              </h2>
+              <p class="text-base text-gray-600 mt-0.5 font-sans">
+                Pilih periode yang akan dijalankan. Anda dapat mengubah tanggal, menambah periode baru, atau menghapus periode.
+              </p>
+            </div>
+
+            <button 
+              @click="addPeriod" 
+              type="button"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-teal-300 hover:border-teal-400 text-teal-800 rounded-lg text-base font-semibold transition-all shadow-2xs cursor-pointer self-start sm:self-auto"
+            >
+              <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+              Tambah Periode Baru
+            </button>
+          </div>
+
+          <!-- Grid Daftar Periode -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="preset in periods" 
+              :key="preset.id"
+              @click="selectedPeriodId = preset.id"
+              class="p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between group hover:shadow-xs relative bg-white"
+              :class="selectedPeriodId === preset.id ? 'border-teal-600 bg-teal-50/40 shadow-xs ring-1 ring-teal-500/30' : 'border-gray-200 hover:border-gray-300'"
+            >
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors" :class="selectedPeriodId === preset.id ? 'border-teal-600 bg-teal-600' : 'border-gray-300 bg-white'">
+                      <span v-if="selectedPeriodId === preset.id" class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                    </span>
+                    <input 
+                      v-model="preset.name" 
+                      @click.stop
+                      class="font-bold text-h3 text-gray-900 group-hover:text-teal-800 transition-colors font-sans bg-transparent border-b border-transparent hover:border-gray-300 focus:border-teal-500 focus:outline-none px-1"
+                      title="Klik untuk ubah nama periode"
+                    />
+                  </div>
+                  
+                  <div class="flex items-center gap-1.5">
+                    <span v-if="selectedPeriodId === preset.id" class="text-tiny font-sans font-bold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-300/60">
+                      Aktif
+                    </span>
+                    <button 
+                      v-if="periods.length > 1"
+                      @click.stop="removePeriod(preset.id)"
+                      type="button"
+                      class="text-gray-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors cursor-pointer"
+                      title="Hapus periode ini"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Editable Date Range per Periode -->
+                <div class="pl-6 space-y-2 mt-3" @click.stop>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="text-[11px] font-sans font-bold text-gray-500 block mb-0.5">Mulai:</label>
+                      <input 
+                        v-model="preset.startDate" 
+                        type="date"
+                        class="w-full text-base font-semibold px-2 py-1 bg-white border border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label class="text-[11px] font-sans font-bold text-gray-500 block mb-0.5">Selesai:</label>
+                      <input 
+                        v-model="preset.endDate" 
+                        type="date"
+                        class="w-full text-base font-semibold px-2 py-1 bg-white border border-gray-300 rounded focus:border-teal-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer Periode Card -->
+              <div class="pl-6 mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between text-base text-gray-500 font-sans">
+                <span class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  {{ formatIndoDate(preset.startDate) }} s.d. {{ formatIndoDate(preset.endDate) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Periode Detail Indicator -->
+          <div class="p-3 bg-slate-50 rounded-lg border border-gray-200/80 text-base text-gray-700 flex flex-wrap items-center justify-between gap-2 font-sans">
+            <div>
+              Periode Terpilih: <strong class="text-teal-900">{{ activePeriod.name }}</strong> 
+              ({{ formatIndoDate(activePeriod.startDate) }} – {{ formatIndoDate(activePeriod.endDate) }})
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-teal-800"><span class="font-mono tabular-nums">{{ activeWorkingDays.length }}</span> Hari Kerja Aktif</span>
+              <span>•</span>
+              <span>Kapasitas: <strong class="text-gray-900 font-mono tabular-nums">{{ activeWorkingDays.length * 4 * customRooms.length }}</strong> Slot Sidang</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Pengaturan Ruangan Sidang (Manual / Fleksibel) -->
         <div class="bg-slate-50/70 border border-gray-200/90 rounded-xl p-5 sm:p-6 space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-                2. Pengaturan Ruangan Sidang (Setting Manual)
+                3. Pengaturan Ruangan Sidang (Setting Manual)
               </h2>
               <p class="text-base text-gray-600 mt-0.5 font-sans">Tentukan ruangan sidang yang aktif. Anda dapat menambah ruangan baru atau menghapus ruangan.</p>
             </div>
@@ -691,20 +983,14 @@ const downloadTemplate = () => {
             <svg class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
             {{ roomError }}
           </div>
-
-          <div class="text-base text-gray-600 font-sans flex flex-wrap items-center gap-3 pt-2 border-t border-gray-200/70">
-            <span>Kapasitas Harian: <strong class="text-gray-900"><span class="font-mono tabular-nums">{{ 4 * customRooms.length }}</span> Slot</strong> (4 Sesi × {{ customRooms.length }} Ruangan)</span>
-            <span>•</span>
-            <span>Total Kapasitas Periode: <strong class="text-teal-800"><span class="font-mono tabular-nums">{{ 4 * customRooms.length * 5 }}</span> Slot</strong> (5 Hari)</span>
-          </div>
         </div>
 
-        <!-- 3. File Upload Box -->
+        <!-- 4. File Upload Box -->
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-              3. Unggah Berkas Peserta Sidang (.xlsx)
+              4. Unggah Berkas Peserta Sidang (.xlsx)
             </h2>
             <span class="text-base text-gray-500 font-sans">Mendukung berkas Excel batch rekomendasi</span>
           </div>
@@ -728,7 +1014,7 @@ const downloadTemplate = () => {
                 Tarik & letakkan berkas Excel di sini, atau <span class="text-teal-700 underline">pilih dari komputer</span>
               </div>
               <p class="text-base text-gray-500 max-w-sm mx-auto mt-1 font-sans">
-                Gunakan hasil berkas <strong>Hasil_Batch_Rekomendasi.xlsx</strong> atau template berkas proposal mahasiswa.
+                Gunakan berkas <strong>Hasil_Batch_Rekomendasi.xlsx</strong> atau template berkas peserta sidang.
               </p>
             </div>
 
@@ -738,7 +1024,7 @@ const downloadTemplate = () => {
               <button 
                 @click.stop="clearFile" 
                 type="button" 
-                class="text-gray-400 hover:text-red-600 text-base p-1"
+                class="text-gray-400 hover:text-red-600 text-base p-1 cursor-pointer"
                 title="Hapus berkas terpilih"
               >
                 &times;
@@ -779,7 +1065,7 @@ const downloadTemplate = () => {
           <div class="w-16 h-16 border-4 border-teal-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
         </div>
         <div>
-          <h2 class="text-h2 font-bold text-gray-900 mb-1 font-sans">Menyusun Jadwal Sidang Bebas Bentrok...</h2>
+          <h2 class="text-h2 font-bold text-gray-900 mb-1 font-sans">Menyusun Jadwal {{ selectedJenisSidang }} Bebas Bentrok...</h2>
           <p class="text-base text-gray-600 max-w-md mx-auto leading-relaxed font-sans">
             Mengevaluasi kepakaran dosen, membatasi kuota harian (max 2 TA) & kuota periode (max 10 TA), serta menempatkan ruangan sidang yang telah diatur.
           </p>
@@ -795,6 +1081,37 @@ const downloadTemplate = () => {
 
       <!-- Step 3: Result Workspace -->
       <div v-if="step === 3 && scheduleResult" class="flex flex-col h-full">
+        
+        <!-- Header Banner Resmi (Sesuai format gambar Polibatam) -->
+        <div class="p-5 bg-gradient-to-r from-teal-800 to-slate-900 text-white border-b border-teal-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
+          <div>
+            <div class="text-tiny font-sans uppercase tracking-widest text-teal-200 font-bold">
+              HASIL PENJADWALAN RESMI POLIBATAM
+            </div>
+            <h2 class="text-h1 font-extrabold tracking-tight mt-0.5 font-sans">
+              {{ periodTitle || activePeriod.title }}
+            </h2>
+            <div class="text-base text-teal-100 font-medium flex items-center gap-2 mt-1">
+              <span>{{ academicYear }}</span>
+              <span>•</span>
+              <span class="px-2 py-0.5 rounded bg-teal-700/80 text-white font-bold text-tiny">{{ selectedJenisSidang }}</span>
+              <span>•</span>
+              <span>{{ activePeriod.name }} ({{ formatIndoDate(activePeriod.startDate) }} s.d. {{ formatIndoDate(activePeriod.endDate) }})</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 shrink-0">
+            <button 
+              @click="downloadSchedule" 
+              type="button"
+              class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-base font-bold shadow-sm inline-flex items-center gap-2 transition-all cursor-pointer hover:shadow-md active:scale-98"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Ekspor Jadwal Excel (.xlsx)
+            </button>
+          </div>
+        </div>
+
         <!-- Sub-Navigation Tabs & Actions -->
         <div class="p-4 sm:p-5 border-b border-gray-200 bg-gray-50/70 flex flex-wrap gap-4 items-center justify-between">
           <!-- View Tabs -->
@@ -826,11 +1143,18 @@ const downloadTemplate = () => {
               <input 
                 v-model="searchQuery" 
                 type="text" 
-                placeholder="Cari NIM, Nama, Penguji..." 
-                class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none w-48 sm:w-56 bg-white shadow-2xs" 
+                placeholder="Cari NIM, Nama, No WA, Penguji..." 
+                class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none w-52 sm:w-60 bg-white shadow-2xs" 
               />
               <svg class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
+
+            <!-- Usulan Filter -->
+            <select v-model="selectedUsulanFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:outline-none bg-white font-sans shadow-2xs">
+              <option value="">Semua Usulan</option>
+              <option value="Sidang TA1">Sidang TA 1</option>
+              <option value="Sidang TA2">Sidang TA 2</option>
+            </select>
 
             <!-- Date Filter -->
             <select v-model="selectedDateFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:outline-none bg-white font-sans shadow-2xs">
@@ -856,19 +1180,9 @@ const downloadTemplate = () => {
               @click="resetFilters" 
               type="button" 
               title="Reset Filter"
-              class="px-2 py-1.5 text-base text-gray-500 hover:text-red-600 bg-white border border-gray-300 rounded-lg hover:border-red-300 transition-colors shadow-2xs"
+              class="px-2 py-1.5 text-base text-gray-500 hover:text-red-600 bg-white border border-gray-300 rounded-lg hover:border-red-300 transition-colors shadow-2xs cursor-pointer"
             >
               Reset Filter
-            </button>
-
-            <!-- Export Button -->
-            <button 
-              @click="downloadSchedule" 
-              type="button"
-              class="px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-base font-semibold shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-md active:scale-98"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-              Ekspor Excel
             </button>
           </div>
         </div>
@@ -877,12 +1191,12 @@ const downloadTemplate = () => {
         <div class="px-6 py-3.5 bg-teal-50/80 border-b border-teal-200/70 flex flex-wrap items-center justify-between gap-2 text-base text-teal-900 font-sans">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-            <span><strong class="font-semibold">Periode:</strong> {{ activePeriod.name }} ({{ formatIndoDate(activePeriod.startDate) }} s.d. {{ formatIndoDate(activePeriod.endDate) }})</span>
+            <span><strong class="font-semibold">Status:</strong> <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalScheduled }}</span> dari <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalRequested }}</span> Mahasiswa Berhasil Dijadwalkan</span>
           </div>
           <div class="flex items-center gap-4">
-            <span><strong class="font-semibold">Terjadwal:</strong> <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalScheduled }}</span> / <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalRequested }}</span> Mahasiswa</span>
+            <span><strong class="font-semibold">Ruangan:</strong> <span class="font-mono tabular-nums font-bold">{{ allRoomsList.length }}</span> Ruang Aktif</span>
             <span>•</span>
-            <span><strong class="font-semibold">Ruangan:</strong> <span class="font-mono tabular-nums font-bold">{{ allRoomsList.length }}</span> Ruang</span>
+            <span><strong class="font-semibold">Jenis Usulan:</strong> <span class="font-bold">{{ selectedJenisSidang }}</span></span>
           </div>
         </div>
 
@@ -899,45 +1213,88 @@ const downloadTemplate = () => {
           </ul>
         </div>
 
-        <!-- View 1: Tabel Jadwal -->
+        <!-- View 1: Tabel Jadwal (Sesuai Kolom Gambar Resmi) -->
         <div v-if="activeTab === 'table'" class="overflow-x-auto">
-          <table class="w-full text-left text-base">
-            <thead class="bg-gray-50/90 border-b border-gray-200 font-sans text-h3 font-bold uppercase tracking-wider text-gray-700 sticky top-0 backdrop-blur-xs">
+          <table class="w-full text-left text-base border-collapse">
+            <thead class="bg-gray-100 border-b border-gray-300 font-sans text-tiny font-bold uppercase tracking-wider text-gray-800 sticky top-0 backdrop-blur-xs">
               <tr>
-                <th class="p-3.5 border-b border-gray-200">No</th>
-                <th class="p-3.5 border-b border-gray-200">Mahasiswa</th>
-                <th class="p-3.5 border-b border-gray-200">Topik Tugas Akhir</th>
-                <th class="p-3.5 border-b border-gray-200 min-w-[230px]">Penguji 1 (Bisa Diganti)</th>
-                <th class="p-3.5 border-b border-gray-200 min-w-[230px]">Penguji 2 (Bisa Diganti)</th>
-                <th class="p-3.5 border-b border-gray-200">Jadwal & Waktu</th>
-                <th class="p-3.5 border-b border-gray-200">Ruangan</th>
+                <th class="p-3 border-r border-gray-300 min-w-[170px] bg-yellow-100/60 text-yellow-900">Hari dan Ruang Sidang</th>
+                <th class="p-3 border-r border-gray-300 min-w-[130px] bg-yellow-100/60 text-yellow-900">Jam Sidang</th>
+                <th class="p-3 border-r border-gray-300 w-12 text-center">No</th>
+                <th class="p-3 border-r border-gray-300 min-w-[120px]">Jenis Usulan</th>
+                <th class="p-3 border-r border-gray-300 min-w-[120px]">NIM</th>
+                <th class="p-3 border-r border-gray-300 min-w-[180px]">Nama Mahasiswa</th>
+                <th class="p-3 border-r border-gray-300 min-w-[130px]">No WA</th>
+                <th class="p-3 border-r border-gray-300 min-w-[280px]">Judul Tugas Akhir</th>
+                <th class="p-3 border-r border-gray-300 min-w-[240px]">Penguji 1 (Bisa Diganti)</th>
+                <th class="p-3 min-w-[240px]">Penguji 2 (Bisa Diganti)</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200/90 bg-white">
+            <tbody class="divide-y divide-gray-200 bg-white">
               <tr v-for="(row, idx) in filteredSchedule" :key="row.id || idx" class="hover:bg-teal-50/30 transition-colors group">
-                <td class="p-3.5 font-mono tabular-nums text-gray-500 align-top">
-                  <span class="w-6 h-6 rounded-md bg-gray-100 group-hover:bg-teal-100 group-hover:text-teal-900 flex items-center justify-center font-bold text-base transition-colors">
-                    {{ idx + 1 }}
+                <!-- Hari dan Ruang Sidang -->
+                <td class="p-3 border-r border-gray-200 align-top">
+                  <div class="font-bold text-gray-900 text-base font-sans">{{ row.tanggal_indo }}</div>
+                  <div class="mt-1">
+                    <select 
+                      v-model="row.ruangan" 
+                      class="px-2 py-1 font-sans text-tiny font-bold text-teal-900 bg-teal-50/90 border border-teal-300 rounded hover:border-teal-500 focus:border-teal-600 focus:outline-none cursor-pointer shadow-2xs w-full"
+                      title="Ubah ruangan sidang"
+                    >
+                      <option v-for="r in allRoomsList" :key="r" :value="r">{{ r }}</option>
+                    </select>
+                  </div>
+                </td>
+
+                <!-- Jam Sidang -->
+                <td class="p-3 border-r border-gray-200 align-top whitespace-nowrap">
+                  <div class="font-mono tabular-nums font-bold text-gray-900 text-base">{{ row.waktu }}</div>
+                  <div class="text-tiny text-gray-500 mt-0.5">{{ row.sesi_label }}</div>
+                </td>
+
+                <!-- No -->
+                <td class="p-3 border-r border-gray-200 font-mono tabular-nums text-gray-700 align-top text-center font-bold">
+                  {{ idx + 1 }}
+                </td>
+
+                <!-- Jenis Usulan -->
+                <td class="p-3 border-r border-gray-200 align-top">
+                  <span class="inline-flex px-2 py-0.5 rounded text-tiny font-sans font-bold bg-teal-100 text-teal-800 border border-teal-200">
+                    {{ row.jenis_usulan || selectedJenisSidang }}
                   </span>
                 </td>
-                <td class="p-3.5 align-top">
-                  <div class="font-bold text-gray-900 text-h3">{{ row.nama_mahasiswa }}</div>
-                  <div class="font-mono text-base text-gray-500 mt-0.5">{{ row.mahasiswa_id }}</div>
+
+                <!-- NIM -->
+                <td class="p-3 border-r border-gray-200 font-mono tabular-nums text-gray-800 align-top font-semibold">
+                  {{ row.mahasiswa_id }}
                 </td>
-                <td class="p-3.5 text-gray-700 max-w-sm align-top">
+
+                <!-- Nama Mahasiswa -->
+                <td class="p-3 border-r border-gray-200 align-top font-bold text-gray-900">
+                  {{ row.nama_mahasiswa }}
+                </td>
+
+                <!-- No WA (Selalu tampil kolomnya walaupun kosong) -->
+                <td class="p-3 border-r border-gray-200 font-mono tabular-nums align-top text-gray-700">
+                  <span v-if="row.no_wa" class="text-teal-900 font-semibold">{{ row.no_wa }}</span>
+                  <span v-else class="text-gray-400 italic text-tiny">- (kosong) -</span>
+                </td>
+
+                <!-- Judul Tugas Akhir -->
+                <td class="p-3 border-r border-gray-200 text-gray-800 align-top">
                   <div class="line-clamp-2 leading-relaxed font-medium" :title="row.judul_tugas_akhir">{{ row.judul_tugas_akhir }}</div>
-                  <div v-if="row.pembimbing && row.pembimbing !== '-'" class="text-base text-gray-500 mt-1 flex items-center gap-1 font-sans">
+                  <div v-if="row.pembimbing && row.pembimbing !== '-'" class="text-tiny text-gray-500 mt-1 flex items-center gap-1 font-sans">
                     <span class="text-gray-400">Pembimbing:</span>
                     <span class="font-semibold text-gray-700">{{ row.pembimbing }}</span>
                   </div>
                 </td>
                 
                 <!-- Penguji 1: Editable Dropdown with Recommendations & Scores -->
-                <td class="p-3.5 align-top">
-                  <div class="space-y-1 max-w-[240px]">
+                <td class="p-3 border-r border-gray-200 align-top">
+                  <div class="space-y-1">
                     <select 
                       v-model="row.penguji_1" 
-                      class="w-full text-base font-semibold px-2.5 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
+                      class="w-full text-base font-semibold px-2 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
                       :class="row.penguji_1 === row.penguji_2 ? 'border-red-400 bg-red-50/50 text-red-900 focus:ring-red-400' : 'border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500 hover:border-gray-400'"
                       title="Pilih Dosen Penguji 1"
                     >
@@ -967,7 +1324,7 @@ const downloadTemplate = () => {
                         class="inline-flex items-center gap-1 text-tiny font-sans font-medium text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
                       >
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                        Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_1).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_1).score || 0) * 100) }}%</span> Cocok)
+                        Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_1).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_1).score || 0) * 100) }}%</span>)
                       </span>
                       <span 
                         v-else 
@@ -986,11 +1343,11 @@ const downloadTemplate = () => {
                 </td>
 
                 <!-- Penguji 2: Editable Dropdown with Recommendations & Scores -->
-                <td class="p-3.5 align-top">
-                  <div class="space-y-1 max-w-[240px]">
+                <td class="p-3 align-top">
+                  <div class="space-y-1">
                     <select 
                       v-model="row.penguji_2" 
-                      class="w-full text-base font-semibold px-2.5 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
+                      class="w-full text-base font-semibold px-2 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
                       :class="row.penguji_1 === row.penguji_2 ? 'border-red-400 bg-red-50/50 text-red-900 focus:ring-red-400' : 'border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500 hover:border-gray-400'"
                       title="Pilih Dosen Penguji 2"
                     >
@@ -1020,7 +1377,7 @@ const downloadTemplate = () => {
                         class="inline-flex items-center gap-1 text-tiny font-sans font-medium text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
                       >
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                        Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_2).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_2).score || 0) * 100) }}%</span> Cocok)
+                        Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_2).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_2).score || 0) * 100) }}%</span>)
                       </span>
                       <span 
                         v-else 
@@ -1037,24 +1394,9 @@ const downloadTemplate = () => {
                     </div>
                   </div>
                 </td>
-
-                <td class="p-3.5 align-top whitespace-nowrap">
-                  <div class="font-semibold text-gray-900 text-base font-sans">{{ row.tanggal_indo }}</div>
-                  <div class="text-base text-teal-800 font-medium mt-0.5 font-sans">{{ row.sesi_label }} (<span class="font-mono tabular-nums font-semibold">{{ row.waktu }}</span>)</div>
-                </td>
-                
-                <td class="p-3.5 align-top whitespace-nowrap">
-                  <select 
-                    v-model="row.ruangan" 
-                    class="px-2.5 py-1.5 font-sans text-base font-semibold text-teal-900 bg-teal-50/90 border border-teal-300 rounded-lg hover:border-teal-500 focus:border-teal-600 focus:outline-none cursor-pointer transition-colors shadow-2xs"
-                    title="Ubah ruangan sidang untuk jadwal ini"
-                  >
-                    <option v-for="r in allRoomsList" :key="r" :value="r">{{ r }}</option>
-                  </select>
-                </td>
               </tr>
               <tr v-if="filteredSchedule.length === 0">
-                <td colspan="7" class="p-12 text-center text-gray-500 text-base font-sans">
+                <td colspan="10" class="p-12 text-center text-gray-500 text-base font-sans">
                   <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   Tidak ada jadwal yang sesuai dengan filter pencarian.
                 </td>
