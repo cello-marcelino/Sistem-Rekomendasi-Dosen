@@ -90,75 +90,69 @@ const filteredDosen = computed(() => {
     return matchSearch && matchProdi
   })
 })
-
-const toggleProdiFilter = (prodi) => {
-  if (selectedProdi.value === prodi) {
-    selectedProdi.value = ''
-  } else {
-    selectedProdi.value = prodi
-  }
-}
 </script>
 
 <template>
-  <div class="space-y-6 pb-12 animate-in">
+  <div class="space-y-6 pb-12 animate-in font-sans">
     <!-- Header Section (Canvas-First) -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-sans">Direktori Dosen</h1>
-        <p class="text-sm text-gray-600 mt-1">
-          Daftar profil, bidang keahlian, dan riwayat akademik dosen pengajar.
+        <h1 class="text-h1 font-bold text-gray-900 tracking-tight font-sans">Direktori Dosen</h1>
+        <p class="text-base text-gray-700 mt-1 font-normal">
+          Daftar profil, bidang keahlian, dan riwayat akademik dosen pembimbing dan penguji.
         </p>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <span class="inline-flex items-center px-2.5 py-1 text-xs font-mono font-bold text-teal-800 bg-teal-50 border border-teal-200 rounded">
-          {{ filteredDosen.length }} / {{ stats.totalDosen }} Dosen
+        <span class="inline-flex items-center px-3 py-1 text-tiny font-sans font-semibold text-teal-800 bg-teal-50 border border-teal-200/80 rounded-[4px]">
+          <span class="font-mono font-bold tabular-nums mr-1">{{ filteredDosen.length }} / {{ stats.totalDosen }}</span> Dosen
         </span>
       </div>
     </div>
 
     <!-- Metrics Row (Elevated Card) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200 rounded shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
+    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200/90 rounded-lg shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200/80 overflow-hidden">
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Total Populasi</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Total Dosen</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
       </div>
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Publikasi</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Publikasi Terindeks</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
       </div>
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Bimbingan</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Riwayat Bimbingan</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
       </div>
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Pengujian</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Riwayat Pengujian</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
       </div>
     </div>
 
     <!-- Filter & Search Bar (Elevated Card) -->
-    <div class="bg-white border border-gray-200 rounded p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-      <div class="flex gap-4 w-full md:w-auto">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="Cari nama, NIDN, atau keahlian..." 
-          class="w-full md:w-64 bg-white border border-gray-300 rounded-[4px] px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-500"
-        />
+    <div class="bg-white border border-gray-200/90 rounded-lg p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1 max-w-2xl">
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Cari nama, NIDN, atau keahlian dosen..." 
+            class="w-full bg-white border border-gray-300 rounded-[4px] px-3.5 py-2 text-base text-gray-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 font-sans"
+          />
+        </div>
         <select 
           v-model="selectedProdi" 
-          class="w-full md:w-48 bg-white border border-gray-300 rounded-[4px] px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-500"
+          class="w-full sm:w-56 bg-white border border-gray-300 rounded-[4px] px-3.5 py-2 text-base text-gray-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 font-sans"
         >
           <option value="">Semua Program Studi</option>
           <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
         </select>
       </div>
 
-      <div class="flex border border-gray-300 rounded-[4px] bg-white overflow-hidden">
+      <div class="flex border border-gray-300 rounded-[4px] bg-white overflow-hidden shrink-0">
         <button 
           @click="viewMode = 'grid'" 
-          class="px-3 py-2 text-xs font-bold transition-colors"
+          class="px-3.5 py-2 text-base font-semibold font-sans transition-colors"
           :class="viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'"
         >
           GRID
@@ -166,7 +160,7 @@ const toggleProdiFilter = (prodi) => {
         <div class="w-px bg-gray-300"></div>
         <button 
           @click="viewMode = 'table'" 
-          class="px-3 py-2 text-xs font-bold transition-colors"
+          class="px-3.5 py-2 text-base font-semibold font-sans transition-colors"
           :class="viewMode === 'table' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'"
         >
           TABLE
@@ -174,18 +168,19 @@ const toggleProdiFilter = (prodi) => {
       </div>
     </div>
 
-    <!-- Loading / Empty -->
-    <div v-if="loading" class="flex-1 flex flex-col items-center justify-center p-20 min-h-[400px]">
+    <!-- Loading State -->
+    <div v-if="loading" class="flex-1 flex flex-col items-center justify-center p-20 min-h-[360px] bg-white border border-gray-200/90 rounded-lg shadow-sm">
       <div class="w-8 h-8 border-2 border-gray-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
-      <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Memuat Katalog...</span>
+      <span class="text-base font-sans font-semibold uppercase tracking-wider text-gray-500">Memuat Katalog Dosen...</span>
     </div>
 
-    <div v-else-if="filteredDosen.length === 0" class="flex-1 border-t border-dashed border-gray-300 bg-gray-50 flex items-center justify-center p-20">
-      <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">Tidak ada dosen yang cocok</span>
+    <!-- Empty State -->
+    <div v-else-if="filteredDosen.length === 0" class="flex-1 border border-dashed border-gray-300 bg-white rounded-lg flex items-center justify-center p-20 text-center">
+      <span class="text-base font-sans font-bold text-gray-400">Tidak ada dosen yang cocok dengan pencarian</span>
     </div>
 
     <!-- Content: Grid View -->
-    <div v-else-if="viewMode === 'grid'" class="p-6 lg:p-8 bg-slate-100/60 flex-1">
+    <div v-else-if="viewMode === 'grid'">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div 
           v-for="dosen in filteredDosen" 
@@ -199,48 +194,48 @@ const toggleProdiFilter = (prodi) => {
               <!-- Identity Header -->
               <div class="flex items-start gap-3.5 mb-4">
                 <div 
-                  class="w-10 h-10 rounded-[4px] text-white font-bold flex items-center justify-center shrink-0 text-sm shadow-sm"
+                  class="w-10 h-10 rounded-[4px] text-white font-bold flex items-center justify-center shrink-0 text-h3 shadow-sm font-sans"
                   :style="{ backgroundColor: getAvatarBg(dosen.nama) }"
                 >
                   {{ dosen.nama ? dosen.nama.charAt(0).toUpperCase() : 'D' }}
                 </div>
                 <div class="min-w-0 flex-1">
-                  <h3 class="font-bold text-gray-900 text-sm group-hover:text-teal-700 transition-colors leading-snug" :title="dosen.nama">
+                  <h3 class="font-bold text-gray-900 text-h3 group-hover:text-teal-700 transition-colors leading-snug font-sans" :title="dosen.nama">
                     {{ dosen.nama }}
                   </h3>
-                  <div class="text-[11px] font-mono text-gray-500 mt-1">
-                    NIDN: {{ dosen.nidn || '-' }}
+                  <div class="text-tiny text-gray-500 mt-1 font-sans">
+                    NIDN: <span class="font-mono">{{ dosen.nidn || '-' }}</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Hierarchy: Program Studi -->
+              <!-- Program Studi -->
               <div class="mb-3.5 pt-3 border-t border-gray-100">
-                <div class="text-[10px] font-mono font-bold text-gray-500 uppercase tracking-wider mb-1">
+                <div class="text-tiny font-sans font-semibold text-gray-500 uppercase tracking-wider mb-1">
                   Program Studi
                 </div>
-                <div class="text-xs font-semibold text-teal-800 bg-teal-50/80 border border-teal-200/80 px-2 py-0.5 inline-block rounded-sm">
+                <div class="text-tiny font-semibold text-teal-800 bg-teal-50/80 border border-teal-200/80 px-2 py-0.5 inline-block rounded-[3px] font-sans">
                   {{ dosen.program_studi || 'Teknik Informatika' }}
                 </div>
               </div>
 
-              <!-- Hierarchy: Bidang Keahlian -->
+              <!-- Bidang Keahlian -->
               <div class="pt-3 border-t border-gray-100">
-                <div class="text-[10px] font-mono font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                <div class="text-tiny font-sans font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                   Bidang Keahlian
                 </div>
                 <div class="flex flex-wrap gap-1.5">
                   <span 
                     v-for="(tag, tidx) in parseList(dosen.bidang_keahlian).slice(0, 3)" 
                     :key="tidx"
-                    class="px-2 py-0.5 border border-gray-200 bg-gray-50 text-[11px] text-gray-800 rounded-sm font-medium"
+                    class="px-2 py-0.5 border border-gray-200 bg-gray-50 text-tiny text-gray-800 rounded-[3px] font-medium font-sans"
                   >
                     {{ tag }}
                   </span>
-                  <span v-if="parseList(dosen.bidang_keahlian).length > 3" class="text-[10px] font-mono font-bold text-teal-700 self-center px-1">
+                  <span v-if="parseList(dosen.bidang_keahlian).length > 3" class="text-tiny font-sans font-semibold text-teal-700 self-center px-1">
                     +{{ parseList(dosen.bidang_keahlian).length - 3 }} lainnya
                   </span>
-                  <span v-if="!parseList(dosen.bidang_keahlian).length" class="text-xs text-gray-400 italic">
+                  <span v-if="!parseList(dosen.bidang_keahlian).length" class="text-tiny text-gray-400 italic font-sans">
                     Belum terdata
                   </span>
                 </div>
@@ -248,29 +243,29 @@ const toggleProdiFilter = (prodi) => {
             </div>
           </div>
           
-          <!-- Statistics Footer (3 Columns, Unabbreviated, Clear Division) -->
-          <div class="border-t border-gray-200 bg-gray-50/80 grid grid-cols-3 divide-x divide-gray-200 text-center py-3">
+          <!-- Statistics Footer (3 Columns, Clean Division) -->
+          <div class="border-t border-gray-200/90 bg-gray-50/80 grid grid-cols-3 divide-x divide-gray-200 text-center py-3">
             <div class="px-2">
-              <div class="text-sm font-mono font-bold text-gray-900 tabular-nums">
+              <div class="text-h3 font-mono font-bold text-gray-900 tabular-nums">
                 {{ parseList(dosen.jurnal || dosen.publikasi).length }}
               </div>
-              <div class="text-[10px] font-mono text-gray-600 font-semibold uppercase tracking-wider mt-0.5">
+              <div class="text-tiny font-sans text-gray-600 font-medium uppercase tracking-wider mt-0.5">
                 Publikasi
               </div>
             </div>
             <div class="px-2">
-              <div class="text-sm font-mono font-bold text-gray-900 tabular-nums">
+              <div class="text-h3 font-mono font-bold text-gray-900 tabular-nums">
                 {{ parseList(dosen.judul_bimbing || dosen.riwayat_bimbingan).length }}
               </div>
-              <div class="text-[10px] font-mono text-gray-600 font-semibold uppercase tracking-wider mt-0.5">
+              <div class="text-tiny font-sans text-gray-600 font-medium uppercase tracking-wider mt-0.5">
                 Bimbingan
               </div>
             </div>
             <div class="px-2">
-              <div class="text-sm font-mono font-bold text-gray-900 tabular-nums">
+              <div class="text-h3 font-mono font-bold text-gray-900 tabular-nums">
                 {{ parseList(dosen.judul_uji || dosen.riwayat_pengujian).length }}
               </div>
-              <div class="text-[10px] font-mono text-gray-600 font-semibold uppercase tracking-wider mt-0.5">
+              <div class="text-tiny font-sans text-gray-600 font-medium uppercase tracking-wider mt-0.5">
                 Pengujian
               </div>
             </div>
@@ -280,45 +275,47 @@ const toggleProdiFilter = (prodi) => {
     </div>
 
     <!-- Content: Table View -->
-    <div v-else class="flex-1 bg-white">
-      <table class="w-full text-left text-xs">
-        <thead class="bg-gray-50 border-b border-gray-200 font-mono text-[10px] uppercase tracking-widest text-gray-700 font-bold">
-          <tr>
-            <th class="p-4 border-r border-gray-200 w-12 text-center">No</th>
-            <th class="p-4 border-r border-gray-200">Nama Dosen & NIDN</th>
-            <th class="p-4 border-r border-gray-200">Program Studi</th>
-            <th class="p-4 border-r border-gray-200">Keahlian</th>
-            <th class="p-4 text-right">Metrik</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-for="(dosen, idx) in filteredDosen" :key="dosen.id" class="hover:bg-gray-50">
-            <td class="p-4 border-r border-gray-200 text-center font-mono text-gray-400">{{ idx + 1 }}</td>
-            <td class="p-4 border-r border-gray-200">
-              <router-link :to="`/dosen/${dosen.id}`" class="font-bold text-gray-900 text-sm hover:text-teal-600 hover:underline block mb-1">
-                {{ dosen.nama }}
-              </router-link>
-              <div class="text-[10px] font-mono text-gray-500">NIDN: {{ dosen.nidn || '-' }}</div>
-            </td>
-            <td class="p-4 border-r border-gray-200 text-teal-700 font-bold">
-              {{ dosen.program_studi || 'Teknik Informatika' }}
-            </td>
-            <td class="p-4 border-r border-gray-200">
-              <div class="flex flex-wrap gap-1">
-                <span v-for="(tag, tidx) in parseList(dosen.bidang_keahlian).slice(0, 3)" :key="tidx" class="px-2 py-0.5 border border-gray-200 bg-gray-50 text-[10px] text-gray-700">
-                  {{ tag }}
-                </span>
-                <span v-if="parseList(dosen.bidang_keahlian).length > 3" class="text-[10px] text-gray-400">+{{ parseList(dosen.bidang_keahlian).length - 3 }}</span>
-              </div>
-            </td>
-            <td class="p-4 font-mono text-xs text-right whitespace-nowrap">
-              <div class="font-bold text-gray-900">{{ parseList(dosen.jurnal || dosen.publikasi).length }} <span class="text-[10px] text-gray-500 font-normal">Publikasi</span></div>
-              <div class="font-bold text-gray-900">{{ parseList(dosen.judul_bimbing || dosen.riwayat_bimbingan).length }} <span class="text-[10px] text-gray-500 font-normal">Bimbingan</span></div>
-              <div class="font-bold text-gray-900">{{ parseList(dosen.judul_uji || dosen.riwayat_pengujian).length }} <span class="text-[10px] text-gray-500 font-normal">Pengujian</span></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-base border-collapse">
+          <thead class="bg-gray-50/80 border-b border-gray-200/90 font-sans text-tiny uppercase tracking-wider text-gray-700 font-bold">
+            <tr>
+              <th class="p-4 border-r border-gray-200/80 w-12 text-center">No</th>
+              <th class="p-4 border-r border-gray-200/80">Nama Dosen & NIDN</th>
+              <th class="p-4 border-r border-gray-200/80">Program Studi</th>
+              <th class="p-4 border-r border-gray-200/80">Bidang Keahlian</th>
+              <th class="p-4 text-right">Rekam Akademik</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="(dosen, idx) in filteredDosen" :key="dosen.id" class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 border-r border-gray-100 text-center font-mono text-gray-500 font-bold">{{ idx + 1 }}</td>
+              <td class="p-4 border-r border-gray-100">
+                <router-link :to="`/dosen/${dosen.id}`" class="font-bold text-gray-900 text-base hover:text-teal-700 hover:underline block mb-0.5 font-sans">
+                  {{ dosen.nama }}
+                </router-link>
+                <div class="text-tiny text-gray-500 font-sans">NIDN: <span class="font-mono">{{ dosen.nidn || '-' }}</span></div>
+              </td>
+              <td class="p-4 border-r border-gray-100 text-teal-800 font-semibold font-sans">
+                {{ dosen.program_studi || 'Teknik Informatika' }}
+              </td>
+              <td class="p-4 border-r border-gray-100">
+                <div class="flex flex-wrap gap-1">
+                  <span v-for="(tag, tidx) in parseList(dosen.bidang_keahlian).slice(0, 3)" :key="tidx" class="px-2 py-0.5 border border-gray-200 bg-gray-50 text-tiny text-gray-700 rounded-[2px] font-sans">
+                    {{ tag }}
+                  </span>
+                  <span v-if="parseList(dosen.bidang_keahlian).length > 3" class="text-tiny text-gray-400 self-center font-sans">+{{ parseList(dosen.bidang_keahlian).length - 3 }}</span>
+                </div>
+              </td>
+              <td class="p-4 text-base text-right whitespace-nowrap font-sans">
+                <div class="font-bold text-gray-900"><span class="font-mono tabular-nums">{{ parseList(dosen.jurnal || dosen.publikasi).length }}</span> <span class="text-tiny text-gray-500 font-normal">Publikasi</span></div>
+                <div class="font-bold text-gray-900"><span class="font-mono tabular-nums">{{ parseList(dosen.judul_bimbing || dosen.riwayat_bimbingan).length }}</span> <span class="text-tiny text-gray-500 font-normal">Bimbingan</span></div>
+                <div class="font-bold text-gray-900"><span class="font-mono tabular-nums">{{ parseList(dosen.judul_uji || dosen.riwayat_pengujian).length }}</span> <span class="text-tiny text-gray-500 font-normal">Pengujian</span></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -328,7 +325,7 @@ const toggleProdiFilter = (prodi) => {
   animation: fade-in 0.3s ease-out forwards;
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>

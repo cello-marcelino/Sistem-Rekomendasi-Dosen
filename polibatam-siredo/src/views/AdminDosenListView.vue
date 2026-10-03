@@ -89,112 +89,112 @@ const filteredDosen = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-6 pb-12 animate-in">
+  <div class="space-y-6 pb-12 animate-in font-sans">
     <!-- Header Section (Canvas-First) -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 tracking-tight font-sans">Master Data Dosen</h1>
-        <p class="text-sm text-gray-600 mt-1">
+        <h1 class="text-h1 font-bold text-gray-900 tracking-tight font-sans">Master Data Dosen</h1>
+        <p class="text-base text-gray-700 mt-1 font-normal">
           Pengelolaan data profil, publikasi, dan keahlian dosen pengajar.
         </p>
       </div>
       <div class="flex items-center gap-2 shrink-0">
         <router-link 
           to="/admin/dosen/create" 
-          class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-700 rounded hover:bg-teal-800 transition-colors shadow-sm"
+          class="inline-flex items-center gap-1.5 px-4 py-2 text-base font-semibold text-white bg-teal-700 rounded-[4px] hover:bg-teal-800 transition-colors shadow-sm font-sans"
         >
-          + Tambah Data
+          + Tambah Dosen
         </router-link>
       </div>
     </div>
 
     <!-- Metrics Row (Elevated Card) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200 rounded shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
+    <div class="grid grid-cols-2 lg:grid-cols-4 bg-white border border-gray-200/90 rounded-lg shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-gray-200/80 overflow-hidden">
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Populasi Master</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Populasi Master</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalDosen }}</div>
       </div>
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Total Publikasi</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Total Publikasi</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalPub }}</div>
       </div>
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Riwayat Bimbingan</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Riwayat Bimbingan</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalBimb }}</div>
       </div>
       <div class="p-5">
-        <div class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">Riwayat Ujian</div>
-        <div class="text-2xl font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
+        <div class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider mb-1.5">Riwayat Ujian</div>
+        <div class="text-h1 font-mono font-bold text-gray-900 tabular-nums">{{ stats.totalUji }}</div>
       </div>
     </div>
 
     <!-- Table Workspace (Elevated Card) -->
-    <div class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+    <div class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
       <!-- Filter & Search Bar -->
-      <div class="border-b border-gray-200 bg-gray-50/70 px-6 py-3.5 flex flex-col sm:flex-row gap-3 items-center">
+      <div class="border-b border-gray-200/90 bg-gray-50/70 px-6 py-3.5 flex flex-col sm:flex-row gap-3 items-center">
         <input 
           type="text" 
           v-model="search" 
           placeholder="Cari berdasarkan nama, NIDN, atau keahlian..." 
-          class="w-full max-w-md bg-white border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-teal-700"
+          class="w-full max-w-md bg-white border border-gray-300 rounded-[4px] px-3.5 py-1.5 text-base text-gray-900 focus:outline-none focus:ring-1 focus:ring-teal-700 font-sans"
         />
         <select 
           v-model="selectedProdi" 
-          class="w-full sm:w-52 bg-white border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-teal-700"
+          class="w-full sm:w-56 bg-white border border-gray-300 rounded-[4px] px-3.5 py-1.5 text-base text-gray-900 focus:outline-none focus:ring-1 focus:ring-teal-700 font-sans"
         >
-          <option value="">Semua Prodi</option>
+          <option value="">Semua Program Studi</option>
           <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
         </select>
       </div>
 
       <!-- Table -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs">
-        <thead class="bg-white border-b border-gray-200 font-mono text-[10px] uppercase tracking-widest text-gray-700 font-bold sticky top-0">
-          <tr>
-            <th class="p-4 border-r border-gray-200 w-12 text-center">No</th>
-            <th class="p-4 border-r border-gray-200">Identitas Dosen</th>
-            <th class="p-4 border-r border-gray-200">Program Studi</th>
-            <th class="p-4 border-r border-gray-200">Keahlian (Cuplikan)</th>
-            <th class="p-4 text-center w-32">Aksi</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-if="loading">
-             <td colspan="5" class="p-12 text-center text-[11px] font-mono uppercase tracking-widest text-gray-500">Memuat Master Data...</td>
-          </tr>
-          <tr v-else-if="filteredDosen.length === 0">
-             <td colspan="5" class="p-12 text-center text-[11px] font-mono uppercase tracking-widest text-gray-500">Kosong</td>
-          </tr>
-          <tr v-for="(dosen, idx) in filteredDosen" :key="dosen.id || idx" class="hover:bg-gray-50">
-            <td class="p-4 border-r border-gray-200 text-center font-mono text-gray-400">{{ idx + 1 }}</td>
-            <td class="p-4 border-r border-gray-200">
-              <div class="font-bold text-gray-900 text-sm mb-0.5">{{ dosen.nama }}</div>
-              <div class="font-mono text-[10px] text-gray-500">NIDN: {{ dosen.nidn || '-' }}</div>
-            </td>
-            <td class="p-4 border-r border-gray-200 font-bold text-teal-700">
-              {{ dosen.program_studi || '-' }}
-            </td>
-            <td class="p-4 border-r border-gray-200">
-               <div class="flex flex-wrap gap-1">
-                 <span v-for="(tag, tidx) in parseList(dosen.bidang_keahlian).slice(0,2)" :key="tidx" class="px-2 py-0.5 border border-gray-200 bg-gray-50 text-[10px] text-gray-700">
-                   {{ tag }}
-                 </span>
-                 <span v-if="parseList(dosen.bidang_keahlian).length > 2" class="text-[10px] text-gray-400">...</span>
-               </div>
-            </td>
-            <td class="p-4 text-center font-mono font-bold text-[10px] uppercase tracking-widest">
-              <div class="flex items-center justify-center gap-2">
-                <router-link :to="`/admin/dosen/${dosen.nidn || dosen.id}/edit`" class="text-teal-700 hover:text-teal-800 hover:underline">Edit</router-link>
-                <span class="text-gray-300">|</span>
-                <button @click="handleDelete(dosen)" class="text-red-600 hover:underline">Hapus</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="w-full text-left text-base border-collapse">
+          <thead class="bg-gray-50/80 border-b border-gray-200/90 font-sans text-tiny uppercase tracking-wider text-gray-700 font-bold sticky top-0">
+            <tr>
+              <th class="p-4 border-r border-gray-200/80 w-12 text-center">No</th>
+              <th class="p-4 border-r border-gray-200/80">Identitas Dosen</th>
+              <th class="p-4 border-r border-gray-200/80">Program Studi</th>
+              <th class="p-4 border-r border-gray-200/80">Bidang Keahlian</th>
+              <th class="p-4 text-center w-32">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-if="loading">
+               <td colspan="5" class="p-12 text-center text-base font-sans uppercase tracking-wider text-gray-500">Memuat Master Data...</td>
+            </tr>
+            <tr v-else-if="filteredDosen.length === 0">
+               <td colspan="5" class="p-12 text-center text-base font-sans text-gray-400">Tidak ada data dosen yang sesuai</td>
+            </tr>
+            <tr v-for="(dosen, idx) in filteredDosen" :key="dosen.id || idx" class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 border-r border-gray-100 text-center font-mono text-gray-500 font-bold">{{ idx + 1 }}</td>
+              <td class="p-4 border-r border-gray-100">
+                <div class="font-bold text-gray-900 text-base mb-0.5 font-sans">{{ dosen.nama }}</div>
+                <div class="text-tiny text-gray-500 font-sans">NIDN: <span class="font-mono">{{ dosen.nidn || '-' }}</span></div>
+              </td>
+              <td class="p-4 border-r border-gray-100 font-semibold text-teal-800 font-sans">
+                {{ dosen.program_studi || '-' }}
+              </td>
+              <td class="p-4 border-r border-gray-100">
+                 <div class="flex flex-wrap gap-1">
+                   <span v-for="(tag, tidx) in parseList(dosen.bidang_keahlian).slice(0,2)" :key="tidx" class="px-2 py-0.5 border border-gray-200 bg-gray-50 text-tiny text-gray-700 rounded-[2px] font-sans">
+                     {{ tag }}
+                   </span>
+                   <span v-if="parseList(dosen.bidang_keahlian).length > 2" class="text-tiny text-gray-400 font-sans">+{{ parseList(dosen.bidang_keahlian).length - 2 }}</span>
+                 </div>
+              </td>
+              <td class="p-4 text-center text-base font-sans">
+                <div class="flex items-center justify-center gap-3">
+                  <router-link :to="`/admin/dosen/${dosen.nidn || dosen.id}/edit`" class="text-teal-700 hover:text-teal-800 hover:underline font-semibold">Edit</router-link>
+                  <span class="text-gray-300">|</span>
+                  <button @click="handleDelete(dosen)" class="text-red-600 hover:underline font-semibold">Hapus</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -203,7 +203,7 @@ const filteredDosen = computed(() => {
   animation: fade-in 0.3s ease-out forwards;
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>

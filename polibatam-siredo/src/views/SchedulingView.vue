@@ -436,14 +436,14 @@ const downloadTemplate = () => {
     <!-- Header Hero Section -->
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-gray-200 pb-5">
       <div>
-        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-[11px] font-mono font-semibold mb-2">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-[11px] font-sans font-semibold mb-2">
           <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
           Modul Penjadwalan Sidang TA Cerdas
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">
+        <h1 class="text-h1 font-extrabold text-gray-900 tracking-tight leading-tight font-sans">
           Penjadwalan Otomatis Sidang TA
         </h1>
-        <p class="text-xs sm:text-sm text-gray-600 mt-1 max-w-2xl leading-relaxed">
+        <p class="text-base text-gray-700 mt-1 max-w-2xl leading-relaxed font-normal">
           Alokasi jadwal sidang, penempatan ruangan, dan 2 dosen penguji bebas bentrok berbasis kecocokan topik NLP serta batas kuota harian & periode.
         </p>
       </div>
@@ -453,7 +453,7 @@ const downloadTemplate = () => {
           v-if="step === 3" 
           @click="resetAll" 
           type="button"
-          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-xs"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-300 rounded-[4px] hover:bg-gray-50 transition-all shadow-xs font-sans"
         >
           <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -464,7 +464,7 @@ const downloadTemplate = () => {
         <button 
           @click="downloadTemplate" 
           type="button"
-          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all shadow-xs group"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-300 rounded-[4px] hover:bg-gray-50 hover:border-gray-400 transition-all shadow-xs group font-sans"
         >
           <svg class="w-3.5 h-3.5 text-teal-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -476,61 +476,61 @@ const downloadTemplate = () => {
 
     <!-- KPI & Constraint Indicators -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-gray-200/90 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
+      <div class="bg-white border border-gray-200/90 rounded-lg p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest">Maks. Uji Harian</span>
-          <span class="p-1.5 rounded-lg bg-teal-50 text-teal-700">
+          <span class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider">Maks. Uji Harian</span>
+          <span class="p-1.5 rounded-[4px] bg-teal-50 text-teal-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </span>
         </div>
         <div>
-          <div class="text-2xl font-bold font-mono text-gray-900 tabular-nums">{{ maxPerDay }} Judul / Hari</div>
-          <p class="text-[11px] text-gray-500 mt-1">Batas beban 1 dosen per tanggal</p>
+          <div class="text-h1 font-bold font-sans text-gray-900"><span class="font-mono tabular-nums">{{ maxPerDay }}</span> Judul / Hari</div>
+          <p class="text-base text-gray-600 mt-1 font-sans">Batas beban 1 dosen per tanggal</p>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200/90 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
+      <div class="bg-white border border-gray-200/90 rounded-lg p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest">Maks. Uji Periode</span>
-          <span class="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
+          <span class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider">Maks. Uji Periode</span>
+          <span class="p-1.5 rounded-[4px] bg-emerald-50 text-emerald-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
           </span>
         </div>
         <div>
-          <div class="text-2xl font-bold font-mono text-teal-800 tabular-nums">{{ maxPerPeriod }} Judul / Periode</div>
-          <p class="text-[11px] text-gray-500 mt-1">Reset kuota pada periode berikutnya</p>
+          <div class="text-h1 font-bold font-sans text-teal-800"><span class="font-mono tabular-nums">{{ maxPerPeriod }}</span> Judul / Periode</div>
+          <p class="text-base text-gray-600 mt-1 font-sans">Reset kuota pada periode berikutnya</p>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200/90 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
+      <div class="bg-white border border-gray-200/90 rounded-lg p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest">Kapasitas Sesi</span>
-          <span class="p-1.5 rounded-lg bg-blue-50 text-blue-700">
+          <span class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider">Kapasitas Sesi</span>
+          <span class="p-1.5 rounded-[4px] bg-blue-50 text-blue-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
           </span>
         </div>
         <div>
-          <div class="text-2xl font-bold font-mono text-gray-900 tabular-nums">4 Sesi × {{ customRooms.length }} Ruang</div>
-          <p class="text-[11px] text-gray-500 mt-1">{{ 4 * customRooms.length }} Slot Sidang per Hari</p>
+          <div class="text-h1 font-bold font-sans text-gray-900"><span class="font-mono tabular-nums">4</span> Sesi × <span class="font-mono tabular-nums">{{ customRooms.length }}</span> Ruang</div>
+          <p class="text-base text-gray-600 mt-1 font-sans"><span class="font-mono tabular-nums">{{ 4 * customRooms.length }}</span> Slot Sidang per Hari</p>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200/90 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
+      <div class="bg-white border border-gray-200/90 rounded-lg p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-widest">Integritas Jadwal</span>
-          <span class="p-1.5 rounded-lg bg-teal-50 text-teal-700">
+          <span class="text-tiny font-sans font-bold text-gray-500 uppercase tracking-wider">Integritas Jadwal</span>
+          <span class="p-1.5 rounded-[4px] bg-teal-50 text-teal-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
           </span>
         </div>
         <div>
-          <div class="text-2xl font-bold font-mono text-teal-700 tabular-nums">Bebas Bentrok</div>
-          <p class="text-[11px] text-gray-500 mt-1">Penguji 1 ≠ Penguji 2 & Ruang Unik</p>
+          <div class="text-h1 font-bold font-sans text-teal-800">Bebas Bentrok</div>
+          <p class="text-base text-gray-600 mt-1 font-sans">Penguji 1 ≠ Penguji 2 & Ruang Unik</p>
         </div>
       </div>
     </div>
 
     <!-- Stepper Navigation Header -->
-    <div class="bg-white border border-gray-200/90 rounded-xl shadow-xs overflow-hidden">
+    <div class="bg-white border border-gray-200/90 rounded-lg shadow-xs overflow-hidden">
       <div class="grid grid-cols-1 sm:grid-cols-3 border-b border-gray-200 divide-y sm:divide-y-0 sm:divide-x divide-gray-200 bg-gray-50/50">
         <button 
           @click="step = 1" 
@@ -539,14 +539,14 @@ const downloadTemplate = () => {
           :class="step === 1 ? 'bg-white font-bold text-teal-800 shadow-xs ring-1 ring-inset ring-teal-500/20' : 'text-gray-500 hover:bg-gray-100/70'"
         >
           <span 
-            class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shrink-0 transition-colors" 
+            class="w-7 h-7 rounded-full flex items-center justify-center text-base font-sans font-bold shrink-0 transition-colors" 
             :class="step === 1 ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-600'"
           >
             1
           </span>
           <div>
-            <div class="text-xs font-mono font-bold uppercase tracking-wider">Langkah 1</div>
-            <div class="text-xs text-gray-700 font-semibold mt-0.5">Konfigurasi & Berkas</div>
+            <div class="text-tiny font-sans font-bold uppercase tracking-wider">Langkah 1</div>
+            <div class="text-base text-gray-700 font-semibold mt-0.5 font-sans">Konfigurasi & Berkas</div>
           </div>
         </button>
 
@@ -555,14 +555,14 @@ const downloadTemplate = () => {
           :class="step === 2 ? 'bg-white font-bold text-teal-800 shadow-xs ring-1 ring-inset ring-teal-500/20' : 'text-gray-400'"
         >
           <span 
-            class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shrink-0 transition-colors" 
+            class="w-7 h-7 rounded-full flex items-center justify-center text-base font-sans font-bold shrink-0 transition-colors" 
             :class="step === 2 ? 'bg-teal-700 text-white animate-pulse' : 'bg-gray-200 text-gray-400'"
           >
             2
           </span>
           <div>
-            <div class="text-xs font-mono font-bold uppercase tracking-wider">Langkah 2</div>
-            <div class="text-xs font-semibold mt-0.5" :class="step === 2 ? 'text-teal-900' : 'text-gray-400'">Alokasi Cerdas & NLP</div>
+            <div class="text-tiny font-sans font-bold uppercase tracking-wider">Langkah 2</div>
+            <div class="text-base font-semibold mt-0.5 font-sans" :class="step === 2 ? 'text-teal-900' : 'text-gray-400'">Alokasi Cerdas & NLP</div>
           </div>
         </div>
 
@@ -574,14 +574,14 @@ const downloadTemplate = () => {
           :class="step === 3 ? 'bg-white font-bold text-teal-800 shadow-xs ring-1 ring-inset ring-teal-500/20' : 'text-gray-500 hover:bg-gray-100/70'"
         >
           <span 
-            class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shrink-0 transition-colors" 
+            class="w-7 h-7 rounded-full flex items-center justify-center text-base font-sans font-bold shrink-0 transition-colors" 
             :class="step === 3 ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-600'"
           >
             3
           </span>
           <div>
-            <div class="text-xs font-mono font-bold uppercase tracking-wider">Langkah 3</div>
-            <div class="text-xs text-gray-700 font-semibold mt-0.5">Jadwal Sidang Final</div>
+            <div class="text-tiny font-sans font-bold uppercase tracking-wider">Langkah 3</div>
+            <div class="text-base text-gray-700 font-semibold mt-0.5 font-sans">Jadwal Sidang Final</div>
           </div>
         </button>
       </div>
@@ -591,11 +591,11 @@ const downloadTemplate = () => {
         <!-- 1. Periode Sidang Selection -->
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+            <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-teal-600"></span>
               1. Pilih Periode Pelaksanaan Sidang
             </h2>
-            <span class="text-xs text-gray-500 font-mono">5 Hari Kerja per Periode</span>
+            <span class="text-base text-gray-500 font-sans">5 Hari Kerja per Periode</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -611,14 +611,14 @@ const downloadTemplate = () => {
                   <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors" :class="selectedPreset === preset.id && !isCustomDate ? 'border-teal-600 bg-teal-600' : 'border-gray-300 bg-white'">
                     <span v-if="selectedPreset === preset.id && !isCustomDate" class="w-1.5 h-1.5 rounded-full bg-white"></span>
                   </span>
-                  <span class="font-bold text-sm text-gray-900 group-hover:text-teal-800 transition-colors">{{ preset.name }}</span>
+                  <span class="font-bold text-h3 text-gray-900 group-hover:text-teal-800 transition-colors font-sans">{{ preset.name }}</span>
                 </div>
-                <span v-if="selectedPreset === preset.id && !isCustomDate" class="text-[11px] font-mono font-bold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-300/60">
+                <span v-if="selectedPreset === preset.id && !isCustomDate" class="text-tiny font-sans font-bold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-300/60">
                   Terpilih
                 </span>
               </div>
-              <p class="text-xs text-gray-600 pl-6 mb-3 leading-relaxed">{{ preset.description }}</p>
-              <div class="text-[11px] font-mono text-gray-500 pl-6 flex items-center gap-2">
+              <p class="text-base text-gray-600 pl-6 mb-3 leading-relaxed font-sans">{{ preset.description }}</p>
+              <div class="text-base text-gray-500 pl-6 flex items-center gap-2 font-sans">
                 <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 Senin – Jumat (4 Sesi / Hari)
               </div>
@@ -630,16 +630,16 @@ const downloadTemplate = () => {
         <div class="bg-slate-50/70 border border-gray-200/90 rounded-xl p-5 sm:p-6 space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
-              <h2 class="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-teal-600"></span>
                 2. Pengaturan Ruangan Sidang (Setting Manual)
               </h2>
-              <p class="text-xs text-gray-600 mt-0.5">Tentukan ruangan sidang yang aktif. Anda dapat menambah ruangan baru atau menghapus ruangan.</p>
+              <p class="text-base text-gray-600 mt-0.5 font-sans">Tentukan ruangan sidang yang aktif. Anda dapat menambah ruangan baru atau menghapus ruangan.</p>
             </div>
             <button 
               @click="resetRooms" 
               type="button"
-              class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-teal-700 hover:text-teal-900 underline self-start sm:self-auto cursor-pointer"
+              class="inline-flex items-center gap-1.5 text-base font-sans font-semibold text-teal-700 hover:text-teal-900 underline self-start sm:self-auto cursor-pointer"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
               Reset ke Default
@@ -651,7 +651,7 @@ const downloadTemplate = () => {
             <div 
               v-for="(room, idx) in customRooms" 
               :key="room" 
-              class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-teal-300 rounded-lg text-xs font-mono font-bold text-teal-900 shadow-2xs group hover:border-teal-400 transition-all"
+              class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-teal-300 rounded-lg text-tiny font-sans font-bold text-teal-900 shadow-2xs group hover:border-teal-400 transition-all"
             >
               <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
               <span>{{ room }}</span>
@@ -674,39 +674,39 @@ const downloadTemplate = () => {
                 @keyup.enter="addRoom"
                 type="text" 
                 placeholder="Tambah ruang baru (contoh: R. PBL 104, Lab AI)..." 
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none bg-white font-sans shadow-2xs transition-all" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none bg-white font-sans shadow-2xs transition-all" 
               />
             </div>
             <button 
               @click="addRoom" 
               type="button"
-              class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors shrink-0 inline-flex items-center gap-1 cursor-pointer"
+              class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-base font-semibold shadow-2xs transition-colors shrink-0 inline-flex items-center gap-1 cursor-pointer font-sans"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
               Tambah
             </button>
           </div>
 
-          <div v-if="roomError" class="text-xs text-red-600 font-medium flex items-center gap-1">
+          <div v-if="roomError" class="text-base text-red-600 font-medium flex items-center gap-1 font-sans">
             <svg class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
             {{ roomError }}
           </div>
 
-          <div class="text-[11px] font-mono text-gray-500 flex flex-wrap items-center gap-3 pt-2 border-t border-gray-200/70">
-            <span>Kapasitas Harian: <strong class="text-gray-900">{{ 4 * customRooms.length }} Slot</strong> (4 Sesi × {{ customRooms.length }} Ruangan)</span>
+          <div class="text-base text-gray-600 font-sans flex flex-wrap items-center gap-3 pt-2 border-t border-gray-200/70">
+            <span>Kapasitas Harian: <strong class="text-gray-900"><span class="font-mono tabular-nums">{{ 4 * customRooms.length }}</span> Slot</strong> (4 Sesi × {{ customRooms.length }} Ruangan)</span>
             <span>•</span>
-            <span>Total Kapasitas Periode: <strong class="text-teal-800">{{ 4 * customRooms.length * 5 }} Slot</strong> (5 Hari)</span>
+            <span>Total Kapasitas Periode: <strong class="text-teal-800"><span class="font-mono tabular-nums">{{ 4 * customRooms.length * 5 }}</span> Slot</strong> (5 Hari)</span>
           </div>
         </div>
 
         <!-- 3. File Upload Box -->
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+            <h2 class="text-h2 font-sans font-bold text-gray-900 tracking-tight flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-teal-600"></span>
               3. Unggah Berkas Peserta Sidang (.xlsx)
             </h2>
-            <span class="text-xs text-gray-500">Mendukung berkas Excel batch rekomendasi</span>
+            <span class="text-base text-gray-500 font-sans">Mendukung berkas Excel batch rekomendasi</span>
           </div>
 
           <div 
@@ -724,21 +724,21 @@ const downloadTemplate = () => {
             </div>
 
             <div v-if="!fileName">
-              <div class="text-sm font-bold text-gray-900 mb-1">
+              <div class="text-h3 font-bold text-gray-900 mb-1 font-sans">
                 Tarik & letakkan berkas Excel di sini, atau <span class="text-teal-700 underline">pilih dari komputer</span>
               </div>
-              <p class="text-xs text-gray-500 max-w-sm mx-auto mt-1">
+              <p class="text-base text-gray-500 max-w-sm mx-auto mt-1 font-sans">
                 Gunakan hasil berkas <strong>Hasil_Batch_Rekomendasi.xlsx</strong> atau template berkas proposal mahasiswa.
               </p>
             </div>
 
             <div v-else class="flex items-center gap-3 bg-white px-4 py-2.5 rounded-lg border border-teal-300 shadow-xs">
-              <span class="text-xs font-mono font-bold text-teal-900">{{ fileName }}</span>
-              <span v-if="fileSize" class="text-[10px] font-mono text-gray-500">({{ fileSize }})</span>
+              <span class="text-base font-sans font-bold text-teal-900">{{ fileName }}</span>
+              <span v-if="fileSize" class="text-tiny font-mono text-gray-500">({{ fileSize }})</span>
               <button 
                 @click.stop="clearFile" 
                 type="button" 
-                class="text-gray-400 hover:text-red-600 text-xs p-1"
+                class="text-gray-400 hover:text-red-600 text-base p-1"
                 title="Hapus berkas terpilih"
               >
                 &times;
@@ -748,13 +748,13 @@ const downloadTemplate = () => {
             <input type="file" ref="fileInput" class="hidden" accept=".xlsx,.xls" @change="handleFileChange">
           </div>
 
-          <div v-if="error" class="p-4 bg-red-50 text-red-700 rounded-xl text-xs border border-red-200 flex items-center gap-2">
+          <div v-if="error" class="p-4 bg-red-50 text-red-700 rounded-xl text-base border border-red-200 flex items-center gap-2 font-sans">
             <svg class="w-4 h-4 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
             <span><strong>Perhatian:</strong> {{ error }}</span>
           </div>
 
           <div class="pt-4 flex items-center justify-between">
-            <div class="text-xs text-gray-500 flex items-center gap-2">
+            <div class="text-base text-gray-500 flex items-center gap-2 font-sans">
               <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
               Format didukung: <code>.xlsx</code>, <code>.xls</code>
             </div>
@@ -763,7 +763,7 @@ const downloadTemplate = () => {
               @click="processScheduling" 
               :disabled="!fileName || loading"
               type="button"
-              class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-xs sm:text-sm font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm inline-flex items-center gap-2 cursor-pointer hover:shadow-md active:scale-98"
+              class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-base font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm inline-flex items-center gap-2 cursor-pointer hover:shadow-md active:scale-98 font-sans"
             >
               <span>Jalankan Penjadwalan Otomatis</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -773,18 +773,18 @@ const downloadTemplate = () => {
       </div>
 
       <!-- Step 2: Processing Spinner -->
-      <div v-if="step === 2" class="p-16 sm:p-20 flex flex-col items-center justify-center text-center space-y-4">
+      <div v-if="step === 2" class="p-16 sm:p-20 flex flex-col items-center justify-center text-center space-y-4 font-sans">
         <div class="relative w-16 h-16">
           <div class="w-16 h-16 border-4 border-teal-100 rounded-full"></div>
           <div class="w-16 h-16 border-4 border-teal-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
         </div>
         <div>
-          <h3 class="text-lg font-bold text-gray-900 mb-1">Menyusun Jadwal Sidang Bebas Bentrok...</h3>
-          <p class="text-xs text-gray-600 max-w-md mx-auto leading-relaxed">
+          <h2 class="text-h2 font-bold text-gray-900 mb-1 font-sans">Menyusun Jadwal Sidang Bebas Bentrok...</h2>
+          <p class="text-base text-gray-600 max-w-md mx-auto leading-relaxed font-sans">
             Mengevaluasi kepakaran dosen, membatasi kuota harian (max 2 TA) & kuota periode (max 10 TA), serta menempatkan ruangan sidang yang telah diatur.
           </p>
         </div>
-        <div class="flex items-center gap-4 text-[11px] font-mono text-teal-800 bg-teal-50/80 px-4 py-2 rounded-full border border-teal-200">
+        <div class="flex items-center gap-4 text-tiny font-sans text-teal-800 bg-teal-50/80 px-4 py-2 rounded-full border border-teal-200">
           <span>✓ Evaluasi NLP</span>
           <span>•</span>
           <span>✓ Validasi Kuota</span>
@@ -802,7 +802,7 @@ const downloadTemplate = () => {
             <button 
               @click="activeTab = 'table'" 
               type="button"
-              class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer inline-flex items-center gap-1.5"
+              class="px-3 py-1.5 text-base font-semibold rounded-md transition-all cursor-pointer inline-flex items-center gap-1.5"
               :class="activeTab === 'table' ? 'bg-white text-teal-900 shadow-xs font-bold' : 'text-gray-600 hover:text-gray-900'"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -811,7 +811,7 @@ const downloadTemplate = () => {
             <button 
               @click="activeTab = 'workload'" 
               type="button"
-              class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer inline-flex items-center gap-1.5"
+              class="px-3 py-1.5 text-base font-semibold rounded-md transition-all cursor-pointer inline-flex items-center gap-1.5"
               :class="activeTab === 'workload' ? 'bg-white text-teal-900 shadow-xs font-bold' : 'text-gray-600 hover:text-gray-900'"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -827,25 +827,25 @@ const downloadTemplate = () => {
                 v-model="searchQuery" 
                 type="text" 
                 placeholder="Cari NIM, Nama, Penguji..." 
-                class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none w-48 sm:w-56 bg-white shadow-2xs" 
+                class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none w-48 sm:w-56 bg-white shadow-2xs" 
               />
               <svg class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
 
             <!-- Date Filter -->
-            <select v-model="selectedDateFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:border-teal-500 focus:outline-none bg-white font-mono shadow-2xs">
+            <select v-model="selectedDateFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:outline-none bg-white font-sans shadow-2xs">
               <option value="">Semua Tanggal</option>
               <option v-for="d in scheduleResult.period.workingDays" :key="d" :value="d">{{ formatIndoDate(d) }}</option>
             </select>
 
             <!-- Room Filter -->
-            <select v-model="selectedRoomFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:border-teal-500 focus:outline-none bg-white font-mono shadow-2xs">
+            <select v-model="selectedRoomFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:outline-none bg-white font-sans shadow-2xs">
               <option value="">Semua Ruang</option>
               <option v-for="r in allRoomsList" :key="r" :value="r">{{ r }}</option>
             </select>
 
             <!-- Examiner Filter -->
-            <select v-model="selectedExaminerFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:border-teal-500 focus:outline-none bg-white max-w-[150px] shadow-2xs">
+            <select v-model="selectedExaminerFilter" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-base focus:border-teal-500 focus:outline-none bg-white max-w-[150px] shadow-2xs">
               <option value="">Semua Dosen</option>
               <option v-for="ex in uniqueExaminers" :key="ex" :value="ex">{{ ex }}</option>
             </select>
@@ -856,7 +856,7 @@ const downloadTemplate = () => {
               @click="resetFilters" 
               type="button" 
               title="Reset Filter"
-              class="px-2 py-1.5 text-xs text-gray-500 hover:text-red-600 bg-white border border-gray-300 rounded-lg hover:border-red-300 transition-colors shadow-2xs"
+              class="px-2 py-1.5 text-base text-gray-500 hover:text-red-600 bg-white border border-gray-300 rounded-lg hover:border-red-300 transition-colors shadow-2xs"
             >
               Reset Filter
             </button>
@@ -865,7 +865,7 @@ const downloadTemplate = () => {
             <button 
               @click="downloadSchedule" 
               type="button"
-              class="px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-semibold shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-md active:scale-98"
+              class="px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-base font-semibold shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-md active:scale-98"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               Ekspor Excel
@@ -874,35 +874,35 @@ const downloadTemplate = () => {
         </div>
 
         <!-- Summary Banner -->
-        <div class="px-6 py-3.5 bg-teal-50/80 border-b border-teal-200/70 flex flex-wrap items-center justify-between gap-2 text-xs text-teal-900 font-mono">
+        <div class="px-6 py-3.5 bg-teal-50/80 border-b border-teal-200/70 flex flex-wrap items-center justify-between gap-2 text-base text-teal-900 font-sans">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-            <span><strong>Periode:</strong> {{ activePeriod.name }} ({{ formatIndoDate(activePeriod.startDate) }} s.d. {{ formatIndoDate(activePeriod.endDate) }})</span>
+            <span><strong class="font-semibold">Periode:</strong> {{ activePeriod.name }} ({{ formatIndoDate(activePeriod.startDate) }} s.d. {{ formatIndoDate(activePeriod.endDate) }})</span>
           </div>
           <div class="flex items-center gap-4">
-            <span><strong>Terjadwal:</strong> {{ scheduleResult.totalScheduled }} / {{ scheduleResult.totalRequested }} Mahasiswa</span>
+            <span><strong class="font-semibold">Terjadwal:</strong> <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalScheduled }}</span> / <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalRequested }}</span> Mahasiswa</span>
             <span>•</span>
-            <span><strong>Ruangan:</strong> {{ allRoomsList.length }} Ruang</span>
+            <span><strong class="font-semibold">Ruangan:</strong> <span class="font-mono tabular-nums font-bold">{{ allRoomsList.length }}</span> Ruang</span>
           </div>
         </div>
 
         <!-- Warning banner if any unassigned -->
-        <div v-if="scheduleResult.totalUnassigned > 0" class="p-4 bg-amber-50 border-b border-amber-200 text-xs text-amber-900">
+        <div v-if="scheduleResult.totalUnassigned > 0" class="p-4 bg-amber-50 border-b border-amber-200 text-base text-amber-900 font-sans">
           <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-800">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            {{ scheduleResult.totalUnassigned }} Mahasiswa Belum Terjadwal
+            <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalUnassigned }}</span> Mahasiswa Belum Terjadwal
           </div>
           <ul class="list-disc list-inside space-y-0.5 text-amber-700 pl-1">
             <li v-for="u in scheduleResult.unassigned" :key="u.mahasiswa_id">
-              <strong>{{ u.nama_mahasiswa }} ({{ u.mahasiswa_id }}):</strong> {{ u.reason }}
+              <strong>{{ u.nama_mahasiswa }} (<span class="font-mono">{{ u.mahasiswa_id }}</span>):</strong> {{ u.reason }}
             </li>
           </ul>
         </div>
 
         <!-- View 1: Tabel Jadwal -->
         <div v-if="activeTab === 'table'" class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-gray-50/90 border-b border-gray-200 font-mono text-[10px] uppercase tracking-widest text-gray-500 sticky top-0 backdrop-blur-xs">
+          <table class="w-full text-left text-base">
+            <thead class="bg-gray-50/90 border-b border-gray-200 font-sans text-h3 font-bold uppercase tracking-wider text-gray-700 sticky top-0 backdrop-blur-xs">
               <tr>
                 <th class="p-3.5 border-b border-gray-200">No</th>
                 <th class="p-3.5 border-b border-gray-200">Mahasiswa</th>
@@ -915,18 +915,18 @@ const downloadTemplate = () => {
             </thead>
             <tbody class="divide-y divide-gray-200/90 bg-white">
               <tr v-for="(row, idx) in filteredSchedule" :key="row.id || idx" class="hover:bg-teal-50/30 transition-colors group">
-                <td class="p-3.5 font-mono text-gray-500 align-top">
-                  <span class="w-6 h-6 rounded-md bg-gray-100 group-hover:bg-teal-100 group-hover:text-teal-900 flex items-center justify-center font-bold text-[11px] transition-colors">
+                <td class="p-3.5 font-mono tabular-nums text-gray-500 align-top">
+                  <span class="w-6 h-6 rounded-md bg-gray-100 group-hover:bg-teal-100 group-hover:text-teal-900 flex items-center justify-center font-bold text-base transition-colors">
                     {{ idx + 1 }}
                   </span>
                 </td>
                 <td class="p-3.5 align-top">
-                  <div class="font-bold text-gray-900 text-xs">{{ row.nama_mahasiswa }}</div>
-                  <div class="font-mono text-[11px] text-gray-500 mt-0.5">{{ row.mahasiswa_id }}</div>
+                  <div class="font-bold text-gray-900 text-h3">{{ row.nama_mahasiswa }}</div>
+                  <div class="font-mono text-base text-gray-500 mt-0.5">{{ row.mahasiswa_id }}</div>
                 </td>
                 <td class="p-3.5 text-gray-700 max-w-sm align-top">
                   <div class="line-clamp-2 leading-relaxed font-medium" :title="row.judul_tugas_akhir">{{ row.judul_tugas_akhir }}</div>
-                  <div v-if="row.pembimbing && row.pembimbing !== '-'" class="text-[10px] text-gray-500 mt-1 flex items-center gap-1">
+                  <div v-if="row.pembimbing && row.pembimbing !== '-'" class="text-base text-gray-500 mt-1 flex items-center gap-1 font-sans">
                     <span class="text-gray-400">Pembimbing:</span>
                     <span class="font-semibold text-gray-700">{{ row.pembimbing }}</span>
                   </div>
@@ -937,11 +937,11 @@ const downloadTemplate = () => {
                   <div class="space-y-1 max-w-[240px]">
                     <select 
                       v-model="row.penguji_1" 
-                      class="w-full text-xs font-semibold px-2.5 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
+                      class="w-full text-base font-semibold px-2.5 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
                       :class="row.penguji_1 === row.penguji_2 ? 'border-red-400 bg-red-50/50 text-red-900 focus:ring-red-400' : 'border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500 hover:border-gray-400'"
                       title="Pilih Dosen Penguji 1"
                     >
-                      <optgroup label="🌟 Rekomendasi Topik TA">
+                      <optgroup label="Rekomendasi Topik TA">
                         <option 
                           v-for="cand in (row.candidates || [])" 
                           :key="cand.nama" 
@@ -950,7 +950,7 @@ const downloadTemplate = () => {
                           #{{ cand.rank }}: {{ cand.nama }} ({{ Math.round((cand.score || 0) * 100) }}% Cocok)
                         </option>
                       </optgroup>
-                      <optgroup v-if="getNonCandidateDosens(row).length > 0" label="📋 Dosen Lainnya (Pilihan Manual)">
+                      <optgroup v-if="getNonCandidateDosens(row).length > 0" label="Dosen Lainnya (Pilihan Manual)">
                         <option 
                           v-for="dName in getNonCandidateDosens(row)" 
                           :key="dName" 
@@ -964,21 +964,21 @@ const downloadTemplate = () => {
                     <div class="flex items-center gap-1.5 flex-wrap">
                       <span 
                         v-if="getCandidateInfo(row, row.penguji_1)" 
-                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
+                        class="inline-flex items-center gap-1 text-tiny font-sans font-medium text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
                       >
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                        Rank #{{ getCandidateInfo(row, row.penguji_1).rank }} ({{ Math.round((getCandidateInfo(row, row.penguji_1).score || 0) * 100) }}% Cocok)
+                        Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_1).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_1).score || 0) * 100) }}%</span> Cocok)
                       </span>
                       <span 
                         v-else 
-                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200"
+                        class="inline-flex items-center gap-1 text-tiny font-sans font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200"
                       >
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                         Pilihan Manual
                       </span>
                     </div>
 
-                    <div v-if="row.penguji_1 === row.penguji_2" class="text-[10px] font-semibold text-red-600 flex items-center gap-1 pt-0.5">
+                    <div v-if="row.penguji_1 === row.penguji_2" class="text-tiny font-semibold text-red-600 flex items-center gap-1 pt-0.5">
                       <svg class="w-3 h-3 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
                       Penguji 1 & 2 tidak boleh sama
                     </div>
@@ -990,11 +990,11 @@ const downloadTemplate = () => {
                   <div class="space-y-1 max-w-[240px]">
                     <select 
                       v-model="row.penguji_2" 
-                      class="w-full text-xs font-semibold px-2.5 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
+                      class="w-full text-base font-semibold px-2.5 py-1.5 bg-white border rounded-lg focus:ring-1 focus:outline-none transition-colors cursor-pointer shadow-2xs"
                       :class="row.penguji_1 === row.penguji_2 ? 'border-red-400 bg-red-50/50 text-red-900 focus:ring-red-400' : 'border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-teal-500 hover:border-gray-400'"
                       title="Pilih Dosen Penguji 2"
                     >
-                      <optgroup label="🌟 Rekomendasi Topik TA">
+                      <optgroup label="Rekomendasi Topik TA">
                         <option 
                           v-for="cand in (row.candidates || [])" 
                           :key="cand.nama" 
@@ -1003,7 +1003,7 @@ const downloadTemplate = () => {
                           #{{ cand.rank }}: {{ cand.nama }} ({{ Math.round((cand.score || 0) * 100) }}% Cocok)
                         </option>
                       </optgroup>
-                      <optgroup v-if="getNonCandidateDosens(row).length > 0" label="📋 Dosen Lainnya (Pilihan Manual)">
+                      <optgroup v-if="getNonCandidateDosens(row).length > 0" label="Dosen Lainnya (Pilihan Manual)">
                         <option 
                           v-for="dName in getNonCandidateDosens(row)" 
                           :key="dName" 
@@ -1017,36 +1017,36 @@ const downloadTemplate = () => {
                     <div class="flex items-center gap-1.5 flex-wrap">
                       <span 
                         v-if="getCandidateInfo(row, row.penguji_2)" 
-                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
+                        class="inline-flex items-center gap-1 text-tiny font-sans font-medium text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
                       >
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                        Rank #{{ getCandidateInfo(row, row.penguji_2).rank }} ({{ Math.round((getCandidateInfo(row, row.penguji_2).score || 0) * 100) }}% Cocok)
+                        Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_2).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_2).score || 0) * 100) }}%</span> Cocok)
                       </span>
                       <span 
                         v-else 
-                        class="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200"
+                        class="inline-flex items-center gap-1 text-tiny font-sans font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200"
                       >
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                         Pilihan Manual
                       </span>
                     </div>
 
-                    <div v-if="row.penguji_1 === row.penguji_2" class="text-[10px] font-semibold text-red-600 flex items-center gap-1 pt-0.5">
+                    <div v-if="row.penguji_1 === row.penguji_2" class="text-tiny font-semibold text-red-600 flex items-center gap-1 pt-0.5">
                       <svg class="w-3 h-3 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
                       Penguji 1 & 2 tidak boleh sama
                     </div>
                   </div>
                 </td>
 
-                <td class="p-3.5 font-mono align-top whitespace-nowrap">
-                  <div class="font-bold text-gray-900 text-xs">{{ row.tanggal_indo }}</div>
-                  <div class="text-[11px] text-teal-800 font-semibold mt-0.5">{{ row.sesi_label }} ({{ row.waktu }})</div>
+                <td class="p-3.5 align-top whitespace-nowrap">
+                  <div class="font-semibold text-gray-900 text-base font-sans">{{ row.tanggal_indo }}</div>
+                  <div class="text-base text-teal-800 font-medium mt-0.5 font-sans">{{ row.sesi_label }} (<span class="font-mono tabular-nums font-semibold">{{ row.waktu }}</span>)</div>
                 </td>
                 
                 <td class="p-3.5 align-top whitespace-nowrap">
                   <select 
                     v-model="row.ruangan" 
-                    class="px-2.5 py-1.5 font-mono text-[11px] font-bold text-teal-900 bg-teal-50/90 border border-teal-300 rounded-lg hover:border-teal-500 focus:border-teal-600 focus:outline-none cursor-pointer transition-colors shadow-2xs"
+                    class="px-2.5 py-1.5 font-sans text-base font-semibold text-teal-900 bg-teal-50/90 border border-teal-300 rounded-lg hover:border-teal-500 focus:border-teal-600 focus:outline-none cursor-pointer transition-colors shadow-2xs"
                     title="Ubah ruangan sidang untuk jadwal ini"
                   >
                     <option v-for="r in allRoomsList" :key="r" :value="r">{{ r }}</option>
@@ -1054,7 +1054,7 @@ const downloadTemplate = () => {
                 </td>
               </tr>
               <tr v-if="filteredSchedule.length === 0">
-                <td colspan="7" class="p-12 text-center text-gray-500 text-xs font-mono">
+                <td colspan="7" class="p-12 text-center text-gray-500 text-base font-sans">
                   <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   Tidak ada jadwal yang sesuai dengan filter pencarian.
                 </td>
@@ -1066,8 +1066,8 @@ const downloadTemplate = () => {
         <!-- View 2: Workload Dosen Tracker -->
         <div v-if="activeTab === 'workload'" class="p-6 sm:p-8 overflow-x-auto space-y-6">
           <div>
-            <h3 class="text-sm font-bold text-gray-900">Rekap Beban Menguji Dosen (Periode Ini)</h3>
-            <p class="text-xs text-gray-500 mt-0.5">Memastikan tidak ada dosen yang melebihi kuota 10 TA per periode dan 2 TA per hari.</p>
+            <h2 class="text-h2 font-bold text-gray-900">Rekap Beban Menguji Dosen (Periode Ini)</h2>
+            <p class="text-base text-gray-500 mt-0.5">Memastikan tidak ada dosen yang melebihi kuota 10 TA per periode dan 2 TA per hari.</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1079,12 +1079,12 @@ const downloadTemplate = () => {
               <div>
                 <div class="flex items-start justify-between gap-2 mb-3">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-teal-100 text-teal-800 font-bold text-xs flex items-center justify-center font-mono">
+                    <span class="w-8 h-8 rounded-lg bg-teal-100 text-teal-800 font-bold text-h3 flex items-center justify-center font-sans">
                       {{ w.nama.charAt(0) }}
                     </span>
-                    <span class="font-bold text-xs text-gray-900 line-clamp-1" :title="w.nama">{{ w.nama }}</span>
+                    <span class="font-bold text-h3 text-gray-900 line-clamp-1" :title="w.nama">{{ w.nama }}</span>
                   </div>
-                  <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full shrink-0" :class="w.total >= w.maxPeriod ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-teal-50 text-teal-700 border border-teal-200'">
+                  <span class="text-tiny font-mono tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0" :class="w.total >= w.maxPeriod ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-teal-50 text-teal-700 border border-teal-200'">
                     {{ w.total }} / {{ w.maxPeriod }} TA
                   </span>
                 </div>
@@ -1099,10 +1099,10 @@ const downloadTemplate = () => {
                 </div>
 
                 <!-- Daily Breakdown -->
-                <div class="text-[10px] font-mono text-gray-500 space-y-1.5 pt-2 border-t border-gray-100">
+                <div class="text-base font-sans text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
                   <div v-for="(cnt, d) in w.perDay" :key="d" class="flex justify-between items-center">
                     <span>{{ formatIndoDate(d) }}:</span>
-                    <span class="font-bold px-1.5 py-0.5 rounded" :class="cnt >= 2 ? 'text-teal-900 bg-teal-50' : 'text-gray-700'">{{ cnt }} TA</span>
+                    <span class="font-mono tabular-nums font-bold px-1.5 py-0.5 rounded" :class="cnt >= 2 ? 'text-teal-900 bg-teal-50' : 'text-gray-700'">{{ cnt }} TA</span>
                   </div>
                 </div>
               </div>

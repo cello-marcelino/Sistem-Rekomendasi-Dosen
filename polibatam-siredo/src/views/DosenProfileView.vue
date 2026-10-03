@@ -89,22 +89,23 @@ const pengujianList = computed(() => parseListItems(dosen.value?.judul_uji || do
 </script>
 
 <template>
-  <div class="space-y-6 pb-12 animate-in">
+  <div class="space-y-6 pb-12 animate-in font-sans">
     <!-- Header Section (Canvas-First) -->
     <div class="border-b border-gray-200 pb-5">
       <button 
         @click="goBack" 
-        class="text-xs font-mono font-bold text-gray-500 hover:text-gray-900 mb-3 inline-flex items-center gap-1.5 transition-colors"
+        class="text-base font-sans font-semibold text-gray-500 hover:text-gray-900 mb-3 inline-flex items-center gap-1.5 transition-colors"
       >
-        &larr; KEMBALI
+        &larr; Kembali ke Direktori
       </button>
+
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 font-sans line-clamp-2">
+          <h1 class="text-h1 font-bold tracking-tight text-gray-900 font-sans line-clamp-2">
             {{ dosen ? dosen.nama : 'Profil Dosen' }}
           </h1>
-          <div class="flex items-center gap-3 text-xs text-gray-500 font-mono mt-1">
-            <span v-if="dosen?.nidn">NIDN: {{ dosen.nidn }}</span>
+          <div class="flex items-center gap-3 text-tiny text-gray-600 font-sans mt-1">
+            <span v-if="dosen?.nidn">NIDN: <span class="font-mono font-bold">{{ dosen.nidn }}</span></span>
             <span v-if="dosen?.program_studi" class="border-l border-gray-300 pl-3 text-teal-800 font-semibold">{{ dosen.program_studi }}</span>
           </div>
         </div>
@@ -112,43 +113,43 @@ const pengujianList = computed(() => parseListItems(dosen.value?.judul_uji || do
     </div>
 
     <!-- State: Loading / Error -->
-    <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center bg-white border border-gray-200 rounded shadow-sm">
+    <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center bg-white border border-gray-200/90 rounded-lg shadow-sm">
       <div class="w-8 h-8 border-2 border-gray-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
-      <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Memuat Profil...</span>
+      <span class="text-base font-sans font-semibold uppercase tracking-wider text-gray-500">Memuat Profil Dosen...</span>
     </div>
 
-    <div v-else-if="errorMessage" class="p-8 bg-rose-50 border border-rose-200 rounded text-rose-700 flex flex-col items-center justify-center">
-      <p class="font-bold text-sm mb-4">{{ errorMessage }}</p>
-      <button @click="goBack" class="px-4 py-2 border border-rose-200 bg-white text-xs font-bold hover:bg-gray-50 rounded">Kembali</button>
+    <div v-else-if="errorMessage" class="p-8 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 flex flex-col items-center justify-center text-center">
+      <p class="font-bold text-base mb-4 font-sans">{{ errorMessage }}</p>
+      <button @click="goBack" class="px-4 py-2 border border-rose-200 bg-white text-base font-semibold hover:bg-gray-50 rounded-[4px] font-sans">Kembali</button>
     </div>
 
     <!-- Split View Layout (Elevated Card) -->
-    <div v-else-if="dosen" class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+    <div v-else-if="dosen" class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12">
       
       <!-- Left: Identity & Metadata (4 Cols) -->
-      <aside class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50/50 p-6 lg:p-8 flex flex-col gap-10">
+      <aside class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50/50 p-6 lg:p-8 flex flex-col gap-8">
         
         <div>
-          <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 mb-4">Bidang Keahlian</div>
+          <div class="text-tiny font-sans font-bold uppercase tracking-wider text-gray-500 mb-3">Bidang Keahlian</div>
           <div class="flex flex-wrap gap-2">
             <span 
               v-for="(tag, idx) in (dosen.bidang_keahlian ? dosen.bidang_keahlian.split(',') : [])" 
               :key="idx" 
-              class="px-2.5 py-1 border border-teal-200 bg-teal-50 text-teal-800 text-[11px] font-bold"
+              class="px-2.5 py-1 border border-teal-200 bg-teal-50 text-teal-800 text-tiny font-semibold rounded-[3px] font-sans"
             >
               {{ tag.trim() }}
             </span>
-            <span v-if="!dosen.bidang_keahlian" class="text-xs text-gray-400 italic">Belum terdata</span>
+            <span v-if="!dosen.bidang_keahlian" class="text-tiny text-gray-400 italic font-sans">Belum terdata</span>
           </div>
         </div>
 
         <div>
-          <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 mb-4">Riwayat Pendidikan</div>
-          <div class="border border-gray-200 rounded-sm divide-y divide-gray-200 bg-white text-xs">
-             <div v-for="(edu, idx) in educationList" :key="idx" class="p-3 text-gray-700 leading-relaxed font-mono">
+          <div class="text-tiny font-sans font-bold uppercase tracking-wider text-gray-500 mb-3">Riwayat Pendidikan</div>
+          <div class="border border-gray-200 rounded-[4px] divide-y divide-gray-100 bg-white text-base">
+             <div v-for="(edu, idx) in educationList" :key="idx" class="p-3 text-gray-700 leading-relaxed font-sans">
                {{ edu }}
              </div>
-             <div v-if="!educationList.length" class="p-3 text-gray-400 italic">Kosong</div>
+             <div v-if="!educationList.length" class="p-3 text-gray-400 italic font-sans">Belum ada riwayat pendidikan</div>
           </div>
         </div>
 
@@ -163,60 +164,59 @@ const pengujianList = computed(() => parseListItems(dosen.value?.judul_uji || do
             class="flex-1 p-4 flex items-center justify-center gap-2 hover:bg-white transition-colors"
             :class="activePortfolioTab === 'jurnal' ? 'bg-white border-b-2 border-b-teal-600' : ''"
           >
-            <span class="text-xs font-mono font-bold uppercase tracking-widest" :class="activePortfolioTab === 'jurnal' ? 'text-teal-600' : 'text-gray-500'">Publikasi</span>
-            <span class="bg-gray-200 text-gray-700 px-1.5 py-0.5 text-[10px] font-mono font-bold tabular-nums">{{ jurnalList.length }}</span>
+            <span class="text-base font-sans font-bold uppercase tracking-wider" :class="activePortfolioTab === 'jurnal' ? 'text-teal-700' : 'text-gray-500'">Publikasi</span>
+            <span class="bg-gray-200 text-gray-700 px-1.5 py-0.5 text-tiny font-mono font-bold tabular-nums rounded-[2px]">{{ jurnalList.length }}</span>
           </button>
           <button 
             @click="activePortfolioTab = 'bimbingan'"
             class="flex-1 p-4 flex items-center justify-center gap-2 hover:bg-white transition-colors"
             :class="activePortfolioTab === 'bimbingan' ? 'bg-white border-b-2 border-b-teal-600' : ''"
           >
-            <span class="text-xs font-mono font-bold uppercase tracking-widest" :class="activePortfolioTab === 'bimbingan' ? 'text-teal-600' : 'text-gray-500'">Bimbingan</span>
-            <span class="bg-gray-200 text-gray-700 px-1.5 py-0.5 text-[10px] font-mono font-bold tabular-nums">{{ bimbinganList.length }}</span>
+            <span class="text-base font-sans font-bold uppercase tracking-wider" :class="activePortfolioTab === 'bimbingan' ? 'text-teal-700' : 'text-gray-500'">Bimbingan</span>
+            <span class="bg-gray-200 text-gray-700 px-1.5 py-0.5 text-tiny font-mono font-bold tabular-nums rounded-[2px]">{{ bimbinganList.length }}</span>
           </button>
           <button 
             @click="activePortfolioTab = 'pengujian'"
             class="flex-1 p-4 flex items-center justify-center gap-2 hover:bg-white transition-colors"
             :class="activePortfolioTab === 'pengujian' ? 'bg-white border-b-2 border-b-teal-600' : ''"
           >
-            <span class="text-xs font-mono font-bold uppercase tracking-widest" :class="activePortfolioTab === 'pengujian' ? 'text-teal-600' : 'text-gray-500'">Pengujian</span>
-            <span class="bg-gray-200 text-gray-700 px-1.5 py-0.5 text-[10px] font-mono font-bold tabular-nums">{{ pengujianList.length }}</span>
+            <span class="text-base font-sans font-bold uppercase tracking-wider" :class="activePortfolioTab === 'pengujian' ? 'text-teal-700' : 'text-gray-500'">Pengujian</span>
+            <span class="bg-gray-200 text-gray-700 px-1.5 py-0.5 text-tiny font-mono font-bold tabular-nums rounded-[2px]">{{ pengujianList.length }}</span>
           </button>
         </div>
 
         <!-- Lists -->
         <div class="flex-1 overflow-y-auto bg-white">
-           <table v-if="activePortfolioTab === 'jurnal' && jurnalList.length" class="w-full text-left text-xs">
-             <tbody class="divide-y divide-gray-200">
-               <tr v-for="(j, idx) in jurnalList" :key="idx" class="hover:bg-gray-50">
-                 <td class="p-4 align-top w-12 text-center font-mono text-gray-400">{{ idx + 1 }}</td>
-                 <td class="p-4 text-gray-900 leading-relaxed font-medium">{{ j }}</td>
+           <table v-if="activePortfolioTab === 'jurnal' && jurnalList.length" class="w-full text-left text-base">
+             <tbody class="divide-y divide-gray-100">
+               <tr v-for="(j, idx) in jurnalList" :key="idx" class="hover:bg-slate-50 transition-colors">
+                 <td class="p-4 align-top w-12 text-center font-mono text-gray-400 font-bold">{{ idx + 1 }}</td>
+                 <td class="p-4 text-gray-900 leading-relaxed font-sans">{{ j }}</td>
                </tr>
              </tbody>
            </table>
-           <table v-else-if="activePortfolioTab === 'bimbingan' && bimbinganList.length" class="w-full text-left text-xs">
-             <tbody class="divide-y divide-gray-200">
-               <tr v-for="(b, idx) in bimbinganList" :key="idx" class="hover:bg-gray-50">
-                 <td class="p-4 align-top w-12 text-center font-mono text-gray-400">{{ idx + 1 }}</td>
-                 <td class="p-4 text-gray-900 leading-relaxed font-medium">{{ b }}</td>
+           <table v-else-if="activePortfolioTab === 'bimbingan' && bimbinganList.length" class="w-full text-left text-base">
+             <tbody class="divide-y divide-gray-100">
+               <tr v-for="(b, idx) in bimbinganList" :key="idx" class="hover:bg-slate-50 transition-colors">
+                 <td class="p-4 align-top w-12 text-center font-mono text-gray-400 font-bold">{{ idx + 1 }}</td>
+                 <td class="p-4 text-gray-900 leading-relaxed font-sans">{{ b }}</td>
                </tr>
              </tbody>
            </table>
-           <table v-else-if="activePortfolioTab === 'pengujian' && pengujianList.length" class="w-full text-left text-xs">
-             <tbody class="divide-y divide-gray-200">
-               <tr v-for="(u, idx) in pengujianList" :key="idx" class="hover:bg-gray-50">
-                 <td class="p-4 align-top w-12 text-center font-mono text-gray-400">{{ idx + 1 }}</td>
-                 <td class="p-4 text-gray-900 leading-relaxed font-medium">{{ u }}</td>
+           <table v-else-if="activePortfolioTab === 'pengujian' && pengujianList.length" class="w-full text-left text-base">
+             <tbody class="divide-y divide-gray-100">
+               <tr v-for="(u, idx) in pengujianList" :key="idx" class="hover:bg-slate-50 transition-colors">
+                 <td class="p-4 align-top w-12 text-center font-mono text-gray-400 font-bold">{{ idx + 1 }}</td>
+                 <td class="p-4 text-gray-900 leading-relaxed font-sans">{{ u }}</td>
                </tr>
              </tbody>
            </table>
-
-           <div v-else class="flex items-center justify-center h-48 text-[11px] font-mono uppercase tracking-widest text-gray-400">
-             Kosong / Tidak Ada Data
+           <div v-else class="p-12 text-center text-base text-gray-400 font-sans italic">
+             Belum ada rekam jejak untuk kategori ini
            </div>
         </div>
-
       </main>
+
     </div>
   </div>
 </template>
@@ -226,7 +226,7 @@ const pengujianList = computed(() => parseListItems(dosen.value?.judul_uji || do
   animation: fade-in 0.3s ease-out forwards;
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>

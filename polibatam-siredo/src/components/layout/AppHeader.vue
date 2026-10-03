@@ -13,7 +13,7 @@ const emit = defineEmits(['toggle-sidebar'])
       </button>
 
       <div>
-        <h2 class="text-sm font-bold text-gray-900 tracking-wide font-sans">Sistem Rekomendasi Dosen Polibatam</h2>
+        <h2 class="text-h3 font-bold text-gray-900 tracking-wide font-sans">Sistem Rekomendasi Dosen Polibatam</h2>
       </div>
     </div>
   </header>

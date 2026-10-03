@@ -17,7 +17,27 @@
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Hierarki Ukuran Tipografi SiReDo */
+  --text-h1: 2rem;
+  --text-h2: 1.5rem;
+  --text-h3: 1rem;
+  --text-base: .8rem;
+  --text-tiny: 0.7rem;
+
+  --text-h1--line-height: 1.25;
+  --text-h2--line-height: 1.33;
+  --text-h3--line-height: 1.4;
+  --text-base--line-height: 1.5;
+  --text-tiny--line-height: 1;
 }
+
+/* Utilitas Helper Khusus Tipografi */
+.text-h1 { font-size: 2rem; line-height: 1.25; }
+.text-h2 { font-size: 1.5rem; line-height: 1.33; }
+.text-h3 { font-size: 1rem; line-height: 1.4; }
+.text-base { font-size: 0.8rem; line-height: 1.5; }
+.text-tiny { font-size: 0.7rem; line-height: 1; }
 
 body {
   font-family: var(--font-sans);

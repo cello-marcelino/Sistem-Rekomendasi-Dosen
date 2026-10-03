@@ -49,8 +49,8 @@ defineExpose({
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
           </div>
           <div>
-            <h1 class="font-bold text-white tracking-wide text-sm font-sans">Polibatam SiReDo</h1>
-            <p class="text-[10px] text-teal-400 font-mono tracking-widest mt-0.5">ADMIN v3.2</p>
+            <h1 class="font-bold text-white tracking-wide text-h3 font-sans">Polibatam SiReDo</h1>
+            <p class="text-tiny text-teal-400 font-mono tracking-widest mt-0.5">ADMIN v3.2</p>
           </div>
         </router-link>
       </div>
@@ -59,7 +59,7 @@ defineExpose({
       <div class="flex-1 overflow-y-auto py-8 custom-scrollbar">
         <nav class="px-4 space-y-8">
           <div v-for="(group, idx) in navGroups" :key="idx" class="space-y-3">
-            <h3 class="px-3 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">{{ group.title }}</h3>
+            <h3 class="px-3 text-tiny font-sans font-bold text-gray-400 uppercase tracking-wider">{{ group.title }}</h3>
             
             <div class="space-y-1">
               <router-link
@@ -67,7 +67,7 @@ defineExpose({
                 :key="item.path"
                 :to="item.path"
                 @click="isMobileOpen = false"
-                class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors group relative rounded-[3px]"
+                class="flex items-center gap-3 px-3 py-2 text-base font-medium transition-colors group relative rounded-[3px]"
                 :class="route.path === item.path || (item.path !== '/' && route.path.startsWith(item.path)) 
                   ? 'text-teal-300 bg-teal-500/15 border border-teal-500/30' 
                   : 'text-gray-300 hover:text-white hover:bg-white/5 border border-transparent'"
@@ -92,7 +92,7 @@ defineExpose({
       <div class="p-4 border-t border-[#2f324d] bg-[#1e2032]/60">
         <div class="flex items-center gap-3 px-3 py-2 border border-[#2f324d] bg-[#24263b]/80 rounded-[3px]">
           <div class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></div>
-          <div class="text-[11px] font-mono font-bold text-gray-300 truncate uppercase tracking-widest">Server Online</div>
+          <div class="text-tiny font-sans font-semibold text-gray-300 truncate uppercase tracking-wider">Server Online</div>
         </div>
       </div>
     </aside>

@@ -98,17 +98,17 @@ const fetchLecturerForEdit = async () => {
       
       parseEducationToFields(d.pendidikan)
 
-      const pubs = parseListItems(d.jurnal || d.publikasi)
-      publikasiList.value = pubs.length > 0 ? pubs : ['']
+      const parsedPub = parseListItems(d.jurnal || d.publikasi)
+      publikasiList.value = parsedPub.length ? parsedPub : ['']
 
-      const bimbs = parseListItems(d.judul_bimbing || d.riwayat_bimbingan)
-      bimbinganList.value = bimbs.length > 0 ? bimbs : ['']
+      const parsedBimb = parseListItems(d.judul_bimbing || d.riwayat_bimbingan)
+      bimbinganList.value = parsedBimb.length ? parsedBimb : ['']
 
-      const ujis = parseListItems(d.judul_uji || d.riwayat_pengujian)
-      pengujianList.value = ujis.length > 0 ? ujis : ['']
+      const parsedUji = parseListItems(d.judul_uji || d.riwayat_pengujian)
+      pengujianList.value = parsedUji.length ? parsedUji : ['']
     }
   } catch (err) {
-    errorMessage.value = err.response?.data?.message || err.message || 'Gagal memuat data dosen untuk diedit'
+    errorMessage.value = err.response?.data?.message || err.message || 'Gagal mengambil data dosen'
   } finally {
     isLoading.value = false
   }
@@ -118,51 +118,46 @@ onMounted(() => {
   fetchLecturerForEdit()
 })
 
-const addPublikasi = () => publikasiList.value.push('')
-const removePublikasi = (idx) => {
-  publikasiList.value.splice(idx, 1)
-  if (publikasiList.value.length === 0) publikasiList.value.push('')
+const addRow = (list) => {
+  list.push('')
 }
 
-const addBimbingan = () => bimbinganList.value.push('')
-const removeBimbingan = (idx) => {
-  bimbinganList.value.splice(idx, 1)
-  if (bimbinganList.value.length === 0) bimbinganList.value.push('')
-}
-
-const addPengujian = () => pengujianList.value.push('')
-const removePengujian = (idx) => {
-  pengujianList.value.splice(idx, 1)
-  if (pengujianList.value.length === 0) pengujianList.value.push('')
+const removeRow = (list, index) => {
+  if (list.length > 1) {
+    list.splice(index, 1)
+  } else {
+    list[0] = ''
+  }
 }
 
 const handleSubmit = async () => {
   if (!formData.value.nama) {
-    errorMessage.value = 'Nama lengkap dosen wajib diisi'
+    alert('Nama dosen wajib diisi')
     return
   }
 
   isSaving.value = true
   errorMessage.value = null
 
-  const eduParts = []
-  if (formData.value.pendidikan_d3?.trim()) eduParts.push(formData.value.pendidikan_d3.trim())
-  if (formData.value.pendidikan_s1_d4?.trim()) eduParts.push(formData.value.pendidikan_s1_d4.trim())
-  if (formData.value.pendidikan_s2?.trim()) eduParts.push(formData.value.pendidikan_s2.trim())
-  if (formData.value.pendidikan_s3?.trim()) eduParts.push(formData.value.pendidikan_s3.trim())
-  const combinedPendidikan = eduParts.join(', ')
+  const eduItems = []
+  if (formData.value.pendidikan_d3.trim()) eduItems.push(formData.value.pendidikan_d3.trim())
+  if (formData.value.pendidikan_s1_d4.trim()) eduItems.push(formData.value.pendidikan_s1_d4.trim())
+  if (formData.value.pendidikan_s2.trim()) eduItems.push(formData.value.pendidikan_s2.trim())
+  if (formData.value.pendidikan_s3.trim()) eduItems.push(formData.value.pendidikan_s3.trim())
 
-  const cleanList = (arr) => arr.map(s => s.trim()).filter(Boolean)
+  const cleanPub = publikasiList.value.map(s => s.trim()).filter(Boolean)
+  const cleanBimb = bimbinganList.value.map(s => s.trim()).filter(Boolean)
+  const cleanUji = pengujianList.value.map(s => s.trim()).filter(Boolean)
 
   const payload = {
-    nidn: formData.value.nidn,
-    nama: formData.value.nama,
-    program_studi: formData.value.program_studi,
-    bidang_keahlian: formData.value.bidang_keahlian,
-    pendidikan: combinedPendidikan,
-    publikasi: cleanList(publikasiList.value),
-    riwayat_bimbingan: cleanList(bimbinganList.value),
-    riwayat_pengujian: cleanList(pengujianList.value)
+    nidn: formData.value.nidn.trim(),
+    nama: formData.value.nama.trim(),
+    program_studi: formData.value.program_studi.trim(),
+    bidang_keahlian: formData.value.bidang_keahlian.trim(),
+    pendidikan: eduItems.join('\n'),
+    publikasi: cleanPub,
+    riwayat_bimbingan: cleanBimb,
+    riwayat_pengujian: cleanUji
   }
 
   try {
@@ -181,22 +176,22 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="space-y-6 pb-12 animate-in">
+  <div class="space-y-6 pb-12 animate-in font-sans">
     <!-- Header Section (Canvas-First) -->
     <div class="border-b border-gray-200 pb-5">
       <router-link 
         to="/admin/dosen" 
-        class="text-xs font-mono font-bold text-gray-500 hover:text-gray-900 mb-3 inline-flex items-center gap-1.5 transition-colors"
+        class="text-base font-sans font-semibold text-gray-500 hover:text-gray-900 mb-3 inline-flex items-center gap-1.5 transition-colors"
       >
-        &larr; KEMBALI
+        &larr; Kembali ke Master Data Dosen
       </router-link>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 font-sans">
+          <h1 class="text-h1 font-bold tracking-tight text-gray-900 font-sans">
             {{ isEditMode ? 'Edit Data Dosen' : 'Registrasi Dosen' }}
           </h1>
-          <p class="text-xs text-gray-600 font-mono mt-1">
-            {{ isEditMode ? formData.nidn || 'ID: ' + dosenId : 'Penambahan master data dosen dan portofolio keahlian' }}
+          <p class="text-base text-gray-600 font-sans mt-1">
+            {{ isEditMode ? 'Memperbarui data dosen ID: ' + (formData.nidn || dosenId) : 'Penambahan master data dosen dan portofolio keahlian' }}
           </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -204,7 +199,7 @@ const handleSubmit = async () => {
             @click="handleSubmit"
             :disabled="isSaving" 
             type="button"
-            class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-700 rounded hover:bg-teal-800 disabled:opacity-50 transition-colors shadow-sm"
+            class="inline-flex items-center gap-1.5 px-4 py-2 text-base font-semibold text-white bg-teal-700 rounded-[4px] hover:bg-teal-800 disabled:opacity-50 transition-colors shadow-sm font-sans"
           >
             {{ isSaving ? 'Menyimpan...' : (isEditMode ? 'Simpan Perubahan' : 'Tambah Data') }}
           </button>
@@ -213,135 +208,132 @@ const handleSubmit = async () => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center bg-white border border-gray-200 rounded shadow-sm">
+    <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center bg-white border border-gray-200/90 rounded-lg shadow-sm">
       <div class="w-8 h-8 border-2 border-gray-200 border-t-teal-600 rounded-full animate-spin mb-4"></div>
-      <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-500">Memuat Data...</span>
+      <span class="text-base font-sans font-semibold uppercase tracking-wider text-gray-500">Memuat Formulir Dosen...</span>
     </div>
 
     <!-- Form Area -->
     <form v-else @submit.prevent="handleSubmit" class="space-y-6">
       
-      <div v-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-[4px] text-xs font-bold font-mono">
+      <div v-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-[4px] text-base font-medium font-sans">
         {{ errorMessage }}
       </div>
 
       <!-- Section: Identitas -->
-      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
-        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-4">
-           <span class="text-[10px] font-mono font-bold text-gray-500">01</span>
-           <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Identitas Utama</h2>
+      <section class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
+        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-3">
+           <span class="text-tiny font-mono font-bold text-gray-500">01</span>
+           <h2 class="text-h2 font-bold text-gray-900 uppercase tracking-wider font-sans">Identitas Utama</h2>
         </header>
         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Nama Lengkap & Gelar *</label>
-            <input type="text" v-model="formData.nama" required class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">Nama Lengkap & Gelar *</label>
+            <input type="text" v-model="formData.nama" required class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
           </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">NIDN</label>
-            <input type="text" v-model="formData.nidn" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none font-mono text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">NIDN</label>
+            <input type="text" v-model="formData.nidn" class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none font-mono text-gray-900" />
           </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Program Studi</label>
-            <input type="text" v-model="formData.program_studi" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">Program Studi</label>
+            <input type="text" v-model="formData.program_studi" class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
           </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Bidang Keahlian (Koma)</label>
-            <input type="text" v-model="formData.bidang_keahlian" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">Bidang Keahlian (Pisahkan dengan koma)</label>
+            <input type="text" v-model="formData.bidang_keahlian" placeholder="NLP, Machine Learning, Web Engineering" class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
           </div>
         </div>
       </section>
 
       <!-- Section: Pendidikan -->
-      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
-        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-4">
-           <span class="text-[10px] font-mono font-bold text-gray-500">02</span>
-           <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Riwayat Pendidikan</h2>
+      <section class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
+        <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center gap-3">
+           <span class="text-tiny font-mono font-bold text-gray-500">02</span>
+           <h2 class="text-h2 font-bold text-gray-900 uppercase tracking-wider font-sans">Riwayat Pendidikan</h2>
         </header>
         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Diploma 3 (D3)</label>
-            <input type="text" v-model="formData.pendidikan_d3" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">Diploma 3 (D3)</label>
+            <input type="text" v-model="formData.pendidikan_d3" placeholder="Nama kampus / jurusan D3" class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
           </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Sarjana (S1/D4)</label>
-            <input type="text" v-model="formData.pendidikan_s1_d4" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">Sarjana (S1 / D4)</label>
+            <input type="text" v-model="formData.pendidikan_s1_d4" placeholder="Nama kampus / jurusan S1/D4" class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
           </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Magister (S2)</label>
-            <input type="text" v-model="formData.pendidikan_s2" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">Magister (S2)</label>
+            <input type="text" v-model="formData.pendidikan_s2" placeholder="Nama kampus / jurusan S2" class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
           </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-[11px] font-mono font-bold uppercase tracking-widest text-gray-700">Doktor (S3)</label>
-            <input type="text" v-model="formData.pendidikan_s3" class="border border-gray-300 rounded-[4px] px-3 py-2 text-sm focus:border-teal-500 focus:outline-none text-gray-900" />
+          <div class="flex flex-col gap-1.5">
+            <label class="text-base font-semibold text-gray-700 font-sans">Doktor (S3)</label>
+            <input type="text" v-model="formData.pendidikan_s3" placeholder="Nama kampus / jurusan S3" class="border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
           </div>
         </div>
       </section>
 
       <!-- Section: Publikasi -->
-      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+      <section class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
-           <div class="flex items-center gap-4">
-             <span class="text-[10px] font-mono font-bold text-gray-500">03</span>
-             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Publikasi Jurnal</h2>
+           <div class="flex items-center gap-3">
+             <span class="text-tiny font-mono font-bold text-gray-500">03</span>
+             <h2 class="text-h2 font-bold text-gray-900 uppercase tracking-wider font-sans">Publikasi Ilmiah</h2>
            </div>
-           <button type="button" @click="addPublikasi" class="text-[10px] font-mono font-bold text-teal-600 border border-teal-200 px-3 py-1 hover:bg-teal-50 bg-white">
-             + TAMBAH
-           </button>
+           <button type="button" @click="addRow(publikasiList)" class="text-base font-semibold text-teal-700 hover:text-teal-800 font-sans">+ Tambah Baris</button>
         </header>
-        <div class="p-0 divide-y divide-gray-200">
-           <div v-for="(item, idx) in publikasiList" :key="idx" class="flex items-center px-6 py-3 bg-white">
-             <span class="w-8 text-[10px] font-mono text-gray-400">#{{ idx + 1 }}</span>
-             <input type="text" v-model="publikasiList[idx]" class="flex-1 bg-transparent border-none text-sm focus:outline-none text-gray-900" placeholder="Judul Publikasi..." />
-             <button type="button" @click="removePublikasi(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold font-mono ml-4">HAPUS</button>
-           </div>
+        <div class="p-6 space-y-3">
+          <div v-for="(pub, idx) in publikasiList" :key="idx" class="flex items-center gap-2">
+            <span class="text-tiny font-mono text-gray-400 w-6 text-center font-bold">{{ idx + 1 }}</span>
+            <input type="text" v-model="publikasiList[idx]" placeholder="Judul publikasi jurnal / konferensi ilmiah..." class="flex-1 border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
+            <button type="button" @click="removeRow(publikasiList, idx)" class="text-base text-red-500 hover:text-red-700 px-2 font-sans font-semibold">Hapus</button>
+          </div>
         </div>
       </section>
 
-      <!-- Section: Bimbingan -->
-      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+      <!-- Section: Riwayat Bimbingan -->
+      <section class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
-           <div class="flex items-center gap-4">
-             <span class="text-[10px] font-mono font-bold text-gray-500">04</span>
-             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Riwayat Bimbingan</h2>
+           <div class="flex items-center gap-3">
+             <span class="text-tiny font-mono font-bold text-gray-500">04</span>
+             <h2 class="text-h2 font-bold text-gray-900 uppercase tracking-wider font-sans">Riwayat Bimbingan Tugas Akhir</h2>
            </div>
-           <button type="button" @click="addBimbingan" class="text-[10px] font-mono font-bold text-teal-600 border border-teal-200 px-3 py-1 hover:bg-teal-50 bg-white">
-             + TAMBAH
-           </button>
+           <button type="button" @click="addRow(bimbinganList)" class="text-base font-semibold text-teal-700 hover:text-teal-800 font-sans">+ Tambah Baris</button>
         </header>
-        <div class="p-0 divide-y divide-gray-200">
-           <div v-for="(item, idx) in bimbinganList" :key="idx" class="flex items-center px-6 py-3 bg-white">
-             <span class="w-8 text-[10px] font-mono text-gray-400">#{{ idx + 1 }}</span>
-             <input type="text" v-model="bimbinganList[idx]" class="flex-1 bg-transparent border-none text-sm focus:outline-none text-gray-900" placeholder="Judul Skripsi Bimbingan..." />
-             <button type="button" @click="removeBimbingan(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold font-mono ml-4">HAPUS</button>
-           </div>
+        <div class="p-6 space-y-3">
+          <div v-for="(bimb, idx) in bimbinganList" :key="idx" class="flex items-center gap-2">
+            <span class="text-tiny font-mono text-gray-400 w-6 text-center font-bold">{{ idx + 1 }}</span>
+            <input type="text" v-model="bimbinganList[idx]" placeholder="Judul tugas akhir mahasiswa bimbingan..." class="flex-1 border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
+            <button type="button" @click="removeRow(bimbinganList, idx)" class="text-base text-red-500 hover:text-red-700 px-2 font-sans font-semibold">Hapus</button>
+          </div>
         </div>
       </section>
 
-      <!-- Section: Pengujian -->
-      <section class="bg-white border border-gray-200 rounded shadow-sm overflow-hidden mb-12">
+      <!-- Section: Riwayat Pengujian -->
+      <section class="bg-white border border-gray-200/90 rounded-lg shadow-sm overflow-hidden">
         <header class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
-           <div class="flex items-center gap-4">
-             <span class="text-[10px] font-mono font-bold text-gray-500">05</span>
-             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest font-mono">Riwayat Pengujian</h2>
+           <div class="flex items-center gap-3">
+             <span class="text-tiny font-mono font-bold text-gray-500">05</span>
+             <h2 class="text-h2 font-bold text-gray-900 uppercase tracking-wider font-sans">Riwayat Pengujian Sidang</h2>
            </div>
-           <button type="button" @click="addPengujian" class="text-[10px] font-mono font-bold text-teal-600 border border-teal-200 px-3 py-1 hover:bg-teal-50 bg-white">
-             + TAMBAH
-           </button>
+           <button type="button" @click="addRow(pengujianList)" class="text-base font-semibold text-teal-700 hover:text-teal-800 font-sans">+ Tambah Baris</button>
         </header>
-        <div class="p-0 divide-y divide-gray-200">
-           <div v-for="(item, idx) in pengujianList" :key="idx" class="flex items-center px-6 py-3 bg-white">
-             <span class="w-8 text-[10px] font-mono text-gray-400">#{{ idx + 1 }}</span>
-             <input type="text" v-model="pengujianList[idx]" class="flex-1 bg-transparent border-none text-sm focus:outline-none text-gray-900" placeholder="Judul Sidang Pengujian..." />
-             <button type="button" @click="removePengujian(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold font-mono ml-4">HAPUS</button>
-           </div>
+        <div class="p-6 space-y-3">
+          <div v-for="(uji, idx) in pengujianList" :key="idx" class="flex items-center gap-2">
+            <span class="text-tiny font-mono text-gray-400 w-6 text-center font-bold">{{ idx + 1 }}</span>
+            <input type="text" v-model="pengujianList[idx]" placeholder="Judul tugas akhir yang pernah diuji..." class="flex-1 border border-gray-300 rounded-[4px] px-3.5 py-2 text-base focus:border-teal-600 focus:outline-none text-gray-900 font-sans" />
+            <button type="button" @click="removeRow(pengujianList, idx)" class="text-base text-red-500 hover:text-red-700 px-2 font-sans font-semibold">Hapus</button>
+          </div>
         </div>
       </section>
-      
-      <!-- Mobile Sticky Action -->
-      <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 md:hidden z-10 flex gap-4">
-        <router-link to="/admin/dosen" class="flex-1 text-center py-3 bg-gray-100 text-gray-700 font-bold text-xs rounded-[4px]">Batal</router-link>
-        <button type="submit" :disabled="isSaving" class="flex-1 py-3 bg-teal-600 text-white font-bold text-xs rounded-[4px]">
-          {{ isSaving ? 'Menyimpan...' : 'Simpan' }}
+
+      <!-- Bottom Save Action -->
+      <div class="flex justify-end pt-4">
+        <button 
+          type="submit" 
+          :disabled="isSaving" 
+          class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-base font-semibold rounded-[4px] shadow-sm transition-colors font-sans"
+        >
+          {{ isSaving ? 'Menyimpan...' : (isEditMode ? 'Simpan Perubahan' : 'Simpan Data Dosen') }}
         </button>
       </div>
 
@@ -354,7 +346,7 @@ const handleSubmit = async () => {
   animation: fade-in 0.3s ease-out forwards;
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>
