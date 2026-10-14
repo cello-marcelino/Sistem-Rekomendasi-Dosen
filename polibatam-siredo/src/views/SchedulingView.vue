@@ -625,7 +625,7 @@ const downloadPdfSchedule = () => {
       doc.setTextColor(140)
       doc.text(pageStr, doc.internal.pageSize.getWidth() - 12, doc.internal.pageSize.getHeight() - 6, { align: 'right' })
       doc.text(
-        `SiReDo Polibatam • Dicetak otomatis pada ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+        `SiReDo Polibatam | Dicetak otomatis pada ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}`,
         12,
         doc.internal.pageSize.getHeight() - 6
       )
@@ -642,7 +642,7 @@ const downloadPdfSchedule = () => {
     
     doc.setFontSize(9.5)
     doc.setFont('helvetica', 'normal')
-    doc.text(`${aYear} • Batas Beban: Maksimal ${maxPerPeriod.value} TA / Periode & ${maxPerDay.value} TA / Hari`, doc.internal.pageSize.getWidth() / 2, 17, { align: 'center' })
+    doc.text(`${aYear} | Batas Beban: Maksimal ${maxPerPeriod.value} TA / Periode & ${maxPerDay.value} TA / Hari`, doc.internal.pageSize.getWidth() / 2, 17, { align: 'center' })
 
     const workloadRows = currentWorkload.value.map((w, idx) => [
       String(idx + 1),
@@ -728,11 +728,7 @@ const downloadTemplate = () => {
     <!-- Header Hero Section -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-5">
       <div>
-        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold mb-2">
-          <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-          Modul Penjadwalan Sidang TA Cerdas
-        </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight">
           Penjadwalan Otomatis Sidang TA
         </h1>
         <p class="text-sm sm:text-base text-slate-600 mt-1 max-w-2xl leading-relaxed">
@@ -809,7 +805,7 @@ const downloadTemplate = () => {
       </div>
     </div>
 
-    <!-- Stepper Navigation Header -->
+    <!-- Stepper Navigation Header (Segmented Process Tabs without step numbers) -->
     <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
       <div class="grid grid-cols-1 sm:grid-cols-3 border-b border-slate-200 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 bg-slate-50/60">
         <button 
@@ -818,15 +814,15 @@ const downloadTemplate = () => {
           class="p-4 flex items-center gap-3 transition-all text-left cursor-pointer" 
           :class="step === 1 ? 'bg-white font-bold text-teal-800 shadow-xs' : 'text-slate-500 hover:bg-slate-100/70'"
         >
-          <span 
-            class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors" 
-            :class="step === 1 ? 'bg-teal-700 text-white' : 'bg-slate-200 text-slate-600'"
+          <div 
+            class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors" 
+            :class="step === 1 ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-500'"
           >
-            1
-          </span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+          </div>
           <div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tahap 1</div>
             <div class="text-sm font-semibold text-slate-800">Konfigurasi & Berkas</div>
+            <div class="text-xs text-slate-500">Periode, ruangan, dan file data</div>
           </div>
         </button>
 
@@ -834,15 +830,15 @@ const downloadTemplate = () => {
           class="p-4 flex items-center gap-3 text-left transition-all" 
           :class="step === 2 ? 'bg-white font-bold text-teal-800 shadow-xs' : 'text-slate-400'"
         >
-          <span 
-            class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors" 
-            :class="step === 2 ? 'bg-teal-700 text-white animate-pulse' : 'bg-slate-200 text-slate-400'"
+          <div 
+            class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors" 
+            :class="step === 2 ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-400'"
           >
-            2
-          </span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
+          </div>
           <div>
-            <div class="text-[11px] font-bold uppercase tracking-wider">Tahap 2</div>
             <div class="text-sm font-semibold" :class="step === 2 ? 'text-teal-900' : 'text-slate-400'">Alokasi Cerdas & NLP</div>
+            <div class="text-xs text-slate-500">Evaluasi kuota & jadwal bebas bentrok</div>
           </div>
         </div>
 
@@ -853,15 +849,15 @@ const downloadTemplate = () => {
           class="p-4 flex items-center gap-3 transition-all text-left disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer" 
           :class="step === 3 ? 'bg-white font-bold text-teal-800 shadow-xs' : 'text-slate-500 hover:bg-slate-100/70'"
         >
-          <span 
-            class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors" 
-            :class="step === 3 ? 'bg-teal-700 text-white' : 'bg-slate-200 text-slate-600'"
+          <div 
+            class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors" 
+            :class="step === 3 ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-500'"
           >
-            3
-          </span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+          </div>
           <div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tahap 3</div>
             <div class="text-sm font-semibold text-slate-800">Jadwal Sidang Final</div>
+            <div class="text-xs text-slate-500">Tabel jadwal & ekspor Excel / PDF</div>
           </div>
         </button>
       </div>
@@ -873,9 +869,8 @@ const downloadTemplate = () => {
         <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
           <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
-                1. Jenis Usulan Sidang
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">
+                Jenis Usulan Sidang
               </h2>
               <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Pilih tingkat ujian tugas akhir yang akan dijadwalkan.</p>
             </div>
@@ -966,9 +961,8 @@ const downloadTemplate = () => {
         <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
             <div>
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
-                2. Pilihan & Waktu Periode Sidang
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">
+                Pilihan & Waktu Periode Sidang
               </h2>
               <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
                 Pilih periode yang aktif atau ubah rentang tanggalnya sesuai jadwal operasional jurusan.
@@ -1080,9 +1074,8 @@ const downloadTemplate = () => {
         <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
             <div>
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
-                3. Pengaturan Ruangan Sidang
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">
+                Pengaturan Ruangan Sidang
               </h2>
               <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Tentukan ruangan sidang yang aktif untuk periode ini.</p>
             </div>
@@ -1145,9 +1138,8 @@ const downloadTemplate = () => {
         <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
           <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
             <div>
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
-                4. Unggah Berkas Peserta Sidang (.xlsx)
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">
+                Unggah Berkas Peserta Sidang (.xlsx)
               </h2>
               <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Unggah berkas hasil batch rekomendasi atau berkas daftar mahasiswa.</p>
             </div>
@@ -1201,8 +1193,8 @@ const downloadTemplate = () => {
           <!-- Bottom Action Bar -->
           <div class="pt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-100">
             <div class="text-xs text-slate-600 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-              <span>Siap menjadwalkan: <strong>{{ selectedJenisSidang }}</strong> • {{ activePeriod.name }} ({{ activeWorkingDays.length }} Hari Kerja)</span>
+              <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>Siap menjadwalkan: <strong>{{ selectedJenisSidang }}</strong> <span class="text-slate-300 mx-1">|</span> {{ activePeriod.name }} ({{ activeWorkingDays.length }} Hari Kerja)</span>
             </div>
 
             <button 
@@ -1230,12 +1222,19 @@ const downloadTemplate = () => {
             Mengevaluasi kecocokan topik dosen NLP, membatasi kuota harian (max 2 TA) & kuota periode (max 10 TA), serta menempatkan ruangan sidang secara optimal.
           </p>
         </div>
-        <div class="flex items-center gap-4 text-xs font-semibold text-teal-800 bg-teal-50 px-4 py-2 rounded-full border border-teal-200">
-          <span>✓ Evaluasi NLP SBERT</span>
-          <span>•</span>
-          <span>✓ Batasan Kuota Dosen</span>
-          <span>•</span>
-          <span>✓ Alokasi Bebas Bentrok</span>
+        <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-800 border border-teal-200">
+            <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            Evaluasi NLP SBERT
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-800 border border-teal-200">
+            <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            Batasan Kuota Dosen
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-800 border border-teal-200">
+            <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            Alokasi Bebas Bentrok
+          </span>
         </div>
       </div>
 
@@ -1248,14 +1247,14 @@ const downloadTemplate = () => {
             <div class="text-[11px] uppercase tracking-widest text-teal-200 font-bold">
               HASIL PENJADWALAN RESMI POLIBATAM
             </div>
-            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-0.5">
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight mt-0.5">
               {{ periodTitle || activePeriod.title }}
             </h2>
             <div class="text-xs sm:text-sm text-teal-100 font-medium flex items-center gap-2 mt-1">
               <span>{{ academicYear }}</span>
-              <span>•</span>
+              <span class="text-teal-400">|</span>
               <span class="px-2 py-0.5 rounded bg-teal-700/80 text-white font-bold text-xs">{{ selectedJenisSidang }}</span>
-              <span>•</span>
+              <span class="text-teal-400">|</span>
               <span>{{ activePeriod.name }} ({{ formatIndoDate(activePeriod.startDate) }} s.d. {{ formatIndoDate(activePeriod.endDate) }})</span>
             </div>
           </div>
@@ -1380,27 +1379,29 @@ const downloadTemplate = () => {
         <!-- Summary Banner -->
         <div class="px-6 py-3 bg-teal-50/80 border-b border-teal-200/70 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-teal-900">
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-teal-600"></span>
             <span><strong class="font-semibold">Status:</strong> <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalScheduled }}</span> dari <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalRequested }}</span> Mahasiswa Berhasil Dijadwalkan</span>
           </div>
           <div class="flex items-center gap-4">
             <span><strong class="font-semibold">Ruangan:</strong> <span class="font-mono tabular-nums font-bold">{{ allRoomsList.length }}</span> Ruang Aktif</span>
-            <span>•</span>
+            <span class="text-teal-300">|</span>
             <span><strong class="font-semibold">Jenis Usulan:</strong> <span class="font-bold">{{ selectedJenisSidang }}</span></span>
           </div>
         </div>
 
         <!-- Warning banner if any unassigned -->
         <div v-if="scheduleResult.totalUnassigned > 0" class="p-4 bg-amber-50 border-b border-amber-200 text-xs sm:text-sm text-amber-900">
-          <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-800">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <div class="font-bold flex items-center gap-1.5 mb-2 text-amber-800">
+            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             <span class="font-mono tabular-nums font-bold">{{ scheduleResult.totalUnassigned }}</span> Mahasiswa Belum Terjadwal
           </div>
-          <ul class="list-disc list-inside space-y-0.5 text-amber-700 pl-1">
-            <li v-for="u in scheduleResult.unassigned" :key="u.mahasiswa_id">
-              <strong>{{ u.nama_mahasiswa }} (<span class="font-mono">{{ u.mahasiswa_id }}</span>):</strong> {{ u.reason }}
-            </li>
-          </ul>
+          <div class="space-y-1.5 pl-6 text-amber-800">
+            <div v-for="u in scheduleResult.unassigned" :key="u.mahasiswa_id" class="flex flex-wrap items-baseline gap-1.5 text-xs sm:text-sm">
+              <span class="font-semibold text-amber-950">{{ u.nama_mahasiswa }}</span>
+              <span class="font-mono text-[11px] text-amber-700">({{ u.mahasiswa_id }})</span>
+              <span class="text-amber-500">—</span>
+              <span class="text-amber-800">{{ u.reason }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- View 1: Tabel Jadwal (Sesuai Kolom Gambar Resmi Polibatam) -->
@@ -1460,7 +1461,7 @@ const downloadTemplate = () => {
                 </td>
 
                 <!-- Nama Mahasiswa -->
-                <td class="p-3 border-r border-slate-200 align-top font-bold text-slate-900">
+                <td class="p-3 border-r border-slate-200 align-top font-semibold text-slate-900">
                   {{ row.nama_mahasiswa }}
                 </td>
 
@@ -1513,14 +1514,12 @@ const downloadTemplate = () => {
                         v-if="getCandidateInfo(row, row.penguji_1)" 
                         class="inline-flex items-center gap-1 text-[11px] font-medium text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
                       >
-                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
                         Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_1).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_1).score || 0) * 100) }}%</span>)
                       </span>
                       <span 
                         v-else 
                         class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200"
                       >
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                         Pilihan Manual
                       </span>
                     </div>
@@ -1566,14 +1565,12 @@ const downloadTemplate = () => {
                         v-if="getCandidateInfo(row, row.penguji_2)" 
                         class="inline-flex items-center gap-1 text-[11px] font-medium text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/80"
                       >
-                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
                         Rank #<span class="font-mono tabular-nums font-semibold">{{ getCandidateInfo(row, row.penguji_2).rank }}</span> (<span class="font-mono tabular-nums font-semibold">{{ Math.round((getCandidateInfo(row, row.penguji_2).score || 0) * 100) }}%</span>)
                       </span>
                       <span 
                         v-else 
                         class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200"
                       >
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                         Pilihan Manual
                       </span>
                     </div>
@@ -1611,10 +1608,10 @@ const downloadTemplate = () => {
               <div>
                 <div class="flex items-start justify-between gap-2 mb-3">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-teal-100 text-teal-800 font-bold text-sm flex items-center justify-center">
+                    <span class="w-8 h-8 rounded-lg bg-teal-50 text-teal-800 font-bold text-sm flex items-center justify-center border border-teal-200">
                       {{ w.nama.charAt(0) }}
                     </span>
-                    <span class="font-bold text-sm text-slate-900 line-clamp-1" :title="w.nama">{{ w.nama }}</span>
+                    <span class="font-semibold text-sm text-slate-900 line-clamp-1" :title="w.nama">{{ w.nama }}</span>
                   </div>
                   <span class="text-xs font-mono tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0" :class="w.total >= w.maxPeriod ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-teal-50 text-teal-700 border border-teal-200'">
                     {{ w.total }} / {{ w.maxPeriod }} TA

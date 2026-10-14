@@ -1,3 +1,0 @@
-# Ignore all report files in this directory from Git tracking
-*
-!.gitignore
