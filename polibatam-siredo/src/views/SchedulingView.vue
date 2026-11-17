@@ -101,9 +101,13 @@ const removePeriod = (id) => {
   }
 }
 
-// Batas Beban Menguji Dosen
-const maxPerDay = ref(2)
-const maxPerPeriod = ref(10)
+// Batas Beban Menguji Dosen & Sesi (Sesuai Arahan Koordinator Sidang Buk Alena)
+const maxSessionsPerDay = ref(2) // 1 dosen dalam sehari menguji maks 2 sesi (pagi dan siang)
+const targetStudentsPerSession = ref(4) // 1 sesi 2-5 mhs
+const minStudentsPerSession = ref(2)
+const maxStudentsPerSession = ref(5)
+const maxPerDay = computed(() => maxSessionsPerDay.value)
+const maxPerPeriod = ref('Round-Robin')
 
 // Ruangan Configuration State (Setting Manual)
 const customRooms = ref([...DEFAULT_ROOMS])
@@ -342,7 +346,7 @@ const processScheduling = async () => {
       throw new Error("Tidak ada data proposal yang valid ditemukan dalam file Excel.")
     }
 
-    // 2. Jalankan algoritma penjadwalan cerdas
+    // 2. Jalankan algoritma penjadwalan cerdas berbasis sesi & round-robin
     const result = scheduleDefenses(proposalsToSchedule, {
       periodId: activePeriod.value.id,
       periodName: activePeriod.value.name,
@@ -353,8 +357,11 @@ const processScheduling = async () => {
       endDate: activePeriod.value.endDate,
       sessions: DEFAULT_SESSIONS,
       rooms: customRooms.value,
-      maxPerDay: maxPerDay.value,
-      maxPerPeriod: maxPerPeriod.value
+      minStudentsPerSession: minStudentsPerSession.value,
+      maxStudentsPerSession: maxStudentsPerSession.value,
+      targetStudentsPerSession: targetStudentsPerSession.value,
+      maxSessionsPerDay: maxSessionsPerDay.value,
+      availableExaminers: allAvailableExaminers.value
     })
 
     scheduleResult.value = result
@@ -393,50 +400,89 @@ const filteredSchedule = computed(() => {
   })
 })
 
-// Real-Time Recalculated Examiner Workload
+// Real-Time Recalculated Examiner Workload (Berbasis Sesi & Mahasiswa Sesuai Aturan Buk Alena)
 const currentWorkload = computed(() => {
   if (!scheduleResult.value?.scheduled || !scheduleResult.value?.period) return []
 
   const workingDays = scheduleResult.value.period.workingDays || []
-  const periodCount = {}
-  const dailyCount = {}
-  workingDays.forEach(d => { dailyCount[d] = {} })
+  
+  // Lacak sesi unik per dosen: Map of dosen -> Set of unique sessionKeys (tanggal_sesiId_ruangan)
+  const lecturerSessions = {}
+  const lecturerDailySessions = {}
+  
+  // Lacak judul/mahasiswa per dosen
+  const lecturerTitles = {}
+  const lecturerDailyTitles = {}
+
+  workingDays.forEach(d => {
+    lecturerDailySessions[d] = {}
+    lecturerDailyTitles[d] = {}
+  })
 
   scheduleResult.value.scheduled.forEach(row => {
     const date = row.tanggal
+    const sessionKey = `${row.tanggal}_${row.sesi_id}_${row.ruangan}`
     const p1 = row.penguji_1
     const p2 = row.penguji_2
 
-    if (p1) {
-      periodCount[p1] = (periodCount[p1] || 0) + 1
-      if (dailyCount[date]) dailyCount[date][p1] = (dailyCount[date][p1] || 0) + 1
+    const recordDosen = (nama) => {
+      if (!nama || nama === '-') return
+      if (!lecturerSessions[nama]) lecturerSessions[nama] = new Set()
+      lecturerSessions[nama].add(sessionKey)
+
+      if (date && lecturerDailySessions[date]) {
+        if (!lecturerDailySessions[date][nama]) lecturerDailySessions[date][nama] = new Set()
+        lecturerDailySessions[date][nama].add(sessionKey)
+      }
+
+      lecturerTitles[nama] = (lecturerTitles[nama] || 0) + 1
+      if (date && lecturerDailyTitles[date]) {
+        lecturerDailyTitles[date][nama] = (lecturerDailyTitles[date][nama] || 0) + 1
+      }
     }
-    if (p2) {
-      periodCount[p2] = (periodCount[p2] || 0) + 1
-      if (dailyCount[date]) dailyCount[date][p2] = (dailyCount[date][p2] || 0) + 1
-    }
+
+    recordDosen(p1)
+    recordDosen(p2)
   })
 
   const allNames = new Set([
-    ...Object.keys(periodCount),
-    ...(scheduleResult.value.examinerWorkload || []).map(w => w.nama)
+    ...Object.keys(lecturerSessions),
+    ...(scheduleResult.value.examinerWorkload || []).map(w => w.nama),
+    ...allAvailableExaminers.value
   ])
 
-  return Array.from(allNames).map(nama => {
-    const total = periodCount[nama] || 0
-    const perDay = {}
+  return Array.from(allNames).filter(Boolean).map(nama => {
+    const totalSesi = lecturerSessions[nama] ? lecturerSessions[nama].size : 0
+    const totalJudul = lecturerTitles[nama] || 0
+
+    const perDaySessions = {}
+    const perDayTitles = {}
     workingDays.forEach(d => {
-      perDay[d] = dailyCount[d]?.[nama] || 0
+      perDaySessions[d] = lecturerDailySessions[d]?.[nama]?.size || 0
+      perDayTitles[d] = lecturerDailyTitles[d]?.[nama] || 0
     })
+
+    let roundStatus = 'Belum Ada Sesi'
+    if (totalSesi === 1) roundStatus = 'Putaran 1 (1 Sesi)'
+    else if (totalSesi === 2) roundStatus = 'Putaran 2 (2 Sesi)'
+    else if (totalSesi > 2) roundStatus = `Putaran ${totalSesi} (${totalSesi} Sesi)`
 
     return {
       nama,
-      total,
-      maxPeriod: maxPerPeriod.value,
-      percentage: Math.min(100, Math.round((total / maxPerPeriod.value) * 100)),
-      perDay
+      totalSessions: totalSesi,
+      totalTitles: totalJudul,
+      total: totalJudul, // backward compatibility
+      maxPeriod: 'Round-Robin',
+      percentage: Math.min(100, totalSesi * 50),
+      roundStatus,
+      perDaySessions,
+      perDayTitles,
+      perDay: perDayTitles // backward compatibility
     }
-  }).sort((a, b) => b.total - a.total)
+  }).sort((a, b) => {
+    if (b.totalSessions !== a.totalSessions) return b.totalSessions - a.totalSessions
+    return b.totalTitles - a.totalTitles
+  })
 })
 
 // Unique Examiners list for filter dropdown
@@ -517,9 +563,9 @@ const downloadSchedule = () => {
   const dataWorkload = currentWorkload.value.map((w, idx) => ({
     'No': idx + 1,
     'Nama Dosen': w.nama,
-    'Total Menguji (Periode Ini)': w.total,
-    'Batas Maksimal Periode': w.maxPeriod,
-    'Persentase Beban': `${w.percentage}%`
+    'Total Sesi Menguji': w.totalSessions || 0,
+    'Total Mahasiswa / Judul Diuji': w.totalTitles || w.total || 0,
+    'Status Putaran Sesi': w.roundStatus || '-'
   }))
   const ws2 = XLSX.utils.json_to_sheet(dataWorkload)
 
@@ -642,20 +688,20 @@ const downloadPdfSchedule = () => {
     
     doc.setFontSize(9.5)
     doc.setFont('helvetica', 'normal')
-    doc.text(`${aYear} | Batas Beban: Maksimal ${maxPerPeriod.value} TA / Periode & ${maxPerDay.value} TA / Hari`, doc.internal.pageSize.getWidth() / 2, 17, { align: 'center' })
+    doc.text(`${aYear} • Sesi Sidang: Pagi & Siang (2-5 Mhs/Sesi) • Beban Penguji: Pemerataan Sesi (Round-Robin)`, doc.internal.pageSize.getWidth() / 2, 17, { align: 'center' })
 
     const workloadRows = currentWorkload.value.map((w, idx) => [
       String(idx + 1),
       w.nama,
-      `${w.total} TA`,
-      `${w.maxPeriod} TA`,
-      `${w.percentage}%`
+      `${w.totalSessions || 0} Sesi`,
+      `${w.totalTitles || w.total || 0} Judul`,
+      w.roundStatus || '-'
     ])
 
     autoTable(doc, {
       startY: 21,
-      margin: { left: 45, right: 45 },
-      head: [['No', 'Nama Dosen Penguji', 'Total Menguji', 'Batas Maksimal Periode', 'Persentase Beban']],
+      margin: { left: 40, right: 40 },
+      head: [['No', 'Nama Dosen Penguji', 'Total Sesi Menguji', 'Total Judul / Mhs Diuji', 'Status Putaran Pemerataan']],
       body: workloadRows,
       theme: 'grid',
       styles: {
@@ -671,9 +717,9 @@ const downloadPdfSchedule = () => {
       columnStyles: {
         0: { cellWidth: 12, halign: 'center' },
         1: { cellWidth: 'auto' },
-        2: { cellWidth: 32, halign: 'center' },
-        3: { cellWidth: 42, halign: 'center' },
-        4: { cellWidth: 35, halign: 'center' }
+        2: { cellWidth: 35, halign: 'center' },
+        3: { cellWidth: 40, halign: 'center' },
+        4: { cellWidth: 45, halign: 'center' }
       }
     })
   }
@@ -762,7 +808,7 @@ const downloadTemplate = () => {
       </div>
     </div>
 
-    <!-- KPI & Constraint Indicators -->
+    <!-- KPI & Constraint Indicators (Sesuai Aturan Koordinator Sidang Buk Alena) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
@@ -770,7 +816,8 @@ const downloadTemplate = () => {
         </div>
         <div>
           <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Maks. Uji Harian</div>
-          <div class="text-lg font-bold text-slate-900 mt-0.5"><span class="font-mono tabular-nums">{{ maxPerDay }}</span> Judul / Hari</div>
+          <div class="text-lg font-bold text-slate-900 mt-0.5"><span class="font-mono tabular-nums">{{ maxSessionsPerDay }}</span> Sesi / Hari</div>
+          <div class="text-[11px] text-slate-500">Pagi & Siang (s/d 10 Judul)</div>
         </div>
       </div>
 
@@ -779,8 +826,9 @@ const downloadTemplate = () => {
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
         </div>
         <div>
-          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Maks. Uji Periode</div>
-          <div class="text-lg font-bold text-emerald-900 mt-0.5"><span class="font-mono tabular-nums">{{ maxPerPeriod }}</span> Judul / Periode</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Distribusi Periode</div>
+          <div class="text-lg font-bold text-emerald-900 mt-0.5">Pemerataan Sesi</div>
+          <div class="text-[11px] text-slate-500">Prioritas Semua Dosen (Round-Robin)</div>
         </div>
       </div>
 
@@ -789,8 +837,9 @@ const downloadTemplate = () => {
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
         </div>
         <div>
-          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kapasitas Slot</div>
-          <div class="text-lg font-bold text-slate-900 mt-0.5"><span class="font-mono tabular-nums">{{ 4 * customRooms.length }}</span> Slot / Hari</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kapasitas Sesi</div>
+          <div class="text-lg font-bold text-slate-900 mt-0.5"><span class="font-mono tabular-nums">2 - 5</span> Mhs / Sesi</div>
+          <div class="text-[11px] text-slate-500">1 Mahasiswa diuji 2 Dosen</div>
         </div>
       </div>
 
@@ -799,8 +848,9 @@ const downloadTemplate = () => {
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
         </div>
         <div>
-          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Target Laporan</div>
-          <div class="text-lg font-bold text-indigo-900 mt-0.5">{{ selectedJenisSidang }}</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kuota Pendaftaran</div>
+          <div class="text-lg font-bold text-indigo-900 mt-0.5">Tanpa Batas Kuota</div>
+          <div class="text-[11px] text-slate-500">{{ selectedJenisSidang }}</div>
         </div>
       </div>
     </div>
@@ -1191,12 +1241,7 @@ const downloadTemplate = () => {
           </div>
 
           <!-- Bottom Action Bar -->
-          <div class="pt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-100">
-            <div class="text-xs text-slate-600 flex items-center gap-2">
-              <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <span>Siap menjadwalkan: <strong>{{ selectedJenisSidang }}</strong> <span class="text-slate-300 mx-1">|</span> {{ activePeriod.name }} ({{ activeWorkingDays.length }} Hari Kerja)</span>
-            </div>
-
+          <div class="pt-3 flex justify-end border-t border-slate-100">
             <button 
               @click="processScheduling" 
               :disabled="!fileName || loading"
@@ -1219,7 +1264,7 @@ const downloadTemplate = () => {
         <div>
           <h2 class="text-xl font-bold text-slate-900 mb-1">Menyusun Jadwal {{ selectedJenisSidang }} Bebas Bentrok...</h2>
           <p class="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-            Mengevaluasi kecocokan topik dosen NLP, membatasi kuota harian (max 2 TA) & kuota periode (max 10 TA), serta menempatkan ruangan sidang secara optimal.
+            Mengevaluasi kecocokan topik NLP, membatasi maks 2 sesi per hari (Pagi & Siang), menerapkan pemerataan sesi round-robin, serta mengelompokkan 2-5 mahasiswa per sesi.
           </p>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
@@ -1229,11 +1274,11 @@ const downloadTemplate = () => {
           </span>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-800 border border-teal-200">
             <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-            Batasan Kuota Dosen
+            Maks. 2 Sesi / Hari
           </span>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-800 border border-teal-200">
             <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-            Alokasi Bebas Bentrok
+            Pemerataan Round-Robin
           </span>
         </div>
       </div>
@@ -1596,7 +1641,9 @@ const downloadTemplate = () => {
         <div v-if="activeTab === 'workload'" class="p-6 sm:p-8 overflow-x-auto space-y-6">
           <div>
             <h2 class="text-xl font-bold text-slate-900">Rekap Beban Menguji Dosen (Periode Ini)</h2>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Memastikan tidak ada dosen yang melebihi kuota 10 TA per periode dan 2 TA per hari.</p>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Distribusi beban berbasis sesi (maksimal 2 sesi/hari: Pagi & Siang) dengan prinsip pemerataan putaran (round-robin) sesuai arahan koordinator sidang.
+            </p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1613,25 +1660,25 @@ const downloadTemplate = () => {
                     </span>
                     <span class="font-semibold text-sm text-slate-900 line-clamp-1" :title="w.nama">{{ w.nama }}</span>
                   </div>
-                  <span class="text-xs font-mono tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0" :class="w.total >= w.maxPeriod ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-teal-50 text-teal-700 border border-teal-200'">
-                    {{ w.total }} / {{ w.maxPeriod }} TA
+                  <span class="text-xs font-mono tabular-nums font-bold px-2 py-0.5 rounded-full shrink-0" :class="w.totalSessions > 0 ? 'bg-teal-50 text-teal-800 border border-teal-200' : 'bg-slate-100 text-slate-500 border border-slate-200'">
+                    {{ w.totalSessions || 0 }} Sesi ({{ w.totalTitles || w.total || 0 }} Judul)
                   </span>
                 </div>
 
-                <!-- Progress bar -->
-                <div class="w-full bg-slate-100 rounded-full h-2 mb-3 overflow-hidden">
-                  <div 
-                    class="h-2 rounded-full transition-all" 
-                    :class="w.total >= w.maxPeriod ? 'bg-amber-500' : 'bg-teal-600'"
-                    :style="{ width: `${w.percentage}%` }"
-                  ></div>
+                <!-- Status Round-Robin Badge -->
+                <div class="mb-3">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold" :class="w.totalSessions === 0 ? 'bg-slate-100 text-slate-600' : w.totalSessions === 1 ? 'bg-teal-100 text-teal-800' : 'bg-blue-100 text-blue-800'">
+                    {{ w.roundStatus }}
+                  </span>
                 </div>
 
                 <!-- Daily Breakdown -->
                 <div class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
-                  <div v-for="(cnt, d) in w.perDay" :key="d" class="flex justify-between items-center">
+                  <div v-for="(cnt, d) in (w.perDaySessions || {})" :key="d" class="flex justify-between items-center">
                     <span>{{ formatIndoDate(d) }}:</span>
-                    <span class="font-mono tabular-nums font-bold px-1.5 py-0.5 rounded" :class="cnt >= 2 ? 'text-teal-900 bg-teal-50' : 'text-slate-700'">{{ cnt }} TA</span>
+                    <span class="font-mono tabular-nums font-bold px-1.5 py-0.5 rounded" :class="cnt >= 2 ? 'text-amber-800 bg-amber-50 border border-amber-200' : cnt === 1 ? 'text-teal-900 bg-teal-50' : 'text-slate-400'">
+                      {{ cnt }} Sesi ({{ w.perDayTitles ? (w.perDayTitles[d] || 0) : 0 }} Judul)
+                    </span>
                   </div>
                 </div>
               </div>

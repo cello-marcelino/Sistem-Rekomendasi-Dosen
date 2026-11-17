@@ -1,6 +1,17 @@
 /**
- * Engine Penjadwalan Otomatis Sidang Tugas Akhir
- * Mematuhi batasan kuota harian (max 2 TA/hari) & kuota periode (max 10 TA/periode).
+ * Engine Penjadwalan Otomatis Sidang Tugas Akhir Polibatam
+ * 
+ * Aturan & Batasan Berdasarkan Instruksi Koordinator Sidang (Buk Alena Uperiati):
+ * 1. Tidak ada batas maksimal pendaftaran judul per periode (semua judul diproses).
+ * 2. 1 dosen dalam sehari menguji maksimal 2 sesi (Sesi Pagi dan Sesi Siang).
+ * 3. 1 sesi menampung 2 - 5 mahasiswa.
+ * 4. 1 mahasiswa diuji oleh 2 orang dosen penguji (Penguji 1 & Penguji 2).
+ * 5. Mahasiswa yang mengulang di periode berikutnya diperbolehkan diuji oleh dosen penguji yang sama.
+ * 6. Kapasitas judul per hari ditentukan oleh ketersediaan ruangan & kesediaan penguji.
+ * 7. Pemerataan Sesi per Periode (Workload Fairness / Round-Robin):
+ *    Prioritaskan SEMUA dosen yang eligible mendapatkan minimal 1 sesi menguji terlebih dahulu.
+ *    Jika semua dosen sudah mendapatkan sesi dan masih ada sesi tersisa, baru "muter lagi"
+ *    memberikan sesi ke-2, ke-3, dst.
  */
 
 export const DEFAULT_PERIODS = [
@@ -26,11 +37,37 @@ export const DEFAULT_PERIODS = [
 
 export const PERIOD_PRESETS = DEFAULT_PERIODS
 
+/**
+ * Konfigurasi Sesi Standar (2 Sesi per Hari: Pagi & Siang)
+ * Setiap sesi dapat menampung 2 s/d 5 mahasiswa dengan sub-slot waktu @45 menit.
+ */
 export const DEFAULT_SESSIONS = [
-  { id: 1, label: 'Sesi 1', time: '08:30 - 10:00' },
-  { id: 2, label: 'Sesi 2', time: '10:15 - 11:45' },
-  { id: 3, label: 'Sesi 3', time: '13:30 - 15:00' },
-  { id: 4, label: 'Sesi 4', time: '15:15 - 16:45' }
+  {
+    id: 1,
+    code: 'pagi',
+    label: 'Sesi Pagi',
+    time: '08:30 - 11:45',
+    subTimes: [
+      '08:30 - 09:15',
+      '09:15 - 10:00',
+      '10:15 - 11:00',
+      '11:00 - 11:45',
+      '11:45 - 12:30'
+    ]
+  },
+  {
+    id: 2,
+    code: 'siang',
+    label: 'Sesi Siang',
+    time: '13:30 - 16:45',
+    subTimes: [
+      '13:30 - 14:15',
+      '14:15 - 15:00',
+      '15:15 - 16:00',
+      '16:00 - 16:45',
+      '16:45 - 17:30'
+    ]
+  }
 ]
 
 export const DEFAULT_ROOMS = [
@@ -74,7 +111,43 @@ export function formatIndoDate(dateStr) {
 }
 
 /**
- * Algoritma Penjadwalan Berbasis Batasan Kuota & Ranking NLP
+ * Mengelompokkan proposal mahasiswa ke dalam batch sesi berkapasitas 2 - 5 orang.
+ * Mengutamakan ukuran ideal 3-4 mahasiswa per sesi secara seimbang.
+ */
+export function createSessionBatches(proposals = [], minStudents = 2, maxStudents = 5, targetStudents = 4) {
+  const n = proposals.length
+  if (n === 0) return []
+  if (n <= maxStudents) {
+    return [proposals]
+  }
+
+  // Hitung jumlah batch optimal
+  let k = Math.ceil(n / targetStudents)
+  if (Math.floor(n / k) < minStudents) {
+    k = Math.max(1, Math.floor(n / minStudents))
+  }
+  if (Math.ceil(n / k) > maxStudents) {
+    k = Math.ceil(n / maxStudents)
+  }
+
+  // Bagi rata mahasiswa ke dalam k batch
+  const batches = []
+  const base = Math.floor(n / k)
+  const rem = n % k
+  let currentIdx = 0
+
+  for (let i = 0; i < k; i++) {
+    const batchSize = base + (i < rem ? 1 : 0)
+    const batch = proposals.slice(currentIdx, currentIdx + batchSize)
+    batches.push(batch)
+    currentIdx += batchSize
+  }
+
+  return batches
+}
+
+/**
+ * Algoritma Penjadwalan Sidang TA Cerdas Berbasis Sesi & Pemerataan Round-Robin
  * 
  * @param {Array} proposals Daftar proposal / mahasiswa dengan rekomendasi penguji
  * @param {Object} options Konfigurasi penjadwalan
@@ -91,8 +164,11 @@ export function scheduleDefenses(proposals = [], options = {}) {
     endDate = '2026-10-09',
     sessions = DEFAULT_SESSIONS,
     rooms = DEFAULT_ROOMS,
-    maxPerDay = 2,
-    maxPerPeriod = 10
+    minStudentsPerSession = 2,
+    maxStudentsPerSession = 5,
+    targetStudentsPerSession = 4,
+    maxSessionsPerDay = 2, // Maksimal 2 sesi per hari (Pagi & Siang)
+    availableExaminers = [] // Daftar master dosen penguji prodi jika tersedia
   } = options
 
   const workingDays = getWorkingDays(startDate, endDate)
@@ -100,42 +176,11 @@ export function scheduleDefenses(proposals = [], options = {}) {
     throw new Error("Rentang tanggal tidak memiliki hari kerja (Senin-Jumat).")
   }
 
-  // State Pelacak Batasan (Constraint Trackers)
-  // 1. dailyCount[date][dosenNama] -> jumlah menguji per hari
-  const dailyCount = {}
-  workingDays.forEach(d => { dailyCount[d] = {} })
+  // Kumpulkan seluruh nama dosen penguji yang dikenal
+  const allExaminersSet = new Set(availableExaminers.map(e => String(e).trim()).filter(Boolean))
 
-  // 2. periodCount[dosenNama] -> total menguji dalam periode ini
-  const periodCount = {}
-
-  // 3. slotOccupancy[date_sessionId][dosenNama] -> penanda dosen sedang di ruangan lain pada sesi yang sama
-  const slotOccupancy = {}
-
-  // 4. roomOccupancy[date_sessionId_room] -> mahasiswa yang sudah terjadwal di ruangan tersebut
-  const roomOccupancy = {}
-
-  const scheduled = []
-  const unassigned = []
-  const allExaminersSet = new Set()
-
-  // Siapkan seluruh slot waktu berurutan (Date x Session x Room)
-  const availableSlots = []
-  for (const date of workingDays) {
-    for (const session of sessions) {
-      for (const room of rooms) {
-        availableSlots.push({
-          date,
-          session,
-          room,
-          slotKey: `${date}_${session.id}`,
-          roomKey: `${date}_${session.id}_${room}`
-        })
-      }
-    }
-  }
-
-  for (let pIdx = 0; pIdx < proposals.length; pIdx++) {
-    const item = proposals[pIdx]
+  // 1. Parsing & Normalisasi Setiap Proposal Mahasiswa
+  const normalizedProposals = proposals.map((item, pIdx) => {
     const keys = Object.keys(item)
     const idKey = keys.find(k => ['id', 'nim', 'no', 'nomorinduk', 'nomor'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
     const namaKey = keys.find(k => ['nama', 'namamahasiswa', 'mahasiswa', 'name'].includes(k.toLowerCase().replace(/[^a-z0-9]/g, '')))
@@ -151,7 +196,7 @@ export function scheduleDefenses(proposals = [], options = {}) {
     const noWa = (waKey && item[waKey] != null && String(item[waKey]).trim() !== '-') ? String(item[waKey]).trim() : (item.no_wa || item.no_hp || '')
     const jenisUsulan = (usulanKey && item[usulanKey] && String(item[usulanKey]).trim() !== '-') ? String(item[usulanKey]).trim() : (item.jenis_usulan || jenisSidang || 'Sidang TA2')
 
-    // 1. Ekstrak list rekomendasi dosen dari berbagai format (JSON / Excel hasil batch)
+    // Ekstrak rekomendasi penguji (S-BERT / BM25 / Excel)
     let recList = []
     if (item.rekomendasi?.recommendations) {
       recList = item.rekomendasi.recommendations
@@ -159,7 +204,6 @@ export function scheduleDefenses(proposals = [], options = {}) {
       recList = item.recommendations
     }
 
-    // Jika belum ada dari objek API, periksa kolom file Excel: 'Rekomendasi 1', 'Rekomendasi 2', dsb.
     if (recList.length === 0) {
       for (let i = 1; i <= 10; i++) {
         const rekKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === `rekomendasi${i}`)
@@ -178,7 +222,7 @@ export function scheduleDefenses(proposals = [], options = {}) {
       if (item.penguji_2) recList.push({ dosen: { nama: item.penguji_2 }, scores: { hybrid: 0.9 } })
     }
 
-    // Normalisasi kandidat dosen (buang duplikat & pembimbing)
+    // Normalisasi kandidat dosen (buang duplikat & jangan sampai pembimbing jadi penguji)
     const seenCand = new Set()
     const candidateList = []
     for (let rIdx = 0; rIdx < recList.length; rIdx++) {
@@ -195,104 +239,234 @@ export function scheduleDefenses(proposals = [], options = {}) {
       }
     }
 
-    let isAssigned = false
+    return {
+      index: pIdx,
+      id: mhsId,
+      nama: mhsNama,
+      judul,
+      pembimbing: String(pembimbing).trim() || '-',
+      noWa,
+      jenisUsulan,
+      candidates: candidateList,
+      topCandidate: candidateList[0]?.nama || ''
+    }
+  })
 
-    // Bangun pasangan penguji berurutan berdasarkan prioritas ranking: (0,1), (0,2), (1,2), (0,3), (1,3)...
-    const candidatePairs = []
-    for (let i = 0; i < candidateList.length; i++) {
-      for (let j = i + 1; j < candidateList.length; j++) {
-        candidatePairs.push({
-          p1: candidateList[i],
-          p2: candidateList[j],
-          combinedRank: candidateList[i].rank + candidateList[j].rank
+  // Pengurutan awal agar mahasiswa yang memiliki dosen pembimbing atau topik serumpun berkumpul
+  normalizedProposals.sort((a, b) => {
+    if (a.pembimbing !== b.pembimbing) return a.pembimbing.localeCompare(b.pembimbing)
+    return a.topCandidate.localeCompare(b.topCandidate)
+  })
+
+  // 2. Bagi Proposal ke Dalam Batch Sesi (2 - 5 Mahasiswa per Sesi)
+  const sessionBatches = createSessionBatches(
+    normalizedProposals, 
+    minStudentsPerSession, 
+    maxStudentsPerSession, 
+    targetStudentsPerSession
+  )
+
+  // 3. Susun Seluruh Slot Sesi yang Tersedia (Tanggal x Sesi [Pagi/Siang] x Ruangan)
+  const availableSlots = []
+  for (const date of workingDays) {
+    for (const session of sessions) {
+      for (const room of rooms) {
+        availableSlots.push({
+          date,
+          session,
+          room,
+          slotKey: `${date}_${session.id}`,
+          roomKey: `${date}_${session.id}_${room}`
         })
       }
     }
-    // Urutkan pasangan penguji berdasarkan kombinasi rank terendah (terbaik)
-    candidatePairs.sort((a, b) => a.combinedRank - b.combinedRank)
+  }
 
-    // Cari slot waktu (Date x Session x Room) dan pasangan penguji terbaik
-    for (const pair of candidatePairs) {
-      const p1Name = pair.p1.nama
-      const p2Name = pair.p2.nama
+  // 4. State Pelacak Batasan & Workload Sesi
+  // dailySessions[date][dosen] -> Jumlah sesi yang diuji dosen di tanggal tertentu (Maks 2 sesi/hari)
+  const dailySessions = {}
+  workingDays.forEach(d => { dailySessions[d] = {} })
 
-      // Cek kuota periode (max 10 TA per periode)
-      if ((periodCount[p1Name] || 0) >= maxPerPeriod) continue
-      if ((periodCount[p2Name] || 0) >= maxPerPeriod) continue
+  // periodSessions[dosen] -> Total sesi yang diuji dosen di periode ini (Untuk Pemerataan Round-Robin)
+  const periodSessions = {}
 
-      // Cari slot ruangan & jam yang kosong di hari di mana kedua dosen belum mencapai max 2 TA/hari
-      for (let sIdx = 0; sIdx < availableSlots.length; sIdx++) {
-        const slot = availableSlots[sIdx]
+  // dailyStudents[date][dosen] -> Total mahasiswa/judul yang diuji per hari
+  const dailyStudents = {}
+  workingDays.forEach(d => { dailyStudents[d] = {} })
 
-        // Jika ruangan pada slot jam tersebut sudah dipakai
-        if (roomOccupancy[slot.roomKey]) continue
+  // periodStudents[dosen] -> Total mahasiswa/judul yang diuji dalam periode ini
+  const periodStudents = {}
 
-        const date = slot.date
-        const slotKey = slot.slotKey
+  // slotOccupancy[date_sessionId] -> Set dosen yang sedang menguji di slot jam tersebut (Bebas Bentrok Ruangan)
+  const slotOccupancy = {}
 
-        // Inisialisasi slot occupancy
-        if (!slotOccupancy[slotKey]) {
-          slotOccupancy[slotKey] = new Set()
+  // roomOccupancy[date_sessionId_room] -> Penanda ruangan sudah terisi
+  const roomOccupancy = {}
+
+  const scheduled = []
+  const unassigned = []
+  const allExaminersList = Array.from(allExaminersSet)
+
+  // Helper untuk mendapatkan skor kecocokan dosen terhadap satu mahasiswa
+  const getExaminerScoreForStudent = (dosenName, student) => {
+    const cand = student.candidates.find(c => c.nama.toLowerCase() === dosenName.toLowerCase())
+    if (cand) {
+      return (cand.score || 0.5) + (10 - Math.min(10, cand.rank)) * 0.05
+    }
+    return 0.1 // Skor dasar jika dosen adalah dosen prodi namun tidak masuk top-k rekomendasi
+  }
+
+  // 5. Alokasi Setiap Batch Sesi ke Slot & Pasangan Penguji Optimal
+  let slotIndex = 0
+
+  for (let bIdx = 0; bIdx < sessionBatches.length; bIdx++) {
+    const batch = sessionBatches[bIdx]
+    const batchPembimbings = new Set(
+      batch.map(m => m.pembimbing.toLowerCase().trim()).filter(p => p && p !== '-')
+    )
+
+    let isBatchAssigned = false
+
+    // Cari slot yang kosong
+    while (slotIndex < availableSlots.length) {
+      const slot = availableSlots[slotIndex]
+      slotIndex++
+
+      if (roomOccupancy[slot.roomKey]) continue
+
+      const date = slot.date
+      const slotKey = slot.slotKey
+      if (!slotOccupancy[slotKey]) slotOccupancy[slotKey] = new Set()
+
+      // Cari kandidat dosen yang memenuhi Hard Constraints untuk slot ini
+      const eligibleExaminers = allExaminersList.filter(dosenName => {
+        const dLower = dosenName.toLowerCase().trim()
+        
+        // 1. Bukan pembimbing dari mahasiswa mana pun di sesi ini
+        if (batchPembimbings.has(dLower)) return false
+
+        // 2. Tidak sedang menguji di ruangan lain pada sesi jam yang sama
+        if (slotOccupancy[slotKey].has(dosenName)) return false
+
+        // 3. Belum melebihi batas 2 sesi per hari (Maks Sesi Pagi & Sesi Siang)
+        if ((dailySessions[date][dosenName] || 0) >= maxSessionsPerDay) return false
+
+        return true
+      })
+
+      if (eligibleExaminers.length < 2) {
+        // Tidak cukup dosen yang memenuhi syarat untuk slot ini, coba slot berikutnya
+        continue
+      }
+
+      // Bangun pasangan penguji yang mungkin & terapkan Aturan Pemerataan Round-Robin Buk Alena
+      const candidatePairs = []
+      for (let i = 0; i < eligibleExaminers.length; i++) {
+        for (let j = i + 1; j < eligibleExaminers.length; j++) {
+          const d1 = eligibleExaminers[i]
+          const d2 = eligibleExaminers[j]
+
+          const s1 = periodSessions[d1] || 0
+          const s2 = periodSessions[d2] || 0
+
+          // Aturan Inti Buk Alena:
+          // "tiap periode,,,prioritaskan semua dosen dapat sesi...kalau masih ad sisa baru muter lgi dosen dapat 2 sesi"
+          // Dosen dengan jumlah sesi paling sedikit selalu diprioritaskan terlebih dahulu.
+          const fairnessCost = (s1 + s2) * 1000 + Math.max(s1, s2) * 500
+
+          // Skor relevansi keahlian NLP dosen terhadap seluruh mahasiswa di batch ini
+          let batchNLPScore = 0
+          for (const mhs of batch) {
+            batchNLPScore += getExaminerScoreForStudent(d1, mhs)
+            batchNLPScore += getExaminerScoreForStudent(d2, mhs)
+          }
+
+          candidatePairs.push({
+            p1: d1,
+            p2: d2,
+            fairnessCost,
+            batchNLPScore,
+            // Nilai total: Minimalkan fairnessCost, maksimalkan batchNLPScore
+            totalPriority: fairnessCost - batchNLPScore
+          })
         }
+      }
 
-        // Cek apakah dosen sedang menguji di ruangan lain pada sesi jam yang sama (bentrok)
-        if (slotOccupancy[slotKey].has(p1Name) || slotOccupancy[slotKey].has(p2Name)) continue
+      // Urutkan pasangan penguji: Yang paling sedikit dapat sesi berada di urutan teratas!
+      candidatePairs.sort((a, b) => a.totalPriority - b.totalPriority)
 
-        // Cek kuota harian kedua dosen (max 2 TA/hari)
-        if ((dailyCount[date][p1Name] || 0) >= maxPerDay) continue
-        if ((dailyCount[date][p2Name] || 0) >= maxPerDay) continue
+      if (candidatePairs.length === 0) continue
 
-        // ALOKASI BERHASIL!
-        roomOccupancy[slot.roomKey] = mhsId
-        slotOccupancy[slotKey].add(p1Name)
-        slotOccupancy[slotKey].add(p2Name)
+      // Ambil pasangan penguji terbaik
+      const bestPair = candidatePairs[0]
+      const p1Name = bestPair.p1
+      const p2Name = bestPair.p2
 
-        dailyCount[date][p1Name] = (dailyCount[date][p1Name] || 0) + 1
-        dailyCount[date][p2Name] = (dailyCount[date][p2Name] || 0) + 1
+      // Tetapkan alokasi ke slot ini
+      roomOccupancy[slot.roomKey] = `BATCH-${bIdx + 1}`
+      slotOccupancy[slotKey].add(p1Name)
+      slotOccupancy[slotKey].add(p2Name)
 
-        periodCount[p1Name] = (periodCount[p1Name] || 0) + 1
-        periodCount[p2Name] = (periodCount[p2Name] || 0) + 1
+      dailySessions[date][p1Name] = (dailySessions[date][p1Name] || 0) + 1
+      dailySessions[date][p2Name] = (dailySessions[date][p2Name] || 0) + 1
+
+      periodSessions[p1Name] = (periodSessions[p1Name] || 0) + 1
+      periodSessions[p2Name] = (periodSessions[p2Name] || 0) + 1
+
+      // Jadwalkan setiap mahasiswa di dalam batch ini
+      batch.forEach((mhs, mIdx) => {
+        const subTime = slot.session.subTimes?.[mIdx] || slot.session.time
+
+        dailyStudents[date][p1Name] = (dailyStudents[date][p1Name] || 0) + 1
+        dailyStudents[date][p2Name] = (dailyStudents[date][p2Name] || 0) + 1
+
+        periodStudents[p1Name] = (periodStudents[p1Name] || 0) + 1
+        periodStudents[p2Name] = (periodStudents[p2Name] || 0) + 1
+
+        const p1Cand = mhs.candidates.find(c => c.nama.toLowerCase() === p1Name.toLowerCase())
+        const p2Cand = mhs.candidates.find(c => c.nama.toLowerCase() === p2Name.toLowerCase())
 
         scheduled.push({
-          id: `SCH-${1000 + pIdx}`,
-          mahasiswa_id: mhsId,
-          nama_mahasiswa: mhsNama,
-          no_wa: noWa,
-          jenis_usulan: jenisUsulan,
-          judul_tugas_akhir: judul,
-          pembimbing: pembimbing || '-',
+          id: `SCH-${1000 + mhs.index}`,
+          mahasiswa_id: mhs.id,
+          nama_mahasiswa: mhs.nama,
+          no_wa: mhs.noWa,
+          jenis_usulan: mhs.jenisUsulan,
+          judul_tugas_akhir: mhs.judul,
+          pembimbing: mhs.pembimbing,
           penguji_1: p1Name,
           penguji_2: p2Name,
-          penguji_1_rank: pair.p1.rank,
-          penguji_2_rank: pair.p2.rank,
-          candidates: candidateList,
+          penguji_1_rank: p1Cand?.rank || '-',
+          penguji_2_rank: p2Cand?.rank || '-',
+          candidates: mhs.candidates,
           tanggal: date,
           tanggal_indo: formatIndoDate(date),
           sesi_id: slot.session.id,
-          sesi_label: slot.session.label,
-          waktu: slot.session.time,
+          sesi_label: `${slot.session.label} (Mhs ${mIdx + 1})`,
+          sesi_utama: slot.session.label,
+          waktu: subTime,
           ruangan: slot.room,
-          period_id: periodId
+          period_id: periodId,
+          batch_id: `B-${bIdx + 1}`,
+          batch_size: batch.length
         })
+      })
 
-        isAssigned = true
-        break
-      }
-
-      if (isAssigned) break
+      isBatchAssigned = true
+      break
     }
 
-    if (!isAssigned) {
-      unassigned.push({
-        mahasiswa_id: mhsId,
-        nama_mahasiswa: mhsNama,
-        no_wa: noWa,
-        jenis_usulan: jenisUsulan,
-        judul_tugas_akhir: judul,
-        candidates: candidateList,
-        reason: candidateList.length < 2 
-          ? 'Jumlah dosen rekomendasi pada berkas kurang dari 2 orang.' 
-          : 'Dosen rekomendasi telah mencapai kuota harian (2 TA) / periode (10 TA) atau semua slot ruangan penuh.'
+    if (!isBatchAssigned) {
+      batch.forEach(mhs => {
+        unassigned.push({
+          mahasiswa_id: mhs.id,
+          nama_mahasiswa: mhs.nama,
+          no_wa: mhs.noWa,
+          jenis_usulan: mhs.jenisUsulan,
+          judul_tugas_akhir: mhs.judul,
+          candidates: mhs.candidates,
+          reason: 'Kapasitas slot ruangan sidang habis atau seluruh dosen penguji yang memenuhi kriteria telah mencapai batas 2 sesi per hari.'
+        })
       })
     }
   }
@@ -301,25 +475,41 @@ export function scheduleDefenses(proposals = [], options = {}) {
   scheduled.sort((a, b) => {
     if (a.tanggal !== b.tanggal) return a.tanggal.localeCompare(b.tanggal)
     if (a.sesi_id !== b.sesi_id) return a.sesi_id - b.sesi_id
-    return a.ruangan.localeCompare(b.ruangan)
+    if (a.ruangan !== b.ruangan) return a.ruangan.localeCompare(b.ruangan)
+    return a.waktu.localeCompare(b.waktu)
   })
 
-  // Format statistik beban menguji dosen
-  const examinerWorkload = Object.keys(periodCount).map(nama => {
-    const total = periodCount[nama] || 0
-    const perDay = {}
+  // 6. Format Rekapitulasi Beban Penguji (Workload Fairness Summary)
+  const examinerWorkload = allExaminersList.map(nama => {
+    const totalSesi = periodSessions[nama] || 0
+    const totalJudul = periodStudents[nama] || 0
+
+    const perDaySessions = {}
+    const perDayTitles = {}
     workingDays.forEach(d => {
-      perDay[d] = dailyCount[d][nama] || 0
+      perDaySessions[d] = dailySessions[d][nama] || 0
+      perDayTitles[d] = dailyStudents[d][nama] || 0
     })
+
+    let roundStatus = 'Belum Ada Sesi'
+    if (totalSesi === 1) roundStatus = 'Putaran 1 (1 Sesi)'
+    else if (totalSesi === 2) roundStatus = 'Putaran 2 (2 Sesi)'
+    else if (totalSesi > 2) roundStatus = `Putaran ${totalSesi} (${totalSesi} Sesi)`
 
     return {
       nama,
-      total,
-      maxPeriod: maxPerPeriod,
-      percentage: Math.min(100, Math.round((total / maxPerPeriod) * 100)),
-      perDay
+      totalSessions: totalSesi,
+      totalTitles: totalJudul,
+      total: totalJudul, // backward compatibility
+      roundStatus,
+      perDaySessions,
+      perDayTitles,
+      perDay: perDayTitles // backward compatibility
     }
-  }).sort((a, b) => b.total - a.total)
+  }).sort((a, b) => {
+    if (b.totalSessions !== a.totalSessions) return b.totalSessions - a.totalSessions
+    return b.totalTitles - a.totalTitles
+  })
 
   return {
     period: {
@@ -336,13 +526,17 @@ export function scheduleDefenses(proposals = [], options = {}) {
     totalRequested: proposals.length,
     totalScheduled: scheduled.length,
     totalUnassigned: unassigned.length,
+    totalSessionsScheduled: sessionBatches.length,
     scheduled,
     unassigned,
     examinerWorkload,
-    allExaminers: Array.from(allExaminersSet),
+    allExaminers: allExaminersList,
     constraints: {
-      maxPerDay,
-      maxPerPeriod
+      maxSessionsPerDay,
+      minStudentsPerSession,
+      maxStudentsPerSession,
+      targetStudentsPerSession,
+      ruleSummary: 'Maks. 2 Sesi/Hari (Pagi & Siang), 1 Sesi 2-5 Mhs, 1 Mhs 2 Penguji, Pemerataan Sesi (Round-Robin)'
     }
   }
 }
