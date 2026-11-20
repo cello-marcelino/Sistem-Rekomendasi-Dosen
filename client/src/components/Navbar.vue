@@ -17,12 +17,36 @@
           </div>
         </router-link>
 
-        <!-- Navigation Links -->
+        <!-- Navigation Links with Smooth Scroll Transition Handlers -->
         <nav class="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-slate-600">
-          <a href="#hero" class="hover:text-slate-900 transition-colors">Beranda</a>
-          <a href="#rekomendasi" class="hover:text-slate-900 transition-colors">Rekomendasi Cepat</a>
-          <a href="#metodologi" class="hover:text-slate-900 transition-colors">Metodologi</a>
-          <a href="#ekosistem" class="hover:text-slate-900 transition-colors">Ekosistem Peran</a>
+          <a
+            href="#hero"
+            @click.prevent="scrollTo('#hero')"
+            class="hover:text-teal-700 transition-colors cursor-pointer py-1"
+          >
+            Beranda
+          </a>
+          <a
+            href="#rekomendasi"
+            @click.prevent="scrollTo('#rekomendasi')"
+            class="hover:text-teal-700 transition-colors cursor-pointer py-1"
+          >
+            Rekomendasi Cepat
+          </a>
+          <a
+            href="#metodologi"
+            @click.prevent="scrollTo('#metodologi')"
+            class="hover:text-teal-700 transition-colors cursor-pointer py-1"
+          >
+            Metodologi
+          </a>
+          <a
+            href="#ekosistem"
+            @click.prevent="scrollTo('#ekosistem')"
+            class="hover:text-teal-700 transition-colors cursor-pointer py-1"
+          >
+            Ekosistem Peran
+          </a>
         </nav>
 
         <!-- Right Action Button -->
@@ -44,4 +68,24 @@
 </template>
 
 <script setup>
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+
+const scrollTo = (hash) => {
+  if (route.path !== '/') {
+    router.push({ path: '/', hash }).then(() => {
+      setTimeout(() => {
+        const el = document.querySelector(hash)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+    })
+  } else {
+    const el = document.querySelector(hash)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+}
 </script>

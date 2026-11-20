@@ -4,7 +4,7 @@
     <Navbar />
 
     <!-- 2. Sided Hero Section -->
-    <section id="hero" class="relative pt-8 pb-16 sm:pt-12 sm:pb-24 overflow-hidden">
+    <section id="hero" class="relative pt-8 pb-16 sm:pt-12 sm:pb-24 overflow-hidden scroll-mt-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
@@ -79,7 +79,7 @@
           </div>
 
           <!-- RIGHT COLUMN: Interactive Single Recommendation Widget -->
-          <div id="rekomendasi" class="lg:col-span-6">
+          <div id="rekomendasi" class="lg:col-span-6 scroll-mt-24">
             <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-7 shadow-none space-y-5">
               
               <div class="border-b border-slate-100 pb-3">
@@ -95,7 +95,7 @@
                 </p>
               </div>
 
-              <!-- Quick Topic Example Fillers (1-Click Fill) -->
+              <!-- Quick Topic Example Fillers (1-Click Fill with Active States) -->
               <div class="space-y-1.5">
                 <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Gunakan Contoh Topik:</span>
                 <div class="flex flex-wrap gap-1.5">
@@ -104,7 +104,12 @@
                     v-for="(sample, idx) in sampleTopics"
                     :key="idx"
                     @click="applySampleTopic(sample)"
-                    class="px-2.5 py-1 text-xs rounded-md border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 hover:text-teal-900 transition-colors cursor-pointer text-left font-medium"
+                    :class="[
+                      'px-2.5 py-1 text-xs rounded-md border transition-all duration-200 cursor-pointer text-left font-medium active:scale-95',
+                      form.judul === sample.judul
+                        ? 'border-teal-600 bg-teal-50 text-teal-900 font-semibold shadow-xs'
+                        : 'border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 text-slate-700'
+                    ]"
                   >
                     {{ sample.label }}
                   </button>
@@ -178,75 +183,85 @@
                 </p>
               </div>
 
-              <!-- Recommendation Results Area -->
-              <div v-if="results && results.length > 0" class="pt-4 border-t border-slate-100 space-y-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Hasil Rekomendasi Teratas:</span>
-                  <span class="text-xs font-mono text-teal-800 font-semibold">{{ results.length }} Dosen Cocok</span>
-                </div>
+              <!-- Recommendation Results Area with Smooth Fade & Progressive Staggered Slide-in -->
+              <Transition
+                enter-active-class="transition-all duration-500 ease-out"
+                enter-from-class="opacity-0 translate-y-3"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition-all duration-300 ease-in"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 translate-y-3"
+              >
+                <div v-if="results && results.length > 0" id="hasil-rekomendasi" class="pt-4 border-t border-slate-100 space-y-3 scroll-mt-24">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Hasil Rekomendasi Teratas:</span>
+                    <span class="text-xs font-mono text-teal-800 font-semibold">{{ results.length }} Dosen Cocok</span>
+                  </div>
 
-                <!-- Result Cards List -->
-                <div class="space-y-3">
-                  <div
-                    v-for="(dosen, index) in results"
-                    :key="dosen.id || index"
-                    class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 transition-colors space-y-2.5"
-                  >
-                    <div class="flex items-start justify-between gap-3">
-                      <div>
-                        <div class="flex items-center gap-2">
-                          <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center font-mono">
-                            {{ index + 1 }}
+                  <!-- Staggered Result Cards List -->
+                  <div class="space-y-3">
+                    <div
+                      v-for="(dosen, index) in results"
+                      :key="dosen.id || index"
+                      class="animate-card-fade-in p-4 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-teal-300 hover:shadow-xs transition-all duration-300 space-y-2.5"
+                      :style="{ animationDelay: `${index * 90}ms` }"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center font-mono">
+                              {{ index + 1 }}
+                            </span>
+                            <h3 class="text-sm font-bold text-slate-900">{{ dosen.nama }}</h3>
+                          </div>
+                          <div class="text-xs text-slate-500 font-mono mt-0.5">
+                            NIDN: {{ dosen.nidn || '-' }} · {{ dosen.program_studi }}
+                          </div>
+                        </div>
+
+                        <!-- Skor Kecocokan -->
+                        <div class="text-right shrink-0">
+                          <div class="text-xs font-mono font-bold text-teal-800">
+                            {{ Math.round((dosen.skor_akhir || dosen.skor || 0) * 100) }}%
+                          </div>
+                          <div class="text-[10px] text-slate-400 uppercase tracking-tight">Kecocokan</div>
+                        </div>
+                      </div>
+
+                      <!-- Bidang Keahlian -->
+                      <div v-if="dosen.bidang_keahlian" class="text-xs text-slate-700">
+                        <span class="text-slate-400 font-medium">Keahlian:</span> {{ dosen.bidang_keahlian }}
+                      </div>
+
+                      <!-- Irisan Kata Kunci (NO XAI label) -->
+                      <div v-if="dosen.irisan_kata && dosen.irisan_kata.length > 0" class="space-y-1 pt-1">
+                        <div class="text-[11px] text-slate-500 font-medium">Irisan Kata Kunci yang Cocok:</div>
+                        <div class="flex flex-wrap gap-1">
+                          <span
+                            v-for="(kata, kIdx) in dosen.irisan_kata.slice(0, 5)"
+                            :key="kIdx"
+                            class="px-2 py-0.5 rounded text-[11px] font-mono bg-teal-50 border border-teal-200 text-teal-800"
+                          >
+                            {{ kata }}
                           </span>
-                          <h3 class="text-sm font-bold text-slate-900">{{ dosen.nama }}</h3>
-                        </div>
-                        <div class="text-xs text-slate-500 font-mono mt-0.5">
-                          NIDN: {{ dosen.nidn || '-' }} · {{ dosen.program_studi }}
                         </div>
                       </div>
 
-                      <!-- Skor Kecocokan -->
-                      <div class="text-right shrink-0">
-                        <div class="text-xs font-mono font-bold text-teal-800">
-                          {{ Math.round((dosen.skor_akhir || dosen.skor || 0) * 100) }}%
-                        </div>
-                        <div class="text-[10px] text-slate-400 uppercase tracking-tight">Kecocokan</div>
-                      </div>
-                    </div>
-
-                    <!-- Bidang Keahlian -->
-                    <div v-if="dosen.bidang_keahlian" class="text-xs text-slate-700">
-                      <span class="text-slate-400 font-medium">Keahlian:</span> {{ dosen.bidang_keahlian }}
-                    </div>
-
-                    <!-- Irisan Kata Kunci (NO XAI label) -->
-                    <div v-if="dosen.irisan_kata && dosen.irisan_kata.length > 0" class="space-y-1 pt-1">
-                      <div class="text-[11px] text-slate-500 font-medium">Irisan Kata Kunci yang Cocok:</div>
-                      <div class="flex flex-wrap gap-1">
-                        <span
-                          v-for="(kata, kIdx) in dosen.irisan_kata.slice(0, 5)"
-                          :key="kIdx"
-                          class="px-2 py-0.5 rounded text-[11px] font-mono bg-teal-50 border border-teal-200 text-teal-800"
+                      <!-- CTA Pengajuan Bimbingan -->
+                      <div class="pt-2 flex justify-end">
+                        <button
+                          type="button"
+                          @click="handleRequestBimbingan(dosen)"
+                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-white border border-slate-300 hover:border-teal-600 text-slate-800 hover:text-teal-700 hover:shadow-xs transition-all duration-200 cursor-pointer active:scale-95"
                         >
-                          {{ kata }}
-                        </span>
+                          <IconPaperAirplane customClass="w-3.5 h-3.5 text-teal-700" />
+                          <span>Ajukan Rencana Bimbingan</span>
+                        </button>
                       </div>
-                    </div>
-
-                    <!-- CTA Pengajuan Bimbingan -->
-                    <div class="pt-2 flex justify-end">
-                      <button
-                        type="button"
-                        @click="handleRequestBimbingan(dosen)"
-                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-white border border-slate-300 hover:border-teal-600 text-slate-800 hover:text-teal-700 transition-colors cursor-pointer"
-                      >
-                        <IconPaperAirplane customClass="w-3.5 h-3.5 text-teal-700" />
-                        <span>Ajukan Rencana Bimbingan</span>
-                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Transition>
 
             </div>
           </div>
@@ -326,7 +341,7 @@
     </section>
 
     <!-- 4. Three Roles Ecosystem Section -->
-    <section id="ekosistem" class="py-16">
+    <section id="ekosistem" class="py-16 scroll-mt-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div class="text-center max-w-2xl mx-auto space-y-2">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
@@ -389,51 +404,60 @@
       </div>
     </footer>
 
-    <!-- Informational Modal for Bimbingan Request in Demo Mode -->
-    <div
-      v-if="activeBimbinganModal"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
+    <!-- Informational Modal for Bimbingan Request in Demo Mode with Smooth Fade & Scale Transition -->
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
-      <div class="bg-white rounded-xl border border-slate-200 max-w-md w-full p-6 space-y-4">
-        <div class="flex items-start justify-between">
-          <div class="flex items-center gap-2">
-            <IconPaperAirplane customClass="w-5 h-5 text-teal-700" />
-            <h3 class="text-base font-bold text-slate-900">Pengajuan Bimbingan</h3>
+      <div
+        v-if="activeBimbinganModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+      >
+        <div class="bg-white rounded-xl border border-slate-200 max-w-md w-full p-6 shadow-xl space-y-4 transform transition-all duration-300 scale-100">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-2">
+              <IconPaperAirplane customClass="w-5 h-5 text-teal-700" />
+              <h3 class="text-base font-bold text-slate-900">Pengajuan Bimbingan</h3>
+            </div>
+            <button
+              @click="activeBimbinganModal = null"
+              class="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer text-lg leading-none"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            @click="activeBimbinganModal = null"
-            class="text-slate-400 hover:text-slate-700 cursor-pointer"
-          >
-            ✕
-          </button>
-        </div>
 
-        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-          Anda akan mengajukan bimbingan kepada <strong class="text-slate-900">{{ activeBimbinganModal.nama }}</strong> untuk topik penelitian:
-        </p>
-        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs font-medium text-slate-800">
-          "{{ form.judul || 'Judul Penelitian Belum Ditentukan' }}"
-        </div>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Anda akan mengajukan bimbingan kepada <strong class="text-slate-900">{{ activeBimbinganModal.nama }}</strong> untuk topik penelitian:
+          </p>
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs font-medium text-slate-800">
+            "{{ form.judul || 'Judul Penelitian Belum Ditentukan' }}"
+          </div>
 
-        <p class="text-xs text-slate-500">
-          Fitur autentikasi dan pengiriman bimbingan langsung ke akun dosen akan aktif pada rilis portal bimbingan.
-        </p>
+          <p class="text-xs text-slate-500">
+            Fitur autentikasi dan pengiriman bimbingan langsung ke akun dosen akan aktif pada rilis portal bimbingan.
+          </p>
 
-        <div class="flex justify-end gap-2 pt-2">
-          <button
-            @click="activeBimbinganModal = null"
-            class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"
-          >
-            Tutup
-          </button>
+          <div class="flex justify-end gap-2 pt-2">
+            <button
+              @click="activeBimbinganModal = null"
+              class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              Tutup
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, nextTick } from 'vue'
 import Navbar from '../components/Navbar.vue'
 import IconSearch from '../components/icons/IconSearch.vue'
 import IconBookOpen from '../components/icons/IconBookOpen.vue'
@@ -521,6 +545,15 @@ const handleSearch = async () => {
           irisan_kata: irisan
         }
       })
+
+      // Smooth scroll gently to reveal results
+      if (results.value.length > 0) {
+        await nextTick()
+        const el = document.getElementById('hasil-rekomendasi')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }
+      }
     } else {
       errorMessage.value = res.message || 'Tidak ada rekomendasi yang ditemukan untuk topik ini.'
     }
