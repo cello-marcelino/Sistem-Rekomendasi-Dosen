@@ -28,10 +28,10 @@
               Memadukan pendekatan leksikal dan kecocokan semantik untuk menemukan dosen pembimbing tugas akhir yang paling relevan dengan arah penelitian mahasiswa secara objektif dan akurat.
             </p>
 
-            <!-- 3 Core Value Items (Clean Card Stack) -->
-            <div class="space-y-3 pt-1">
-              <div class="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-[0_4px_20px_rgba(30,58,109,0.04)] flex items-start gap-3">
-                <div class="p-1.5 rounded-lg bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] shrink-0 mt-0.5">
+            <!-- 3 Core Value Items (Unboxed Editorial List - Versi Lama) -->
+            <div class="space-y-3 pt-3 border-t border-[#E2E8F0]">
+              <div class="flex items-start gap-3">
+                <div class="mt-0.5 p-1 rounded-md bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] shrink-0">
                   <IconCheckCircle customClass="w-4 h-4 text-[#1E3A6D]" />
                 </div>
                 <div>
@@ -40,8 +40,8 @@
                 </div>
               </div>
 
-              <div class="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-[0_4px_20px_rgba(30,58,109,0.04)] flex items-start gap-3">
-                <div class="p-1.5 rounded-lg bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] shrink-0 mt-0.5">
+              <div class="flex items-start gap-3">
+                <div class="mt-0.5 p-1 rounded-md bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] shrink-0">
                   <IconClock customClass="w-4 h-4 text-[#1E3A6D]" />
                 </div>
                 <div>
@@ -50,8 +50,8 @@
                 </div>
               </div>
 
-              <div class="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-[0_4px_20px_rgba(30,58,109,0.04)] flex items-start gap-3">
-                <div class="p-1.5 rounded-lg bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] shrink-0 mt-0.5">
+              <div class="flex items-start gap-3">
+                <div class="mt-0.5 p-1 rounded-md bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] shrink-0">
                   <IconCpuChip customClass="w-4 h-4 text-[#1E3A6D]" />
                 </div>
                 <div>
