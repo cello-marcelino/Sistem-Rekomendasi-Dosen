@@ -12,6 +12,7 @@ class Dosen:
     judul_bimbing: str
     judul_uji: str
     pendidikan: str
+    email: Optional[str] = None
     id: Optional[int] = None
     
     def to_dict(self) -> Dict[str, Any]:
@@ -19,6 +20,7 @@ class Dosen:
             "id": self.id,
             "nidn": self.nidn,
             "nama": self.nama,
+            "email": self.email or "",
             "program_studi": self.program_studi,
             "bidang_keahlian": self.bidang_keahlian,
             "jurnal": self.jurnal,

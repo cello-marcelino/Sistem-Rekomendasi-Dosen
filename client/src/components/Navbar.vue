@@ -17,22 +17,22 @@
           </div>
         </router-link>
 
-        <!-- Navigation Links with Smooth Scroll Transition Handlers -->
+        <!-- Navigation Links -->
         <nav class="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-slate-600">
-          <a
-            href="#hero"
-            @click.prevent="scrollTo('#hero')"
-            class="hover:text-teal-700 transition-colors cursor-pointer py-1"
+          <router-link
+            to="/"
+            class="hover:text-teal-700 transition-colors py-1"
+            :class="{ 'text-teal-800 font-semibold': $route.path === '/' && !$route.hash }"
           >
             Beranda
-          </a>
-          <a
-            href="#rekomendasi"
-            @click.prevent="scrollTo('#rekomendasi')"
-            class="hover:text-teal-700 transition-colors cursor-pointer py-1"
+          </router-link>
+          <router-link
+            to="/dosen"
+            class="hover:text-teal-700 transition-colors py-1"
+            :class="{ 'text-teal-800 font-semibold': $route.path === '/dosen' }"
           >
-            Rekomendasi Cepat
-          </a>
+            Dosen & Pembimbing
+          </router-link>
           <a
             href="#metodologi"
             @click.prevent="scrollTo('#metodologi')"

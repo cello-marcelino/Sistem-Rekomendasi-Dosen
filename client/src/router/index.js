@@ -12,6 +12,14 @@ const routes = [
     }
   },
   {
+    path: '/dosen',
+    name: 'dosen',
+    component: () => import('../views/DosenView.vue'),
+    meta: {
+      title: 'Direktori & Rekomendasi Dosen — SiReDo'
+    }
+  },
+  {
     path: '/login',
     name: 'login',
     component: LoginView,

@@ -50,6 +50,7 @@ class AdminDosenController:
         record = {
             "nidn": data.get("nidn", ""),
             "nama": nama,
+            "email": data.get("email", ""),
             "program_studi": prodi,
             "bidang_keahlian": data.get("bidang_keahlian", ""),
             "pendidikan": data.get("pendidikan", ""),
@@ -79,6 +80,7 @@ class AdminDosenController:
         record = {
             "nidn": data.get("nidn", ""),
             "nama": nama,
+            "email": data.get("email", ""),
             "program_studi": data.get("program_studi", "Teknik Informatika"),
             "bidang_keahlian": data.get("bidang_keahlian", ""),
             "pendidikan": data.get("pendidikan", ""),

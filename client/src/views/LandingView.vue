@@ -4,12 +4,12 @@
     <Navbar />
 
     <!-- 2. Sided Hero Section -->
-    <section id="hero" class="relative pt-8 pb-16 sm:pt-12 sm:pb-24 overflow-hidden scroll-mt-20">
+    <section id="hero" class="relative pt-8 pb-16 sm:pt-12 sm:pb-20 overflow-hidden scroll-mt-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           <!-- LEFT COLUMN: Value Proposition & System Identity -->
-          <div class="lg:col-span-6 space-y-6 lg:pt-4">
+          <div class="lg:col-span-6 space-y-6">
             <!-- Micro-Badge: System Philosophy (NO version badge) -->
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/90 border border-slate-200 text-slate-800">
               <span class="w-2 h-2 rounded-full bg-teal-600 animate-pulse"></span>
@@ -28,8 +28,25 @@
               Memadukan pendekatan leksikal dan kecocokan semantik untuk menemukan dosen pembimbing tugas akhir yang paling relevan dengan arah penelitian mahasiswa secara objektif dan akurat.
             </p>
 
+            <!-- Call to Actions -->
+            <div class="flex flex-wrap items-center gap-3 pt-1">
+              <router-link
+                to="/dosen"
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm transition-all duration-200 shadow-xs hover:shadow-sm group cursor-pointer active:scale-95"
+              >
+                <span>Cari & Rekomendasi Dosen</span>
+                <IconArrowRight customClass="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </router-link>
+              <a
+                href="#metodologi"
+                class="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-300 hover:border-slate-400 text-slate-700 hover:text-slate-900 font-semibold text-sm transition-colors cursor-pointer"
+              >
+                <span>Pelajari Metodologi</span>
+              </a>
+            </div>
+
             <!-- 3 Core Value Items (Flowbite Outline Icons) -->
-            <div class="space-y-3 pt-2">
+            <div class="space-y-3 pt-3 border-t border-slate-200/80">
               <div class="flex items-start gap-3">
                 <div class="mt-0.5 p-1 rounded-md bg-teal-50 border border-teal-200/80 text-teal-800 shrink-0">
                   <IconCheckCircle customClass="w-4 h-4" />
@@ -62,7 +79,7 @@
             </div>
 
             <!-- Live Institutional Counter (High Contrast Tabular) -->
-            <div class="pt-4 border-t border-slate-200/80 grid grid-cols-3 gap-4">
+            <div class="pt-3 border-t border-slate-200/80 grid grid-cols-3 gap-4">
               <div>
                 <div class="text-xl sm:text-2xl font-black font-mono tabular-nums text-slate-900">86</div>
                 <div class="text-[11px] uppercase tracking-wider text-slate-500 font-medium">Dosen Aktif</div>
@@ -78,192 +95,65 @@
             </div>
           </div>
 
-          <!-- RIGHT COLUMN: Interactive Single Recommendation Widget -->
-          <div id="rekomendasi" class="lg:col-span-6 scroll-mt-24">
-            <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-7 shadow-none space-y-5">
-              
-              <div class="border-b border-slate-100 pb-3">
-                <div class="flex items-center justify-between">
-                  <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <IconSearch customClass="w-5 h-5 text-teal-700" />
-                    <span>Simulasi Rekomendasi Dosen</span>
-                  </h2>
-                  <span class="text-xs font-mono text-slate-400">Input Mandiri</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-1">
-                  Ketikkan rencana judul dan abstrak tugas akhir Anda untuk melihat kandidat dosen yang memiliki keselarasan kepakaran.
-                </p>
-              </div>
-
-              <!-- Quick Topic Example Fillers (1-Click Fill with Active States) -->
-              <div class="space-y-1.5">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Gunakan Contoh Topik:</span>
-                <div class="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    v-for="(sample, idx) in sampleTopics"
-                    :key="idx"
-                    @click="applySampleTopic(sample)"
-                    :class="[
-                      'px-2.5 py-1 text-xs rounded-md border transition-all duration-200 cursor-pointer text-left font-medium active:scale-95',
-                      form.judul === sample.judul
-                        ? 'border-teal-600 bg-teal-50 text-teal-900 font-semibold shadow-xs'
-                        : 'border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 text-slate-700'
-                    ]"
-                  >
-                    {{ sample.label }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Input Form -->
-              <form @submit.prevent="handleSearch" class="space-y-4">
-                <!-- Judul Input -->
-                <div class="space-y-1">
-                  <label for="judul" class="block text-xs font-semibold text-slate-700">
-                    Judul Proyek / Tugas Akhir
-                  </label>
-                  <input
-                    id="judul"
-                    v-model="form.judul"
-                    type="text"
-                    required
-                    placeholder="Contoh: Implementasi Deep Learning untuk Klasifikasi Citra Medis"
-                    class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-700 transition-colors"
-                  />
-                </div>
-
-                <!-- Abstrak Input -->
-                <div class="space-y-1">
-                  <label for="abstrak" class="block text-xs font-semibold text-slate-700">
-                    Abstrak / Uraian Rencana Penelitian
-                  </label>
-                  <textarea
-                    id="abstrak"
-                    v-model="form.abstrak"
-                    rows="4"
-                    required
-                    placeholder="Jelaskan latar belakang, metode yang diajukan, dataset, dan tujuan utama penelitian secara ringkas..."
-                    class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-700 transition-colors resize-y"
-                  ></textarea>
-                </div>
-
-                <!-- Action Button -->
-                <div class="pt-1">
-                  <button
-                    type="submit"
-                    :disabled="isLoading"
-                    class="w-full py-2.5 px-4 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    <template v-if="isLoading">
-                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>Menganalisis Kecocokan Dosen...</span>
-                    </template>
-                    <template v-else>
-                      <IconSearch customClass="w-4 h-4" />
-                      <span>Analisis & Rekomendasikan Dosen</span>
-                    </template>
-                  </button>
-                </div>
-              </form>
-
-              <!-- Error Alert -->
-              <div v-if="errorMessage" class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs">
-                {{ errorMessage }}
-              </div>
-
-              <!-- Empty Results Notice -->
-              <div v-if="results && results.length === 0" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-900 text-xs space-y-1">
-                <div class="font-bold">Tidak Ada Dosen yang Memenuhi Ambang Batas</div>
-                <p class="text-amber-800 leading-relaxed">
-                  Tidak ditemukan dosen dengan irisan kata kunci yang memenuhi skor minimum untuk topik ini. Silakan tambahkan istilah teknis atau bidang keahlian pada judul/abstrak Anda.
-                </p>
-              </div>
-
-              <!-- Recommendation Results Area with Smooth Fade & Progressive Staggered Slide-in -->
-              <Transition
-                enter-active-class="transition-all duration-500 ease-out"
-                enter-from-class="opacity-0 translate-y-3"
-                enter-to-class="opacity-100 translate-y-0"
-                leave-active-class="transition-all duration-300 ease-in"
-                leave-from-class="opacity-100 translate-y-0"
-                leave-to-class="opacity-0 translate-y-3"
-              >
-                <div v-if="results && results.length > 0" id="hasil-rekomendasi" class="pt-4 border-t border-slate-100 space-y-3 scroll-mt-24">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Hasil Rekomendasi Teratas:</span>
-                    <span class="text-xs font-mono text-teal-800 font-semibold">{{ results.length }} Dosen Cocok</span>
+          <!-- RIGHT COLUMN: 2-Mode Feature Showcase Cards -->
+          <div class="lg:col-span-6 space-y-4">
+            
+            <!-- Showcase Card 1: Direktori Manual -->
+            <router-link
+              to="/dosen?mode=manual"
+              class="block p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-teal-400 hover:shadow-sm transition-all duration-300 group"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-800">
+                    <IconUsers customClass="w-4 h-4 text-teal-700" />
+                    <span>Mode 1: Direktori Dosen Manual</span>
                   </div>
-
-                  <!-- Staggered Result Cards List -->
-                  <div class="space-y-3">
-                    <div
-                      v-for="(dosen, index) in results"
-                      :key="dosen.id || index"
-                      class="animate-card-fade-in p-4 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-teal-300 hover:shadow-xs transition-all duration-300 space-y-2.5"
-                      :style="{ animationDelay: `${index * 90}ms` }"
-                    >
-                      <div class="flex items-start justify-between gap-3">
-                        <div>
-                          <div class="flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center font-mono">
-                              {{ index + 1 }}
-                            </span>
-                            <h3 class="text-sm font-bold text-slate-900">{{ dosen.nama }}</h3>
-                          </div>
-                          <div class="text-xs text-slate-500 font-mono mt-0.5">
-                            NIDN: {{ dosen.nidn || '-' }} · {{ dosen.program_studi }}
-                          </div>
-                        </div>
-
-                        <!-- Skor Kecocokan -->
-                        <div class="text-right shrink-0">
-                          <div class="text-xs font-mono font-bold text-teal-800">
-                            {{ Math.round((dosen.skor_akhir || dosen.skor || 0) * 100) }}%
-                          </div>
-                          <div class="text-[10px] text-slate-400 uppercase tracking-tight">Kecocokan</div>
-                        </div>
-                      </div>
-
-                      <!-- Bidang Keahlian -->
-                      <div v-if="dosen.bidang_keahlian" class="text-xs text-slate-700">
-                        <span class="text-slate-400 font-medium">Keahlian:</span> {{ dosen.bidang_keahlian }}
-                      </div>
-
-                      <!-- Irisan Kata Kunci (NO XAI label) -->
-                      <div v-if="dosen.irisan_kata && dosen.irisan_kata.length > 0" class="space-y-1 pt-1">
-                        <div class="text-[11px] text-slate-500 font-medium">Irisan Kata Kunci yang Cocok:</div>
-                        <div class="flex flex-wrap gap-1">
-                          <span
-                            v-for="(kata, kIdx) in dosen.irisan_kata.slice(0, 5)"
-                            :key="kIdx"
-                            class="px-2 py-0.5 rounded text-[11px] font-mono bg-teal-50 border border-teal-200 text-teal-800"
-                          >
-                            {{ kata }}
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- CTA Pengajuan Bimbingan -->
-                      <div class="pt-2 flex justify-end">
-                        <button
-                          type="button"
-                          @click="handleRequestBimbingan(dosen)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-white border border-slate-300 hover:border-teal-600 text-slate-800 hover:text-teal-700 hover:shadow-xs transition-all duration-200 cursor-pointer active:scale-95"
-                        >
-                          <IconPaperAirplane customClass="w-3.5 h-3.5 text-teal-700" />
-                          <span>Ajukan Rencana Bimbingan</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
+                    Eksplorasi Direktori & Filter Domain IT
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                    Akses tabel lengkap profil 86 dosen jurusan. Filter cepat berdasarkan rumpun kepakaran IT (RPL, AI, Cybersecurity, IoT, Multimedia, Sistem Informasi) dan ajukan rencana pembimbing langsung dari baris data.
+                  </p>
                 </div>
-              </Transition>
+                <div class="p-2 rounded-xl bg-slate-50 group-hover:bg-teal-50 text-slate-400 group-hover:text-teal-700 transition-colors shrink-0">
+                  <IconArrowRight customClass="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span>Filter 6 Rumpun Keahlian IT</span>
+                <span class="text-teal-700 font-semibold group-hover:underline">Buka Data Table &rarr;</span>
+              </div>
+            </router-link>
 
-            </div>
+            <!-- Showcase Card 2: Rekomendasi Top-K -->
+            <router-link
+              to="/dosen?mode=rekomendasi"
+              class="block p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 hover:border-teal-400 hover:shadow-sm transition-all duration-300 group"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-800">
+                    <IconCpuChip customClass="w-4 h-4 text-teal-700" />
+                    <span>Mode 2: Rekomendasi Cerdas Proyek</span>
+                  </div>
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
+                    Analisis Topik Proyek & Peringkat Top-K
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                    Ketikkan draf judul dan uraian abstrak penelitian Anda. Mesin komputasi NLP mengevaluasi irisan istilah leksikal BM25 dan representasi semantik SBERT untuk merekomendasikan dosen paling selaras secara otomatis.
+                  </p>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-50 group-hover:bg-teal-50 text-slate-400 group-hover:text-teal-700 transition-colors shrink-0">
+                  <IconArrowRight customClass="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span>Skor Kecocokan % & Irisan Istilah</span>
+                <span class="text-teal-700 font-semibold group-hover:underline">Mulai Analisis Proyek &rarr;</span>
+              </div>
+            </router-link>
+
           </div>
 
         </div>
@@ -271,7 +161,7 @@
     </section>
 
     <!-- 3. Methodology Section: Dual-Engine Hybrid NLP (Side-by-Side: Diagram | Narasi) -->
-    <section id="metodologi" class="py-12 sm:py-16 bg-white border-y border-slate-200/80">
+    <section id="metodologi" class="py-12 sm:py-16 bg-white border-y border-slate-200/80 scroll-mt-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
         
         <!-- Section Header -->
@@ -296,6 +186,9 @@
                 class="w-full h-auto object-contain mx-auto max-h-[280px] sm:max-h-[320px]"
                 loading="lazy"
               />
+            </div>
+            <div class="text-[11px] text-slate-400 text-center font-mono">
+              Diagram Alur BM25 Leksikal, SBERT Semantik, dan Penggabungan Skor
             </div>
           </div>
 
@@ -403,63 +296,11 @@
         </div>
       </div>
     </footer>
-
-    <!-- Informational Modal for Bimbingan Request in Demo Mode with Smooth Fade & Scale Transition -->
-    <Transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div
-        v-if="activeBimbinganModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs transition-opacity"
-      >
-        <div class="bg-white rounded-xl border border-slate-200 max-w-md w-full p-6 shadow-xl space-y-4 transform transition-all duration-300 scale-100">
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-2">
-              <IconPaperAirplane customClass="w-5 h-5 text-teal-700" />
-              <h3 class="text-base font-bold text-slate-900">Pengajuan Bimbingan</h3>
-            </div>
-            <button
-              @click="activeBimbinganModal = null"
-              class="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer text-lg leading-none"
-            >
-              ✕
-            </button>
-          </div>
-
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            Anda akan mengajukan bimbingan kepada <strong class="text-slate-900">{{ activeBimbinganModal.nama }}</strong> untuk topik penelitian:
-          </p>
-          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs font-medium text-slate-800">
-            "{{ form.judul || 'Judul Penelitian Belum Ditentukan' }}"
-          </div>
-
-          <p class="text-xs text-slate-500">
-            Fitur autentikasi dan pengiriman bimbingan langsung ke akun dosen akan aktif pada rilis portal bimbingan.
-          </p>
-
-          <div class="flex justify-end gap-2 pt-2">
-            <button
-              @click="activeBimbinganModal = null"
-              class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              Tutup
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, nextTick } from 'vue'
 import Navbar from '../components/Navbar.vue'
-import IconSearch from '../components/icons/IconSearch.vue'
 import IconBookOpen from '../components/icons/IconBookOpen.vue'
 import IconClock from '../components/icons/IconClock.vue'
 import IconCheckCircle from '../components/icons/IconCheckCircle.vue'
@@ -467,104 +308,6 @@ import IconCpuChip from '../components/icons/IconCpuChip.vue'
 import IconUsers from '../components/icons/IconUsers.vue'
 import IconUserGraduate from '../components/icons/IconUserGraduate.vue'
 import IconShieldCheck from '../components/icons/IconShieldCheck.vue'
-import IconPaperAirplane from '../components/icons/IconPaperAirplane.vue'
-import { recommendationService } from '../services/api.js'
+import IconArrowRight from '../components/icons/IconArrowRight.vue'
 import diagramImg from '../assets/diagram-alur.png'
-
-// Form State
-const form = reactive({
-  judul: '',
-  abstrak: ''
-})
-
-const isLoading = ref(false)
-const errorMessage = ref('')
-const results = ref(null)
-const activeBimbinganModal = ref(null)
-
-// 1-Click Sample Topics
-const sampleTopics = [
-  {
-    label: 'Computer Vision YOLO',
-    judul: 'Deteksi Pelanggaran Helm Pengendara Motor Menggunakan Algoritma YOLOv8',
-    abstrak: 'Penelitian ini mengembangkan sistem deteksi otomatis penggunaan helm pengendara sepeda motor berbasis pengolahan citra dan deep learning. Algoritma YOLOv8 dilatih dengan dataset rekaman CCTV jalan raya untuk mengenali pengendara tanpa helm secara real-time.'
-  },
-  {
-    label: 'NLP IndoBERT',
-    judul: 'Analisis Sentimen Opini Publik terhadap Layanan Transportasi Menggunakan IndoBERT',
-    abstrak: 'Penelitian ini mengklasifikasikan sentimen pengguna media sosial terhadap efektivitas transportasi publik kota. Model IndoBERT digunakan untuk menangani variasi bahasa gaul dan konteks kalimat bahasa Indonesia dengan akurasi klasifikasi multi-kelas.'
-  },
-  {
-    label: 'IoT Smart Agriculture',
-    judul: 'Sistem Monitoring Kelembapan Tanah dan Penyiraman Otomatis Berbasis IoT dan NodeMCU',
-    abstrak: 'Membangun purwarupa otomasi penyiraman tanaman dengan memanfaatkan sensor kelembapan tanah, mikrokontroler NodeMCU ESP8266, dan protokol MQTT untuk pemantauan data real-time pada dashboard web.'
-  }
-]
-
-const applySampleTopic = (sample) => {
-  form.judul = sample.judul
-  form.abstrak = sample.abstrak
-  errorMessage.value = ''
-}
-
-const handleSearch = async () => {
-  if (!form.judul.trim() || !form.abstrak.trim()) {
-    errorMessage.value = 'Harap isi judul dan abstrak penelitian terlebih dahulu.'
-    return
-  }
-
-  isLoading.value = true
-  errorMessage.value = ''
-  results.value = null
-
-  try {
-    const res = await recommendationService.getSingleRecommendation({
-      judul: form.judul,
-      abstrak: form.abstrak,
-      k_rank: 5
-    })
-
-    if (res.success && res.data) {
-      // Backend returns standard envelope: { metadata, pipeline, recommendations: [...] }
-      const rawList = res.data.recommendations || res.data.rekomendasi || (Array.isArray(res.data) ? res.data : [])
-      
-      results.value = rawList.map((item, idx) => {
-        const dosenData = item.dosen || item
-        const hybridScore = item.scores?.hybrid ?? item.skor_akhir ?? item.skor ?? item.scores?.final ?? 0
-        const irisan = item.xai?.irisan_kata || item.irisan_kata || []
-        
-        return {
-          id: dosenData.id || `rec-${idx}`,
-          rank: item.rank || idx + 1,
-          nama: dosenData.nama || 'Nama Dosen',
-          nidn: dosenData.nidn || '-',
-          program_studi: dosenData.program_studi || '-',
-          bidang_keahlian: dosenData.bidang_keahlian || '',
-          skor_akhir: hybridScore,
-          scores: item.scores || {},
-          irisan_kata: irisan
-        }
-      })
-
-      // Smooth scroll gently to reveal results
-      if (results.value.length > 0) {
-        await nextTick()
-        const el = document.getElementById('hasil-rekomendasi')
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        }
-      }
-    } else {
-      errorMessage.value = res.message || 'Tidak ada rekomendasi yang ditemukan untuk topik ini.'
-    }
-  } catch (err) {
-    errorMessage.value = err.userMessage || 'Gagal terhubung ke engine rekomendasi. Pastikan server aktif.'
-  } finally {
-    isLoading.value = false
-  }
-}
-
-const handleRequestBimbingan = (dosen) => {
-  activeBimbinganModal.value = dosen
-}
 </script>

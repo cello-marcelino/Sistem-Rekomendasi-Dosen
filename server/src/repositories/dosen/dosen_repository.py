@@ -36,7 +36,7 @@ class SQLDosenRepository(DosenRepositoryInterface):
             cursor = conn.cursor() if is_sqlite else conn.cursor(dictionary=True)
             
             # 1. Fetch all lecturers
-            cursor.execute("SELECT id, nidn, nama, program_studi, bidang_keahlian, pendidikan FROM dosen ORDER BY id ASC")
+            cursor.execute("SELECT id, nidn, nama, email, program_studi, bidang_keahlian, pendidikan FROM dosen ORDER BY id ASC")
             dosen_rows = cursor.fetchall()
             
             if not dosen_rows:
@@ -81,9 +81,10 @@ class SQLDosenRepository(DosenRepositoryInterface):
                 d_id = row['id'] if isinstance(row, dict) or hasattr(row, 'keys') else row[0]
                 nidn = row['nidn'] if isinstance(row, dict) or hasattr(row, 'keys') else row[1]
                 nama = row['nama'] if isinstance(row, dict) or hasattr(row, 'keys') else row[2]
-                prodi = row['program_studi'] if isinstance(row, dict) or hasattr(row, 'keys') else row[3]
-                keahlian = row['bidang_keahlian'] if isinstance(row, dict) or hasattr(row, 'keys') else row[4]
-                pendidikan = row['pendidikan'] if isinstance(row, dict) or hasattr(row, 'keys') else row[5]
+                email = row['email'] if isinstance(row, dict) or hasattr(row, 'keys') else (row[3] if len(row) > 6 else "")
+                prodi = row['program_studi'] if isinstance(row, dict) or hasattr(row, 'keys') else (row[4] if len(row) > 6 else row[3])
+                keahlian = row['bidang_keahlian'] if isinstance(row, dict) or hasattr(row, 'keys') else (row[5] if len(row) > 6 else row[4])
+                pendidikan = row['pendidikan'] if isinstance(row, dict) or hasattr(row, 'keys') else (row[6] if len(row) > 6 else row[5])
                 
                 jurnal_str = format_list_to_quoted_str(publikasi_map.get(d_id, []))
                 bimb_str = format_list_to_quoted_str(bimbingan_map.get(d_id, []))
@@ -98,7 +99,8 @@ class SQLDosenRepository(DosenRepositoryInterface):
                     jurnal=jurnal_str,
                     judul_bimbing=bimb_str,
                     judul_uji=uji_str,
-                    pendidikan=str(pendidikan or '')
+                    pendidikan=str(pendidikan or ''),
+                    email=str(email or '')
                 ))
                 
             logger.info(f"Berhasil memuat {len(dosen_list)} data dosen dari database relasional ({driver_name}).")
@@ -130,11 +132,12 @@ class SQLDosenRepository(DosenRepositoryInterface):
             for item in validated_records:
                 # 1. Insert master dosen
                 cursor.execute(
-                    f"INSERT INTO dosen (nidn, nama, program_studi, bidang_keahlian, pendidikan) "
-                    f"VALUES ({param_char}, {param_char}, {param_char}, {param_char}, {param_char})",
+                    f"INSERT INTO dosen (nidn, nama, email, program_studi, bidang_keahlian, pendidikan) "
+                    f"VALUES ({param_char}, {param_char}, {param_char}, {param_char}, {param_char}, {param_char})",
                     (
                         item.get('nidn'),
                         item.get('nama'),
+                        item.get('email') or None,
                         item.get('program_studi', 'Informatika'),
                         item.get('bidang_keahlian', ''),
                         item.get('pendidikan', '')
@@ -203,11 +206,12 @@ class SQLDosenRepository(DosenRepositoryInterface):
             
             # 2. Update master table
             cursor.execute(
-                f"UPDATE dosen SET nidn = {param_char}, nama = {param_char}, program_studi = {param_char}, "
+                f"UPDATE dosen SET nidn = {param_char}, nama = {param_char}, email = {param_char}, program_studi = {param_char}, "
                 f"bidang_keahlian = {param_char}, pendidikan = {param_char} WHERE id = {param_char}",
                 (
                     data.get('nidn', ''),
                     data.get('nama', ''),
+                    data.get('email') or None,
                     data.get('program_studi', 'Teknik Informatika'),
                     data.get('bidang_keahlian', ''),
                     data.get('pendidikan', ''),
@@ -337,6 +341,7 @@ class ExcelDosenRepository(DosenRepositoryInterface):
                 dosen = Dosen(
                     nidn=get_val(row, ['nidn', 'id']),
                     nama=get_val(row, ['nama', 'nama dosen', 'nama lengkap']),
+                    email=get_val(row, ['email', 'surel', 'e-mail']),
                     program_studi=get_val(row, ['program studi', 'prodi', 'program_studi']),
                     bidang_keahlian=get_val(row, ['bidang keahlian', 'keahlian', 'bidang_keahlian']),
                     jurnal=get_val(row, ['jurnal', 'publikasi']),

@@ -2,7 +2,23 @@ import sqlite3
 import importlib
 
 migration_001 = importlib.import_module('server.database.migrations.001_create_dosen_tables')
+migration_005 = importlib.import_module('server.database.migrations.005_add_email_to_dosen_table')
 from server.database.migrations.migration_runner import ensure_migrations_table, get_applied_migrations, record_migration
+
+def test_migration_005_add_email_column():
+    conn = sqlite3.connect(":memory:")
+    # Setup base dosen table
+    migration_001.up(conn, driver='sqlite')
+    
+    # Run migration 005
+    migration_005.up(conn, driver='sqlite')
+    
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(dosen);")
+    cols = [r[1] for r in cursor.fetchall()]
+    assert "email" in cols
+    
+    conn.close()
 
 def test_migration_001_sqlite_lifecycle():
     conn = sqlite3.connect(":memory:")

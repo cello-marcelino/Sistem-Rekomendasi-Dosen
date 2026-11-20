@@ -60,4 +60,15 @@ export const recommendationService = {
   }
 }
 
+export const dosenService = {
+  async getAllDosen() {
+    const response = await apiClient.get('/dosen')
+    return response.data
+  },
+  async getDosenById(id) {
+    const response = await apiClient.get(`/dosen/${id}`)
+    return response.data
+  }
+}
+
 export default apiClient
