@@ -248,73 +248,63 @@
     </section>
 
     <!-- 3. Methodology Section: Dual-Engine Hybrid NLP (Diagram & Unboxed Side-by-Side Narrative) -->
-    <section id="metodologi" class="py-16 bg-white border-y border-slate-200/80">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <section id="metodologi" class="py-10 sm:py-12 bg-white border-y border-slate-200/80">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-7">
         
         <!-- Section Header -->
-        <div class="text-center max-w-2xl mx-auto space-y-2">
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        <div class="text-center max-w-xl mx-auto space-y-1.5">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             Metodologi Dual-Engine Ilmiah
           </h2>
           <p class="text-xs sm:text-sm text-slate-500">
-            Kombinasi komplementer Information Retrieval untuk menjamin presisi istilah teknis dan kedalaman pemaknaan konteks kalimat penelitian.
+            Kombinasi Information Retrieval untuk presisi istilah teknis dan kedalaman makna abstrak penelitian.
           </p>
         </div>
 
-        <!-- Integrated Pipeline Diagram Image -->
-        <div class="space-y-2">
-          <div class="rounded-xl border border-slate-200/90 overflow-hidden bg-slate-50/30 p-2 sm:p-4">
+        <!-- Integrated Pipeline Diagram Image (Scaled Down & Compact) -->
+        <div class="space-y-2 max-w-3xl mx-auto">
+          <div class="rounded-xl border border-slate-200/90 overflow-hidden bg-slate-50/30 p-2 sm:p-3">
             <img
               :src="diagramImg"
               alt="Diagram Alur BM25, SBERT, dan Hybrid"
-              class="w-full h-auto object-contain mx-auto max-h-[480px]"
+              class="w-full h-auto object-contain mx-auto max-h-[220px] sm:max-h-[260px]"
               loading="lazy"
             />
           </div>
           <div class="text-[11px] text-slate-400 text-center font-mono">
-            Diagram Alur Evaluasi Leksikal BM25, Representasi Semantik SBERT, dan Penggabungan Skor Adaptif
+            Diagram Alur BM25 Leksikal, SBERT Semantik, dan Penggabungan Skor
           </div>
         </div>
 
-        <!-- Unboxed Side-by-Side Narrative Layout (Kiri-Kanan, Zero Numbering, Zero Cards) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 pt-4 border-t border-slate-100">
+        <!-- Unboxed Side-by-Side Narrative Layout (Kiri-Kanan, Zero Numbering, Zero Cards, Compact) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 pt-4 border-t border-slate-100 max-w-4xl mx-auto">
           
           <!-- Narrative Sisi Kiri: Pendekatan Leksikal -->
-          <div class="space-y-3">
-            <div class="flex items-center gap-2 text-teal-800 text-xs font-bold uppercase tracking-wider">
+          <div class="space-y-2">
+            <div class="flex items-center gap-1.5 text-teal-800 text-xs font-bold uppercase tracking-wider">
               <IconBookOpen customClass="w-4 h-4 text-teal-700" />
               <span>Pendekatan Leksikal</span>
             </div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+            <h3 class="text-sm sm:text-base font-bold text-slate-900">
               BM25Okapi & Pemangkasan Mutlak
             </h3>
-            <div class="space-y-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              <p>
-                Pencocokan leksikal beroperasi pada ketelitian istilah teknis eksak, singkatan domain informatika, dan kata kunci keilmuan spesifik. Melalui tokenisasi n-gram dan ekspansi sinonim terarah, query mahasiswa dipetakan terhadap basis data riwayat penelitian dosen.
-              </p>
-              <p>
-                Skor mentah BM25 ditransformasikan menggunakan normalisasi Sigmoid Z-Score untuk menyetarakan skala penilaian, sementara aturan <strong class="text-slate-800 font-medium">Hard Constraint Pruning</strong> mengeliminasi kandidat dosen yang tidak memiliki irisan kata kunci sama sekali guna menghemat beban komputasi dan mencegah rekomendasi semu.
-              </p>
-            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              BM25Okapi mengevaluasi kesesuaian kata kunci teknis dan istilah spesifik. Normalisasi Z-Score serta <span class="font-medium text-slate-800">Hard Constraint Pruning</span> mengeliminasi kandidat tanpa irisan kata kunci guna komputasi yang terarah.
+            </p>
           </div>
 
           <!-- Narrative Sisi Kanan: Pendekatan Semantik -->
-          <div class="space-y-3">
-            <div class="flex items-center gap-2 text-teal-800 text-xs font-bold uppercase tracking-wider">
+          <div class="space-y-2">
+            <div class="flex items-center gap-1.5 text-teal-800 text-xs font-bold uppercase tracking-wider">
               <IconCpuChip customClass="w-4 h-4 text-teal-700" />
               <span>Pendekatan Semantik</span>
             </div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+            <h3 class="text-sm sm:text-base font-bold text-slate-900">
               Sentence-BERT & Pemaknaan Konteks
             </h3>
-            <div class="space-y-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              <p>
-                Pencocokan semantik menangkap kedalaman konteks kalimat dan hubungan laten dalam narasi abstrak penelitian yang seringkali menggunakan variasi kosakata berbeda dari profil keahlian dosen.
-              </p>
-              <p>
-                Menggunakan model transformator multibahasa, teks dikonversi ke dalam representasi vektor padat 768 dimensi. Pengukuran <strong class="text-slate-800 font-medium">Cosine Similarity</strong> dilakukan secara efisien pada memori RAM terhadap kumpulan vektor profil dosen yang telah terindeks, melengkapi presisi leksikal dengan pemahaman kontekstual yang utuh.
-              </p>
-            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Sentence-BERT merepresentasikan narasi abstrak ke dalam vektor 768 dimensi. Pengukuran <span class="font-medium text-slate-800">Cosine Similarity</span> mendeteksi keselarasan konteks dan esensi topik meskipun menggunakan variasi kosakata berbeda.
+            </p>
           </div>
 
         </div>
