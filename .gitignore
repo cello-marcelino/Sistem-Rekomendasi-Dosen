@@ -69,3 +69,7 @@ page-refrence*/
 # Pipeline Experiment Lab (Isolated NLP Workspace)
 pipeline-lab/
 experiments/
+
+# Legacy Frontend Archives
+archive/
+
