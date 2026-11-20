@@ -1287,7 +1287,7 @@ const downloadTemplate = () => {
       <div v-if="step === 3 && scheduleResult" class="flex flex-col h-full">
         
         <!-- Header Banner Resmi (Sesuai format gambar Polibatam) -->
-        <div class="p-5 bg-gradient-to-r from-teal-800 to-slate-900 text-white border-b border-teal-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-xs">
+        <div class="p-5 bg-linear-to-r from-teal-800 to-slate-900 text-white border-b border-teal-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-xs">
           <div>
             <div class="text-[11px] uppercase tracking-widest text-teal-200 font-bold">
               HASIL PENJADWALAN RESMI POLIBATAM
@@ -1382,7 +1382,7 @@ const downloadTemplate = () => {
             </select>
 
             <!-- Examiner Filter -->
-            <select v-model="selectedExaminerFilter" class="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs sm:text-sm focus:border-teal-500 focus:outline-none bg-white max-w-[140px] shadow-2xs">
+            <select v-model="selectedExaminerFilter" class="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs sm:text-sm focus:border-teal-500 focus:outline-none bg-white max-w-35 shadow-2xs">
               <option value="">Semua Dosen</option>
               <option v-for="ex in uniqueExaminers" :key="ex" :value="ex">{{ ex }}</option>
             </select>
@@ -1454,16 +1454,16 @@ const downloadTemplate = () => {
           <table class="w-full text-left text-xs sm:text-sm border-collapse">
             <thead class="bg-slate-100 border-b border-slate-300 text-[11px] font-bold uppercase tracking-wider text-slate-800 sticky top-0 backdrop-blur-xs">
               <tr>
-                <th class="p-3 border-r border-slate-300 min-w-[170px] bg-yellow-100/70 text-yellow-900">Hari dan Ruang Sidang</th>
-                <th class="p-3 border-r border-slate-300 min-w-[130px] bg-yellow-100/70 text-yellow-900">Jam Sidang</th>
+                <th class="p-3 border-r border-slate-300 min-w-42.5 bg-yellow-100/70 text-yellow-900">Hari dan Ruang Sidang</th>
+                <th class="p-3 border-r border-slate-300 min-w-32.5 bg-yellow-100/70 text-yellow-900">Jam Sidang</th>
                 <th class="p-3 border-r border-slate-300 w-12 text-center">No</th>
-                <th class="p-3 border-r border-slate-300 min-w-[120px]">Jenis Usulan</th>
-                <th class="p-3 border-r border-slate-300 min-w-[120px]">NIM</th>
-                <th class="p-3 border-r border-slate-300 min-w-[180px]">Nama Mahasiswa</th>
-                <th class="p-3 border-r border-slate-300 min-w-[130px]">No WA</th>
-                <th class="p-3 border-r border-slate-300 min-w-[280px]">Judul Tugas Akhir</th>
-                <th class="p-3 border-r border-slate-300 min-w-[230px]">Penguji 1 (Bisa Diganti)</th>
-                <th class="p-3 min-w-[230px]">Penguji 2 (Bisa Diganti)</th>
+                <th class="p-3 border-r border-slate-300 min-w-30">Jenis Usulan</th>
+                <th class="p-3 border-r border-slate-300 min-w-30">NIM</th>
+                <th class="p-3 border-r border-slate-300 min-w-45">Nama Mahasiswa</th>
+                <th class="p-3 border-r border-slate-300 min-w-32.5">No WA</th>
+                <th class="p-3 border-r border-slate-300 min-w-70">Judul Tugas Akhir</th>
+                <th class="p-3 border-r border-slate-300 min-w-57.5">Penguji 1 (Bisa Diganti)</th>
+                <th class="p-3 min-w-57.5">Penguji 2 (Bisa Diganti)</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 bg-white">
