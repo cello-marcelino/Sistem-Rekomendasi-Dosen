@@ -247,9 +247,11 @@
       </div>
     </section>
 
-    <!-- 3. Methodology Section: 2 Scientific Pillars (BM25 & SBERT, NO XAI) -->
+    <!-- 3. Methodology Section: Dual-Engine Hybrid NLP (Diagram & Unboxed Side-by-Side Narrative) -->
     <section id="metodologi" class="py-16 bg-white border-y border-slate-200/80">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        
+        <!-- Section Header -->
         <div class="text-center max-w-2xl mx-auto space-y-2">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Metodologi Dual-Engine Ilmiah
@@ -259,29 +261,64 @@
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Pillar 1: BM25 Okapi -->
-          <div class="p-6 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
-            <div class="w-10 h-10 rounded-lg bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center">
-              <IconBookOpen customClass="w-5 h-5" />
-            </div>
-            <h3 class="text-base font-bold text-slate-900">1. Pendekatan Leksikal (BM25Okapi)</h3>
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Fokus pada pencocokan eksak kata kunci, akronim domain teknologi informasi, dan istilah spesifik kurikulum. Skor mentah ditransformasi menggunakan normalisasi Sigmoid Z-Score dengan pemangkasan mutlak (<span class="font-mono text-xs">Hard Constraint Pruning</span>) untuk mengeliminasi profil tanpa kesesuaian istilah.
-            </p>
+        <!-- Integrated Pipeline Diagram Image -->
+        <div class="space-y-2">
+          <div class="rounded-xl border border-slate-200/90 overflow-hidden bg-slate-50/30 p-2 sm:p-4">
+            <img
+              :src="diagramImg"
+              alt="Diagram Alur BM25, SBERT, dan Hybrid"
+              class="w-full h-auto object-contain mx-auto max-h-[480px]"
+              loading="lazy"
+            />
           </div>
-
-          <!-- Pillar 2: Sentence-BERT -->
-          <div class="p-6 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
-            <div class="w-10 h-10 rounded-lg bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center">
-              <IconCpuChip customClass="w-5 h-5" />
-            </div>
-            <h3 class="text-base font-bold text-slate-900">2. Pendekatan Semantik (Sentence-BERT)</h3>
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Memahami keterkaitan konteks kalimat secara mendalam melalui komputasi vektor padat 768 dimensi menggunakan model transformator multilingual. Menghitung Cosine Similarity secara instan di memori RAM untuk menangkap sinonim laten yang tidak tertulis secara harfiah.
-            </p>
+          <div class="text-[11px] text-slate-400 text-center font-mono">
+            Diagram Alur Evaluasi Leksikal BM25, Representasi Semantik SBERT, dan Penggabungan Skor Adaptif
           </div>
         </div>
+
+        <!-- Unboxed Side-by-Side Narrative Layout (Kiri-Kanan, Zero Numbering, Zero Cards) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 pt-4 border-t border-slate-100">
+          
+          <!-- Narrative Sisi Kiri: Pendekatan Leksikal -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2 text-teal-800 text-xs font-bold uppercase tracking-wider">
+              <IconBookOpen customClass="w-4 h-4 text-teal-700" />
+              <span>Pendekatan Leksikal</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              BM25Okapi & Pemangkasan Mutlak
+            </h3>
+            <div class="space-y-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p>
+                Pencocokan leksikal beroperasi pada ketelitian istilah teknis eksak, singkatan domain informatika, dan kata kunci keilmuan spesifik. Melalui tokenisasi n-gram dan ekspansi sinonim terarah, query mahasiswa dipetakan terhadap basis data riwayat penelitian dosen.
+              </p>
+              <p>
+                Skor mentah BM25 ditransformasikan menggunakan normalisasi Sigmoid Z-Score untuk menyetarakan skala penilaian, sementara aturan <strong class="text-slate-800 font-medium">Hard Constraint Pruning</strong> mengeliminasi kandidat dosen yang tidak memiliki irisan kata kunci sama sekali guna menghemat beban komputasi dan mencegah rekomendasi semu.
+              </p>
+            </div>
+          </div>
+
+          <!-- Narrative Sisi Kanan: Pendekatan Semantik -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2 text-teal-800 text-xs font-bold uppercase tracking-wider">
+              <IconCpuChip customClass="w-4 h-4 text-teal-700" />
+              <span>Pendekatan Semantik</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              Sentence-BERT & Pemaknaan Konteks
+            </h3>
+            <div class="space-y-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p>
+                Pencocokan semantik menangkap kedalaman konteks kalimat dan hubungan laten dalam narasi abstrak penelitian yang seringkali menggunakan variasi kosakata berbeda dari profil keahlian dosen.
+              </p>
+              <p>
+                Menggunakan model transformator multibahasa, teks dikonversi ke dalam representasi vektor padat 768 dimensi. Pengukuran <strong class="text-slate-800 font-medium">Cosine Similarity</strong> dilakukan secara efisien pada memori RAM terhadap kumpulan vektor profil dosen yang telah terindeks, melengkapi presisi leksikal dengan pemahaman kontekstual yang utuh.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
 
@@ -405,6 +442,7 @@ import IconUserGraduate from '../components/icons/IconUserGraduate.vue'
 import IconShieldCheck from '../components/icons/IconShieldCheck.vue'
 import IconPaperAirplane from '../components/icons/IconPaperAirplane.vue'
 import { recommendationService } from '../services/api.js'
+import diagramImg from '../assets/diagram-alur.png'
 
 // Form State
 const form = reactive({
