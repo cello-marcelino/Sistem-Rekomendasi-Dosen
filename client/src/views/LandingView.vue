@@ -170,6 +170,14 @@
                 {{ errorMessage }}
               </div>
 
+              <!-- Empty Results Notice -->
+              <div v-if="results && results.length === 0" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-900 text-xs space-y-1">
+                <div class="font-bold">Tidak Ada Dosen yang Memenuhi Ambang Batas</div>
+                <p class="text-amber-800 leading-relaxed">
+                  Tidak ditemukan dosen dengan irisan kata kunci yang memenuhi skor minimum untuk topik ini. Silakan tambahkan istilah teknis atau bidang keahlian pada judul/abstrak Anda.
+                </p>
+              </div>
+
               <!-- Recommendation Results Area -->
               <div v-if="results && results.length > 0" class="pt-4 border-t border-slate-100 space-y-3">
                 <div class="flex items-center justify-between">
@@ -273,9 +281,6 @@
                 class="w-full h-auto object-contain mx-auto max-h-[280px] sm:max-h-[320px]"
                 loading="lazy"
               />
-            </div>
-            <div class="text-[11px] text-slate-400 text-center font-mono">
-              Diagram Alur BM25 Leksikal, SBERT Semantik, dan Penggabungan Skor
             </div>
           </div>
 
@@ -496,7 +501,26 @@ const handleSearch = async () => {
     })
 
     if (res.success && res.data) {
-      results.value = res.data.rekomendasi || res.data
+      // Backend returns standard envelope: { metadata, pipeline, recommendations: [...] }
+      const rawList = res.data.recommendations || res.data.rekomendasi || (Array.isArray(res.data) ? res.data : [])
+      
+      results.value = rawList.map((item, idx) => {
+        const dosenData = item.dosen || item
+        const hybridScore = item.scores?.hybrid ?? item.skor_akhir ?? item.skor ?? item.scores?.final ?? 0
+        const irisan = item.xai?.irisan_kata || item.irisan_kata || []
+        
+        return {
+          id: dosenData.id || `rec-${idx}`,
+          rank: item.rank || idx + 1,
+          nama: dosenData.nama || 'Nama Dosen',
+          nidn: dosenData.nidn || '-',
+          program_studi: dosenData.program_studi || '-',
+          bidang_keahlian: dosenData.bidang_keahlian || '',
+          skor_akhir: hybridScore,
+          scores: item.scores || {},
+          irisan_kata: irisan
+        }
+      })
     } else {
       errorMessage.value = res.message || 'Tidak ada rekomendasi yang ditemukan untuk topik ini.'
     }
