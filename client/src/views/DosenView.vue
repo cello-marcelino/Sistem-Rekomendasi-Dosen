@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen bg-ambient-mesh pb-20">
+  <div class="relative min-h-screen bg-hero-soft pb-20">
     <!-- Top Navigation Bar -->
     <Navbar />
 
@@ -8,41 +8,41 @@
       
       <!-- Breadcrumb & Header Title -->
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
-          <router-link to="/" class="hover:text-teal-700 transition-colors">Beranda</router-link>
+        <div class="flex items-center gap-2 text-xs text-[#5A6A85] font-medium">
+          <router-link to="/" class="hover:text-[#1E3A6D] transition-colors">Beranda</router-link>
           <span>/</span>
-          <span class="text-slate-800 font-semibold">Dosen & Pembimbing</span>
+          <span class="text-[#0F172A] font-semibold">Dosen & Pembimbing</span>
         </div>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1E3A6D] tracking-tight">
               Informasi & Rekomendasi Dosen
             </h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            <p class="text-xs sm:text-sm text-[#5A6A85] mt-1">
               Temukan dosen pembimbing tugas akhir melalui eksplorasi direktori manual atau rekomendasi cerdas berbasis analisis topik.
             </p>
           </div>
 
           <!-- Total Dosen Counter Badge -->
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 self-start sm:self-auto shadow-xs">
-            <IconUsers customClass="w-4 h-4 text-teal-700" />
-            <span class="text-xs font-semibold text-slate-700">Total Basis Data:</span>
-            <span class="text-xs font-mono font-bold text-teal-800">{{ dosenList.length || 86 }} Dosen</span>
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#E2E8F0] self-start sm:self-auto shadow-[0_4px_20px_rgba(30,58,109,0.06)]">
+            <IconUsers customClass="w-4 h-4 text-[#1E3A6D]" />
+            <span class="text-xs font-semibold text-[#5A6A85]">Total Basis Data:</span>
+            <span class="text-xs font-mono font-bold text-[#1E3A6D]">{{ dosenList.length || 86 }} Dosen</span>
           </div>
         </div>
       </div>
 
       <!-- Segmented Mode Switcher (Tab 1: Manual vs Tab 2: Rekomendasi) -->
-      <div class="p-1.5 bg-slate-200/60 rounded-xl max-w-xl flex gap-1 border border-slate-200">
+      <div class="p-1.5 bg-[#F5F8FF] rounded-xl max-w-xl flex gap-1 border border-[#E2E8F0]">
         <button
           type="button"
           @click="activeMode = 'manual'"
           class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
           :class="activeMode === 'manual'
-            ? 'bg-white text-slate-900 shadow-xs'
-            : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'"
+            ? 'bg-white text-[#1E3A6D] shadow-xs'
+            : 'text-[#5A6A85] hover:text-[#0F172A] hover:bg-white/50'"
         >
-          <IconUsers customClass="w-4 h-4 text-teal-700" />
+          <IconUsers customClass="w-4 h-4 text-[#1E3A6D]" />
           <span>Direktori Manual Dosen</span>
         </button>
         <button
@@ -50,10 +50,10 @@
           @click="activeMode = 'rekomendasi'"
           class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
           :class="activeMode === 'rekomendasi'
-            ? 'bg-white text-slate-900 shadow-xs'
-            : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'"
+            ? 'bg-white text-[#1E3A6D] shadow-xs'
+            : 'text-[#5A6A85] hover:text-[#0F172A] hover:bg-white/50'"
         >
-          <IconCpuChip customClass="w-4 h-4 text-teal-700" />
+          <IconCpuChip customClass="w-4 h-4 text-[#1E3A6D]" />
           <span>Rekomendasi Cerdas Top-K</span>
         </button>
       </div>
@@ -64,24 +64,24 @@
       <section v-if="activeMode === 'manual'" class="space-y-5 animate-card-fade-in">
         
         <!-- Filter Controls Container -->
-        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-none space-y-4">
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-[0_4px_20px_rgba(30,58,109,0.04)] space-y-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             
             <!-- Real-Time Search Bar -->
             <div class="relative flex-1 max-w-md">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                <IconSearch customClass="w-4 h-4" />
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#5A6A85]">
+                <IconSearch customClass="w-4 h-4 text-[#5A6A85]" />
               </span>
               <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Cari nama dosen, keahlian, atau prodi..."
-                class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-700 transition-colors"
+                class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
               />
               <button
                 v-if="searchQuery"
                 @click="searchQuery = ''"
-                class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 cursor-pointer text-sm"
+                class="absolute inset-y-0 right-0 flex items-center pr-3 text-[#5A6A85] hover:text-[#0F172A] cursor-pointer text-sm"
               >
                 ✕
               </button>
@@ -89,11 +89,11 @@
 
             <!-- Prodi Dropdown Filter -->
             <div class="flex items-center gap-2">
-              <label for="prodiFilter" class="text-xs font-semibold text-slate-600 whitespace-nowrap">Program Studi:</label>
+              <label for="prodiFilter" class="text-xs font-semibold text-[#5A6A85] whitespace-nowrap">Program Studi:</label>
               <select
                 id="prodiFilter"
                 v-model="selectedProdi"
-                class="px-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-teal-700 cursor-pointer"
+                class="px-3 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] cursor-pointer"
               >
                 <option value="all">Semua Program Studi</option>
                 <option v-for="prodi in prodiOptions" :key="prodi" :value="prodi">
@@ -105,7 +105,7 @@
 
           <!-- IT Domain Filter Pills -->
           <div class="space-y-1.5 pt-2 border-t border-slate-100">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Filter Rumpun Keahlian IT:</span>
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-[#5A6A85]">Filter Rumpun Keahlian IT:</span>
             <div class="flex flex-wrap gap-1.5">
               <button
                 type="button"
@@ -115,8 +115,8 @@
                 :class="[
                   'px-3 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer',
                   selectedDomain === domain.id
-                    ? 'border-teal-700 bg-teal-50 text-teal-900 font-semibold shadow-xs'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
+                    ? 'border-[#1E3A6D] bg-[#1E3A6D] text-white font-semibold shadow-xs'
+                    : 'border-[#E2E8F0] bg-[#F5F8FF] hover:bg-[#EBF4FF] text-[#1E3A6D]'
                 ]"
               >
                 {{ domain.label }}
@@ -126,25 +126,25 @@
         </div>
 
         <!-- Filter Count Summary & Quick Action Hint -->
-        <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+        <div class="flex items-center justify-between text-xs text-[#5A6A85] px-1">
           <div>
-            Menampilkan <span class="font-mono font-bold text-slate-900">{{ filteredDosenList.length }}</span> dari
+            Menampilkan <span class="font-mono font-bold text-[#0F172A]">{{ filteredDosenList.length }}</span> dari
             <span class="font-mono">{{ dosenList.length }}</span> dosen
-            <span v-if="selectedDomain !== 'all' || selectedProdi !== 'all' || searchQuery" class="text-teal-700 font-medium ml-1">
+            <span v-if="selectedDomain !== 'all' || selectedProdi !== 'all' || searchQuery" class="text-[#1E3A6D] font-medium ml-1">
               (terfilter)
             </span>
           </div>
-          <div class="text-[11px] text-slate-400 hidden sm:block">
+          <div class="text-[11px] text-[#5A6A85] hidden sm:block">
             Tip: Klik baris dosen atau tombol aksi untuk langsung mengajukan bimbingan.
           </div>
         </div>
 
         <!-- Data Table Dosen Sederhana -->
-        <div class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-none">
+        <div class="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden shadow-[0_4px_20px_rgba(30,58,109,0.04)]">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                <tr class="bg-[#F5F8FF] border-b border-[#E2E8F0] text-[11px] font-bold uppercase tracking-wider text-[#1E3A6D]">
                   <th scope="col" class="py-3 px-4 w-12 text-center font-mono">No</th>
                   <th scope="col" class="py-3 px-4 min-w-[200px]">Dosen & NIDN</th>
                   <th scope="col" class="py-3 px-4 min-w-[180px]">Email Institusi</th>
@@ -157,8 +157,8 @@
                 
                 <!-- Loading State -->
                 <tr v-if="isLoadingDosen">
-                  <td colspan="6" class="py-12 text-center text-slate-500 space-y-2">
-                    <svg class="animate-spin h-6 w-6 text-teal-700 mx-auto" fill="none" viewBox="0 0 24 24">
+                  <td colspan="6" class="py-12 text-center text-[#5A6A85] space-y-2">
+                    <svg class="animate-spin h-6 w-6 text-[#1E3A6D] mx-auto" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -168,15 +168,15 @@
 
                 <!-- Empty State -->
                 <tr v-else-if="filteredDosenList.length === 0">
-                  <td colspan="6" class="py-12 text-center text-slate-500 space-y-2">
-                    <div class="text-sm font-semibold text-slate-800">Tidak Ada Dosen yang Sesuai</div>
-                    <p class="text-xs text-slate-400 max-w-sm mx-auto">
+                  <td colspan="6" class="py-12 text-center text-[#5A6A85] space-y-2">
+                    <div class="text-sm font-semibold text-[#0F172A]">Tidak Ada Dosen yang Sesuai</div>
+                    <p class="text-xs text-[#5A6A85] max-w-sm mx-auto">
                       Tidak ditemukan dosen dengan filter "{{ itDomains.find(d => d.id === selectedDomain)?.label }}" atau kata kunci "{{ searchQuery }}".
                     </p>
                     <button
                       type="button"
                       @click="resetFilters"
-                      class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors cursor-pointer"
+                      class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F5F8FF] hover:bg-[#EBF4FF] text-[#1E3A6D] border border-[#CBD5E1] transition-colors cursor-pointer"
                     >
                       Reset Semua Filter
                     </button>
@@ -188,42 +188,42 @@
                   v-for="(dosen, idx) in paginatedDosenList"
                   :key="dosen.id || idx"
                   @click="openBimbinganModal(dosen)"
-                  class="hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                  class="hover:bg-[#F5F8FF]/80 transition-colors cursor-pointer group"
                 >
                   <!-- No -->
-                  <td class="py-3 px-4 text-center font-mono text-slate-400 text-xs">
+                  <td class="py-3 px-4 text-center font-mono text-[#5A6A85] text-xs">
                     {{ (currentPage - 1) * pageSize + idx + 1 }}
                   </td>
 
                   <!-- Nama & NIDN -->
                   <td class="py-3 px-4">
-                    <div class="font-bold text-slate-900 group-hover:text-teal-800 transition-colors">
+                    <div class="font-bold text-[#0F172A] group-hover:text-[#1E3A6D] transition-colors">
                       {{ dosen.nama }}
                     </div>
-                    <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                    <div class="text-[11px] font-mono text-[#5A6A85] mt-0.5">
                       NIDN: {{ dosen.nidn || '—' }}
                     </div>
                   </td>
 
                   <!-- Email Institusi -->
                   <td class="py-3 px-4 font-mono text-xs">
-                    <span v-if="dosen.email" class="text-slate-700">
+                    <span v-if="dosen.email" class="text-[#0F172A]">
                       {{ dosen.email }}
                     </span>
-                    <span v-else class="text-slate-400 italic text-[11px]">
+                    <span v-else class="text-[#5A6A85] italic text-[11px]">
                       —
                     </span>
                   </td>
 
                   <!-- Program Studi -->
-                  <td class="py-3 px-4 text-slate-600">
-                    <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">
+                  <td class="py-3 px-4 text-[#5A6A85]">
+                    <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#F5F8FF] text-[#1E3A6D] border border-[#E2E8F0]">
                       {{ dosen.program_studi || 'Informatika' }}
                     </span>
                   </td>
 
                   <!-- Bidang Keahlian -->
-                  <td class="py-3 px-4 text-slate-700">
+                  <td class="py-3 px-4 text-[#0F172A]">
                     <div class="line-clamp-2 text-xs leading-relaxed" :title="dosen.bidang_keahlian">
                       {{ dosen.bidang_keahlian || 'Keahlian Umum Informatika' }}
                     </div>
@@ -234,9 +234,9 @@
                     <button
                       type="button"
                       @click.stop="openBimbinganModal(dosen)"
-                      class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 group-hover:border-teal-600 text-slate-800 group-hover:text-teal-700 hover:bg-teal-50 transition-all cursor-pointer whitespace-nowrap active:scale-95 shadow-xs"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#CBD5E1] group-hover:border-[#1E3A6D] text-[#0F172A] group-hover:text-[#1E3A6D] hover:bg-[#F5F8FF] transition-all cursor-pointer whitespace-nowrap active:scale-95 shadow-xs"
                     >
-                      <IconPaperAirplane customClass="w-3.5 h-3.5 text-teal-700" />
+                      <IconPaperAirplane customClass="w-3.5 h-3.5 text-[#1E3A6D]" />
                       <span>&gt; Ajukan Pembimbing</span>
                     </button>
                   </td>
@@ -349,10 +349,10 @@
               <!-- Pilihan Jumlah Top-K & Prodi (Opsional) -->
               <div class="grid grid-cols-2 gap-3 pt-1">
                 <div class="space-y-1">
-                  <label class="block text-[11px] font-semibold text-slate-600">Jumlah Rekomendasi:</label>
+                  <label class="block text-[11px] font-semibold text-[#5A6A85]">Jumlah Rekomendasi:</label>
                   <select
                     v-model="form.k_rank"
-                    class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white text-slate-800 focus:outline-none focus:border-teal-700"
+                    class="w-full px-3 py-1.5 text-xs rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE]"
                   >
                     <option :value="3">Top 3 Dosen</option>
                     <option :value="5">Top 5 Dosen</option>
@@ -360,10 +360,10 @@
                   </select>
                 </div>
                 <div class="space-y-1">
-                  <label class="block text-[11px] font-semibold text-slate-600">Saring Prodi (Opsional):</label>
+                  <label class="block text-[11px] font-semibold text-[#5A6A85]">Saring Prodi (Opsional):</label>
                   <select
                     v-model="form.prodi"
-                    class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white text-slate-800 focus:outline-none focus:border-teal-700"
+                    class="w-full px-3 py-1.5 text-xs rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE]"
                   >
                     <option value="">Semua Jurusan</option>
                     <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
@@ -376,7 +376,7 @@
                 <button
                   type="submit"
                   :disabled="isLoadingRec"
-                  class="w-full py-2.5 px-4 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99] shadow-xs"
+                  class="w-full py-2.5 px-4 rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99] shadow-xs"
                 >
                   <template v-if="isLoadingRec">
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -386,7 +386,7 @@
                     <span>Menganalisis Relevansi Dosen...</span>
                   </template>
                   <template v-else>
-                    <IconSearch customClass="w-4 h-4" />
+                    <IconSearch customClass="w-4 h-4 text-white" />
                     <span>Analisis & Rekomendasikan Dosen</span>
                   </template>
                 </button>
@@ -394,7 +394,7 @@
             </form>
 
             <!-- Error Message -->
-            <div v-if="recError" class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+            <div v-if="recError" class="p-3 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-xs">
               {{ recError }}
             </div>
           </div>
@@ -405,13 +405,13 @@
             <!-- Default Placeholder before search -->
             <div
               v-if="!recommendationResults && !isLoadingRec"
-              class="p-8 sm:p-12 rounded-2xl bg-white border border-slate-200/90 text-center space-y-3"
+              class="p-8 sm:p-12 rounded-2xl bg-white border border-[#E2E8F0] text-center space-y-3 shadow-[0_4px_20px_rgba(30,58,109,0.04)]"
             >
-              <div class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center mx-auto">
-                <IconSearch customClass="w-6 h-6" />
+              <div class="w-12 h-12 rounded-2xl bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] flex items-center justify-center mx-auto">
+                <IconSearch customClass="w-6 h-6 text-[#1E3A6D]" />
               </div>
-              <h3 class="text-base font-bold text-slate-800">Menunggu Input Rencana Penelitian</h3>
-              <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+              <h3 class="text-base font-bold text-[#0F172A]">Menunggu Input Rencana Penelitian</h3>
+              <p class="text-xs sm:text-sm text-[#5A6A85] max-w-md mx-auto leading-relaxed">
                 Isi judul dan abstrak penelitian di formulir sebelah kiri atau klik salah satu contoh topik untuk mengevaluasi rekomendasi dosen pembimbing terbaik.
               </p>
             </div>
@@ -419,10 +419,10 @@
             <!-- Empty Results Notice -->
             <div
               v-else-if="recommendationResults && recommendationResults.length === 0"
-              class="p-5 rounded-2xl border border-amber-200 bg-amber-50/70 text-amber-900 text-xs space-y-1.5"
+              class="p-5 rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] text-[#92400E] text-xs space-y-1.5"
             >
               <div class="font-bold text-sm">Tidak Ada Dosen yang Memenuhi Ambang Batas</div>
-              <p class="text-amber-800 leading-relaxed">
+              <p class="leading-relaxed text-[#B45309]">
                 Kandidat tidak memiliki irisan kata kunci atau skor kecocokan berada di bawah ambang batas minimum. Cobalah menambahkan variasi istilah teknis pada judul atau abstrak penelitian Anda.
               </p>
             </div>
@@ -430,58 +430,58 @@
             <!-- Staggered Results List -->
             <div v-else-if="recommendationResults && recommendationResults.length > 0" class="space-y-3">
               <div class="flex items-center justify-between pb-1">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Hasil Rekomendasi Teratas:</span>
-                <span class="text-xs font-mono text-teal-800 font-semibold">{{ recommendationResults.length }} Dosen Cocok</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">Hasil Rekomendasi Teratas:</span>
+                <span class="text-xs font-mono text-[#1E3A6D] font-semibold">{{ recommendationResults.length }} Dosen Cocok</span>
               </div>
 
               <!-- Recommendation Cards -->
               <div
                 v-for="(dosen, index) in recommendationResults"
                 :key="dosen.id || index"
-                class="animate-card-fade-in p-5 rounded-2xl border border-slate-200 bg-white hover:border-teal-300 hover:shadow-xs transition-all duration-300 space-y-3"
+                class="animate-card-fade-in p-5 rounded-2xl border border-[#E2E8F0] bg-white hover:border-[#8E94F2] hover:shadow-[0_4px_20px_rgba(30,58,109,0.06)] transition-all duration-300 space-y-3"
                 :style="{ animationDelay: `${index * 80}ms` }"
               >
                 <div class="flex items-start justify-between gap-4">
                   <div class="space-y-1">
                     <div class="flex items-center gap-2">
-                      <span class="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center font-mono">
+                      <span class="w-6 h-6 rounded-full bg-[#1E3A6D] text-white text-xs font-bold flex items-center justify-center font-mono">
                         {{ index + 1 }}
                       </span>
-                      <h3 class="text-sm sm:text-base font-bold text-slate-900">
+                      <h3 class="text-sm sm:text-base font-bold text-[#0F172A]">
                         {{ dosen.nama }}
                       </h3>
                     </div>
-                    <div class="text-xs text-slate-500 font-mono flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                    <div class="text-xs text-[#5A6A85] font-mono flex flex-wrap items-center gap-x-3 gap-y-0.5">
                       <span>NIDN: {{ dosen.nidn || '—' }}</span>
                       <span>•</span>
                       <span>{{ dosen.program_studi }}</span>
                       <span v-if="dosen.email">•</span>
-                      <span v-if="dosen.email" class="text-teal-800">{{ dosen.email }}</span>
+                      <span v-if="dosen.email" class="text-[#1E3A6D]">{{ dosen.email }}</span>
                     </div>
                   </div>
 
                   <!-- Skor Kecocokan Badge -->
                   <div class="text-right shrink-0">
-                    <div class="text-base font-mono font-black text-teal-800">
+                    <div class="text-base font-mono font-black text-[#1E3A6D]">
                       {{ Math.round((dosen.skor_akhir || 0) * 100) }}%
                     </div>
-                    <div class="text-[10px] text-slate-400 uppercase tracking-tight font-medium">Kecocokan</div>
+                    <div class="text-[10px] text-[#5A6A85] uppercase tracking-tight font-medium">Kecocokan</div>
                   </div>
                 </div>
 
                 <!-- Bidang Keahlian -->
-                <div v-if="dosen.bidang_keahlian" class="text-xs text-slate-700">
-                  <span class="text-slate-400 font-medium">Keahlian:</span> {{ dosen.bidang_keahlian }}
+                <div v-if="dosen.bidang_keahlian" class="text-xs text-[#0F172A]">
+                  <span class="text-[#5A6A85] font-medium">Keahlian:</span> {{ dosen.bidang_keahlian }}
                 </div>
 
-                <!-- Irisan Kata Kunci yang Cocok (NO XAI label) -->
+                <!-- Irisan Kata Kunci yang Cocok (NLP Badges) -->
                 <div v-if="dosen.irisan_kata && dosen.irisan_kata.length > 0" class="space-y-1 pt-1 border-t border-slate-100">
-                  <div class="text-[11px] text-slate-500 font-medium">Irisan Kata Kunci yang Cocok:</div>
+                  <div class="text-[11px] text-[#5A6A85] font-medium">Irisan Kata Kunci yang Cocok:</div>
                   <div class="flex flex-wrap gap-1">
                     <span
                       v-for="(kata, kIdx) in dosen.irisan_kata.slice(0, 6)"
                       :key="kIdx"
-                      class="px-2 py-0.5 rounded text-[11px] font-mono bg-teal-50 border border-teal-200 text-teal-800"
+                      class="px-2 py-0.5 rounded text-[11px] font-mono bg-[#E0F2FE] border border-[#BAE6FD] text-[#0369A1]"
                     >
                       {{ kata }}
                     </span>
@@ -493,9 +493,9 @@
                   <button
                     type="button"
                     @click="openBimbinganModal(dosen)"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-teal-600 text-slate-800 hover:text-teal-700 hover:shadow-xs transition-all cursor-pointer active:scale-95"
+                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#CBD5E1] hover:border-[#1E3A6D] text-[#0F172A] hover:text-[#1E3A6D] hover:bg-[#F5F8FF] hover:shadow-xs transition-all cursor-pointer active:scale-95"
                   >
-                    <IconPaperAirplane customClass="w-3.5 h-3.5 text-teal-700" />
+                    <IconPaperAirplane customClass="w-3.5 h-3.5 text-[#1E3A6D]" />
                     <span>&gt; Ajukan Pembimbing</span>
                   </button>
                 </div>
@@ -527,31 +527,31 @@
         @click.self="closeBimbinganModal"
       >
         <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-xl space-y-4">
-          <div class="flex items-start justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-start justify-between pb-3 border-b border-[#E2E8F0]">
             <div class="flex items-center gap-2">
-              <IconPaperAirplane customClass="w-5 h-5 text-teal-700" />
-              <h3 class="text-base font-bold text-slate-900">Pengajuan Rencana Pembimbing</h3>
+              <IconPaperAirplane customClass="w-5 h-5 text-[#1E3A6D]" />
+              <h3 class="text-base font-bold text-[#0F172A]">Pengajuan Rencana Pembimbing</h3>
             </div>
             <button
               @click="closeBimbinganModal"
-              class="text-slate-400 hover:text-slate-700 cursor-pointer text-lg leading-none"
+              class="text-[#5A6A85] hover:text-[#0F172A] cursor-pointer text-lg leading-none"
             >
               ✕
             </button>
           </div>
 
           <!-- Dosen Info Card -->
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-            <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Dosen Dituju:</div>
-            <div class="text-sm font-bold text-slate-900">{{ selectedDosenModal.nama }}</div>
-            <div class="text-xs text-slate-600 font-mono">
+          <div class="p-3.5 rounded-xl bg-[#F5F8FF] border border-[#E2E8F0] space-y-1.5">
+            <div class="text-xs text-[#5A6A85] font-semibold uppercase tracking-wider">Dosen Dituju:</div>
+            <div class="text-sm font-bold text-[#0F172A]">{{ selectedDosenModal.nama }}</div>
+            <div class="text-xs text-[#5A6A85] font-mono">
               NIDN: {{ selectedDosenModal.nidn || '—' }} · {{ selectedDosenModal.program_studi }}
             </div>
-            <div class="text-xs text-slate-600 font-mono">
-              Email: <span class="text-teal-800">{{ selectedDosenModal.email || '— (Belum terdata)' }}</span>
+            <div class="text-xs text-[#5A6A85] font-mono">
+              Email: <span class="text-[#1E3A6D]">{{ selectedDosenModal.email || '— (Belum terdata)' }}</span>
             </div>
-            <div v-if="selectedDosenModal.bidang_keahlian" class="text-xs text-slate-500 pt-0.5">
-              <span class="font-medium text-slate-700">Keahlian:</span> {{ selectedDosenModal.bidang_keahlian }}
+            <div v-if="selectedDosenModal.bidang_keahlian" class="text-xs text-[#5A6A85] pt-0.5">
+              <span class="font-medium text-[#0F172A]">Keahlian:</span> {{ selectedDosenModal.bidang_keahlian }}
             </div>
           </div>
 
@@ -559,65 +559,65 @@
           <form @submit.prevent="submitBimbinganRequest" class="space-y-3 pt-1">
             <div class="grid grid-cols-2 gap-3">
               <div class="space-y-1">
-                <label class="block text-xs font-semibold text-slate-700">Nama Mahasiswa</label>
+                <label class="block text-xs font-semibold text-[#0F172A]">Nama Mahasiswa</label>
                 <input
                   v-model="bimbinganForm.nama_mahasiswa"
                   type="text"
                   required
                   placeholder="Nama Lengkap"
-                  class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:border-teal-700"
+                  class="w-full px-3 py-2 text-xs rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20"
                 />
               </div>
               <div class="space-y-1">
-                <label class="block text-xs font-semibold text-slate-700">NIM Mahasiswa</label>
+                <label class="block text-xs font-semibold text-[#0F172A]">NIM Mahasiswa</label>
                 <input
                   v-model="bimbinganForm.nim"
                   type="text"
                   required
                   placeholder="3312411xxx"
-                  class="w-full px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 focus:outline-none focus:border-teal-700"
+                  class="w-full px-3 py-2 text-xs font-mono rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20"
                 />
               </div>
             </div>
 
             <div class="space-y-1">
-              <label class="block text-xs font-semibold text-slate-700">Judul Rencana Proyek / Tugas Akhir</label>
+              <label class="block text-xs font-semibold text-[#0F172A]">Judul Rencana Proyek / Tugas Akhir</label>
               <input
                 v-model="bimbinganForm.judul_proyek"
                 type="text"
                 required
                 placeholder="Judul topik penelitian yang diajukan"
-                class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:border-teal-700"
+                class="w-full px-3 py-2 text-xs rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20"
               />
             </div>
 
             <div class="space-y-1">
-              <label class="block text-xs font-semibold text-slate-700">Catatan Pengantar (Opsional)</label>
+              <label class="block text-xs font-semibold text-[#0F172A]">Catatan Pengantar (Opsional)</label>
               <textarea
                 v-model="bimbinganForm.catatan"
                 rows="3"
                 placeholder="Jelaskan alasan memilih dosen dan ringkasan rencana..."
-                class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:border-teal-700"
+                class="w-full px-3 py-2 text-xs rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20"
               ></textarea>
             </div>
 
             <!-- Confirmation Notice -->
-            <div v-if="requestSuccessNotice" class="p-3 rounded-lg bg-teal-50 border border-teal-200 text-teal-900 text-xs font-medium">
+            <div v-if="requestSuccessNotice" class="p-3 rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] text-xs font-medium">
               ✓ Pengajuan pembimbing kepada <strong>{{ selectedDosenModal.nama }}</strong> berhasil dicatat (Mode Simulasi). Notifikasi akan dikirimkan ke akun dosen.
             </div>
 
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#E2E8F0]">
               <button
                 type="button"
                 @click="closeBimbinganModal"
-                class="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                class="px-4 py-2 text-xs font-semibold rounded-lg border border-[#CBD5E1] text-[#0F172A] hover:bg-[#F5F8FF] transition-colors cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 :disabled="isSubmittingBimbingan"
-                class="px-4 py-2 text-xs font-semibold rounded-lg bg-teal-700 hover:bg-teal-800 text-white transition-all cursor-pointer shadow-xs disabled:opacity-60"
+                class="px-4 py-2 text-xs font-semibold rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white transition-all cursor-pointer shadow-xs disabled:opacity-60"
               >
                 <span v-if="isSubmittingBimbingan">Mengirim Pengajuan...</span>
                 <span v-else>Kirim Pengajuan Pembimbing</span>

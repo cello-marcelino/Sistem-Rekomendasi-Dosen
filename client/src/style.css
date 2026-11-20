@@ -1,0 +1,122 @@
+/* ==========================================================================
+   Clean Academic Tech Design System
+   Palet warna berbasis aset Hybrid NLP (BM25 & SBERT) dengan dominasi putih bersih
+   ========================================================================== */
+
+:root {
+  /* 1. Palette Tokens */
+  --bg-main: #FFFFFF;
+  --bg-subtle: #F5F8FF;
+  --color-primary: #1E3A6D;
+  --color-primary-hover: #15294E;
+  --color-accent-cyan: #4EA8DE;
+  --color-accent-purple: #8E94F2;
+  --text-primary: #0F172A;
+  --text-secondary: #5A6A85;
+  --border-default: #E2E8F0;
+
+  /* 2. Gradients */
+  --ai-gradient: linear-gradient(135deg, #4EA8DE 0%, #8E94F2 100%);
+  --bg-hero-gradient: radial-gradient(circle at top right, #F3E8FF 0%, #EBF4FF 45%, #FFFFFF 100%);
+
+  /* 3. Shadows & Focus Rings */
+  --shadow-card: 0 4px 20px rgba(30, 58, 109, 0.06);
+  --ring-focus: 0 0 0 3px rgba(78, 168, 222, 0.2);
+
+  /* 4. Status Colors */
+  --color-success: #10B981;
+  --bg-success: #ECFDF5;
+  --color-warning: #F59E0B;
+  --bg-warning: #FFFBEB;
+  --color-error: #EF4444;
+  --bg-error: #FEF2F2;
+
+  /* 5. Forms & Inputs */
+  --input-bg: #FFFFFF;
+  --input-border: #CBD5E1;
+  --input-focus-border: #4EA8DE;
+  --dropzone-bg: #F5F8FF;
+  --dropzone-border: #94A3B8;
+
+  /* Backward Compatibility Bridge */
+  --bg-ambient-mesh: var(--bg-hero-gradient);
+}
+
+/* ==========================================================================
+   Component Utility Classes
+   ========================================================================== */
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--color-primary);
+  border: 1px solid #CBD5E1;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-secondary:hover {
+  background-color: var(--bg-subtle);
+  border-color: #94A3B8;
+}
+
+.btn-ai-highlight {
+  background: var(--ai-gradient);
+  color: #FFFFFF;
+  border: none;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+.btn-ai-highlight:hover {
+  opacity: 0.95;
+}
+
+/* NLP Badges */
+.badge-bm25 {
+  background-color: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #BAE6FD;
+}
+
+.badge-sbert {
+  background-color: #EDE9FE;
+  color: #5B21B6;
+  border: 1px solid #DDD6FE;
+}
+
+.badge-hybrid-top {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+}
+
+/* Cards */
+.card-clean {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.card-clean:hover {
+  border-color: var(--color-accent-purple);
+}
+
+/* Visual Illustration Container: seamless pure white background */
+.illustration-container {
+  background-color: #FFFFFF !important;
+  border: none !important;
+}
+
+/* Text Gradient AI */
+.text-ai-gradient {
+  background: var(--ai-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

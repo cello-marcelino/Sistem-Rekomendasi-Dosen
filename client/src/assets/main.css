@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../style.css";
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
@@ -8,41 +9,22 @@
 @import "@fontsource/jetbrains-mono/700.css";
 
 @theme {
-  /* Canvas & Ambient Glow Tokens */
-  --color-bg-canvas-base: #FFFFFF;
-  --color-bg-canvas-subtle: #F8FAFC;
-
-  --color-bg-glow-cyan-soft: #C9ECFF;
-  --color-bg-glow-cyan-vivid: #93E1F5;
-
-  --color-bg-glow-lavender-soft: #E2D4FF;
-  --color-bg-glow-lavender-vivid: #C2B0F8;
-
-  /* Brand Typography & UI Tokens */
+  /* Brand Typography */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --color-primary-50: #eff6ff;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
+  /* Clean Academic Tech Theme Colors */
+  --color-bg-main: #FFFFFF;
+  --color-bg-subtle: #F5F8FF;
 
-  --color-teal-50: #f0fdfa;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
-  --color-teal-800: #115e59;
-}
+  --color-academic-navy: #1E3A6D;
+  --color-academic-hover: #15294E;
+  --color-accent-cyan: #4EA8DE;
+  --color-accent-purple: #8E94F2;
 
-:root {
-  --bg-ambient-mesh:
-    radial-gradient(circle at 12% 28%, rgba(201, 236, 255, 0.75) 0%, transparent 45%),
-    radial-gradient(circle at 38% 50%, rgba(147, 225, 245, 0.45) 0%, transparent 38%),
-    radial-gradient(circle at 88% 22%, rgba(226, 212, 255, 0.75) 0%, transparent 45%),
-    radial-gradient(circle at 62% 52%, rgba(194, 176, 248, 0.45) 0%, transparent 38%),
-    linear-gradient(180deg, var(--color-bg-canvas-base) 0%, var(--color-bg-canvas-subtle) 100%);
-}
-
-.bg-ambient-mesh {
-  background-image: var(--bg-ambient-mesh);
+  --color-text-dark: #0F172A;
+  --color-text-muted: #5A6A85;
+  --color-border-mist: #E2E8F0;
 }
 
 html {
@@ -51,14 +33,23 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-bg-canvas-base);
-  color: #0f172a;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Staggered Card Entrance Animations */
+/* Background Hero Soft Radial Gradient */
+.bg-hero-soft {
+  background: var(--bg-hero-gradient);
+}
+
+.bg-ambient-mesh {
+  background: var(--bg-hero-gradient);
+}
+
+/* Card Entry Animations */
 @keyframes cardFadeIn {
   from {
     opacity: 0;
