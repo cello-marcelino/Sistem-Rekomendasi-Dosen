@@ -362,12 +362,28 @@
 
           <!-- Quick Sample Topics -->
           <div class="space-y-2">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-[#5A6A85]">Contoh Topik Cepat:</span>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[#5A6A85]">
+                Contoh Topik Cepat (Benchmark):
+              </span>
+              <button
+                type="button"
+                @click="refreshRandomSamples"
+                class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#1E3A6D] hover:text-[#15294E] hover:underline cursor-pointer transition-colors active:scale-95"
+                title="Acak 4 topik baru dari benchmark samples"
+              >
+                <!-- Flowbite Outline Icon ArrowPath -->
+                <svg class="w-3.5 h-3.5 text-[#4EA8DE]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                </svg>
+                <span>Acak Topik Lain</span>
+              </button>
+            </div>
             <div class="flex flex-wrap gap-2">
               <button
                 type="button"
-                v-for="(sample, idx) in sampleTopics"
-                :key="idx"
+                v-for="sample in sampleTopics"
+                :key="sample.id"
                 @click="applySampleTopic(sample)"
                 :class="[
                   'px-3 py-1.5 text-xs rounded-lg border transition-all cursor-pointer text-left font-medium active:scale-95',
@@ -720,6 +736,7 @@ import IconCpuChip from '../components/icons/IconCpuChip.vue'
 import IconSearch from '../components/icons/IconSearch.vue'
 import IconPaperAirplane from '../components/icons/IconPaperAirplane.vue'
 import { dosenService, recommendationService } from '../services/api.js'
+import { getRandomBenchmarkSamples } from '../data/benchmarkSamples.js'
 
 const route = useRoute()
 
@@ -856,23 +873,11 @@ const resetRecForm = () => {
   recommendationResults.value = null
 }
 
-const sampleTopics = [
-  {
-    label: 'Computer Vision YOLO',
-    judul: 'Deteksi Pelanggaran Helm Pengendara Motor Menggunakan Algoritma YOLOv8',
-    abstrak: 'Penelitian ini mengembangkan sistem deteksi otomatis penggunaan helm pengendara sepeda motor berbasis pengolahan citra dan deep learning. Algoritma YOLOv8 dilatih dengan dataset rekaman CCTV jalan raya untuk mengenali pengendara tanpa helm secara real-time.'
-  },
-  {
-    label: 'NLP IndoBERT',
-    judul: 'Analisis Sentimen Opini Publik terhadap Layanan Transportasi Menggunakan IndoBERT',
-    abstrak: 'Penelitian ini mengklasifikasikan sentimen pengguna media sosial terhadap efektivitas transportasi publik kota. Model IndoBERT digunakan untuk menangani variasi bahasa gaul dan konteks kalimat bahasa Indonesia dengan akurasi klasifikasi multi-kelas.'
-  },
-  {
-    label: 'IoT Smart Agriculture',
-    judul: 'Sistem Monitoring Kelembapan Tanah dan Penyiraman Otomatis Berbasis IoT dan NodeMCU',
-    abstrak: 'Membangun purwarupa otomasi penyiraman tanaman dengan memanfaatkan sensor kelembapan tanah, mikrokontroler NodeMCU ESP8266, dan protokol MQTT untuk pemantauan data real-time pada dashboard web.'
-  }
-]
+const sampleTopics = ref(getRandomBenchmarkSamples(4))
+
+const refreshRandomSamples = () => {
+  sampleTopics.value = getRandomBenchmarkSamples(4)
+}
 
 const applySampleTopic = (sample) => {
   form.judul = sample.judul
