@@ -16,6 +16,7 @@
   /* Clean Academic Tech Theme Colors */
   --color-bg-main: #FFFFFF;
   --color-bg-subtle: #F5F8FF;
+  --color-academic-soft: #EBF4FF;
 
   --color-academic-navy: #1E3A6D;
   --color-academic-hover: #15294E;
@@ -25,6 +26,10 @@
   --color-text-dark: #0F172A;
   --color-text-muted: #5A6A85;
   --color-border-mist: #E2E8F0;
+  --color-border-subtle: #CBD5E1;
+
+  /* Elevation Shadows */
+  --shadow-card: 0 4px 20px rgba(30, 58, 109, 0.06);
 }
 
 html {

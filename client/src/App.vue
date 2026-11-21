@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#FFFFFF] text-slate-900 font-sans">
+  <div class="min-h-screen bg-bg-main text-slate-900 font-sans">
     <router-view />
   </div>
 </template>

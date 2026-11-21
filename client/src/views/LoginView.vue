@@ -5,9 +5,9 @@
     <div class="max-w-md w-full mx-auto">
       <router-link
         to="/"
-        class="inline-flex items-center gap-2 text-xs font-semibold text-[#5A6A85] hover:text-[#1E3A6D] transition-colors"
+        class="inline-flex items-center gap-2 text-xs font-semibold text-text-muted hover:text-academic-navy transition-colors"
       >
-        <svg class="w-4 h-4 text-[#1E3A6D]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 text-academic-navy" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         <span>Kembali ke Beranda</span>
@@ -19,30 +19,30 @@
       
       <!-- Brand Header (NO version badge) -->
       <div class="text-center mb-6 space-y-1">
-        <div class="w-12 h-12 rounded-xl bg-[#1E3A6D] mx-auto flex items-center justify-center text-white mb-3 shadow-[0_4px_20px_rgba(30,58,109,0.12)]">
-          <svg class="w-7 h-7 text-[#4EA8DE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-12 h-12 rounded-xl bg-academic-navy mx-auto flex items-center justify-center text-white mb-3 shadow-[0_4px_20px_rgba(30,58,109,0.12)]">
+          <svg class="w-7 h-7 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
           </svg>
         </div>
-        <h1 class="text-2xl font-extrabold text-[#1E3A6D] tracking-tight">Masuk Portal SiReDo</h1>
-        <p class="text-xs text-[#5A6A85]">
+        <h1 class="text-2xl font-extrabold text-academic-navy tracking-tight">Masuk Portal SiReDo</h1>
+        <p class="text-xs text-text-muted">
           Pilih portal yang sesuai dengan hak akses peran Anda di sistem.
         </p>
       </div>
 
       <!-- Main Login Card -->
-      <div class="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 space-y-6 shadow-[0_4px_20px_rgba(30,58,109,0.06)]">
+      <div class="bg-white border border-border-mist rounded-2xl p-6 sm:p-8 space-y-6 shadow-card">
         
         <!-- Role-Switcher Tab Header (tabs-border) -->
-        <div class="flex border-b border-[#E2E8F0] text-xs sm:text-sm font-semibold">
+        <div class="flex border-b border-border-mist text-xs sm:text-sm font-semibold">
           <button
             type="button"
             @click="activeRole = 'dosen'"
             class="flex-1 pb-3 text-center border-b-2 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            :class="activeRole === 'dosen' ? 'border-[#1E3A6D] text-[#1E3A6D] font-bold' : 'border-transparent text-[#5A6A85] hover:text-[#0F172A]'"
+            :class="activeRole === 'dosen' ? 'border-academic-navy text-academic-navy font-bold' : 'border-transparent text-text-muted hover:text-text-dark'"
           >
-            <IconUserGraduate customClass="w-4 h-4 text-[#1E3A6D]" />
+            <IconUserGraduate customClass="w-4 h-4 text-academic-navy" />
             <span>Portal Dosen</span>
           </button>
 
@@ -50,15 +50,15 @@
             type="button"
             @click="activeRole = 'admin'"
             class="flex-1 pb-3 text-center border-b-2 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            :class="activeRole === 'admin' ? 'border-[#1E3A6D] text-[#1E3A6D] font-bold' : 'border-transparent text-[#5A6A85] hover:text-[#0F172A]'"
+            :class="activeRole === 'admin' ? 'border-academic-navy text-academic-navy font-bold' : 'border-transparent text-text-muted hover:text-text-dark'"
           >
-            <IconShieldCheck customClass="w-4 h-4 text-[#1E3A6D]" />
+            <IconShieldCheck customClass="w-4 h-4 text-academic-navy" />
             <span>Administrator</span>
           </button>
         </div>
 
         <!-- Role Description Banner -->
-        <div class="p-3 rounded-lg text-xs bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D]">
+        <div class="p-3 rounded-lg text-xs bg-bg-subtle border border-border-subtle text-academic-navy">
           <template v-if="activeRole === 'dosen'">
             <strong>Akses Dosen:</strong> Kelola portofolio kepakaran riset, pantau kuota, dan tanggapi permohonan bimbingan mahasiswa.
           </template>
@@ -70,7 +70,7 @@
         <!-- Form Dosen -->
         <form v-if="activeRole === 'dosen'" @submit.prevent="handleLoginDosen" class="space-y-4">
           <div class="space-y-1">
-            <label for="nidn" class="block text-xs font-semibold text-[#0F172A]">
+            <label for="nidn" class="block text-xs font-semibold text-text-dark">
               NIDN atau Email Institusi
             </label>
             <input
@@ -79,16 +79,16 @@
               type="text"
               required
               placeholder="Contoh: 0012058001 / dosen@polibatam.ac.id"
-              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
+              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-border-subtle bg-white text-text-dark placeholder:text-text-muted focus:outline-none focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 transition-colors"
             />
           </div>
 
           <div class="space-y-1">
             <div class="flex items-center justify-between">
-              <label for="dosen_pwd" class="block text-xs font-semibold text-[#0F172A]">
+              <label for="dosen_pwd" class="block text-xs font-semibold text-text-dark">
                 Kata Sandi
               </label>
-              <a href="#" class="text-[11px] text-[#4EA8DE] hover:underline">Lupa Sandi?</a>
+              <a href="#" class="text-[11px] text-accent-cyan hover:underline">Lupa Sandi?</a>
             </div>
             <input
               id="dosen_pwd"
@@ -96,14 +96,14 @@
               type="password"
               required
               placeholder="••••••••"
-              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
+              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-border-subtle bg-white text-text-dark placeholder:text-text-muted focus:outline-none focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 transition-colors"
             />
           </div>
 
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="w-full py-2.5 px-4 rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
+            class="w-full py-2.5 px-4 rounded-lg bg-academic-navy hover:bg-academic-hover text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
           >
             <IconLock customClass="w-4 h-4 text-white" />
             <span>Masuk sebagai Dosen</span>
@@ -113,7 +113,7 @@
         <!-- Form Administrator -->
         <form v-if="activeRole === 'admin'" @submit.prevent="handleLoginAdmin" class="space-y-4">
           <div class="space-y-1">
-            <label for="admin_user" class="block text-xs font-semibold text-[#0F172A]">
+            <label for="admin_user" class="block text-xs font-semibold text-text-dark">
               Username Administrator
             </label>
             <input
@@ -122,12 +122,12 @@
               type="text"
               required
               placeholder="Masukkan username admin..."
-              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
+              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-border-subtle bg-white text-text-dark placeholder:text-text-muted focus:outline-none focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 transition-colors"
             />
           </div>
 
           <div class="space-y-1">
-            <label for="admin_pwd" class="block text-xs font-semibold text-[#0F172A]">
+            <label for="admin_pwd" class="block text-xs font-semibold text-text-dark">
               Kata Sandi
             </label>
             <input
@@ -136,14 +136,14 @@
               type="password"
               required
               placeholder="••••••••"
-              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
+              class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-border-subtle bg-white text-text-dark placeholder:text-text-muted focus:outline-none focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 transition-colors"
             />
           </div>
 
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="w-full py-2.5 px-4 rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
+            class="w-full py-2.5 px-4 rounded-lg bg-academic-navy hover:bg-academic-hover text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
           >
             <IconShieldCheck customClass="w-4 h-4 text-white" />
             <span>Masuk sebagai Administrator</span>
@@ -151,14 +151,14 @@
         </form>
 
         <!-- Status / Notice for Future Milestone -->
-        <div v-if="noticeMessage" class="p-3 rounded-lg bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] text-xs">
+        <div v-if="noticeMessage" class="p-3 rounded-lg bg-bg-subtle border border-border-subtle text-academic-navy text-xs">
           {{ noticeMessage }}
         </div>
       </div>
     </div>
 
     <!-- Bottom Footer Attribution -->
-    <div class="max-w-md w-full mx-auto text-center text-xs text-[#5A6A85]">
+    <div class="max-w-md w-full mx-auto text-center text-xs text-text-muted">
       SiReDo &copy; 2026 Jurusan Teknik Informatika Polibatam.
     </div>
   </div>

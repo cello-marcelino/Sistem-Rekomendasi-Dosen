@@ -47,7 +47,7 @@
           <!-- Button Masuk Portal (Secondary Variant: White with Border) -->
           <router-link
             to="/login"
-            class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-white hover:bg-bg-subtle text-academic-navy transition-all border border-[#CBD5E1]"
+            class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-white hover:bg-bg-subtle text-academic-navy transition-all border border-border-subtle"
           >
             <!-- Flowbite Outline Icon Lock -->
             <svg class="w-4 h-4 text-academic-navy" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
