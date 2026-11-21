@@ -22,45 +22,6 @@
               Memadukan pendekatan leksikal dan kecocokan semantik untuk menemukan dosen pembimbing tugas akhir yang paling relevan dengan arah penelitian mahasiswa secara objektif dan akurat.
             </p>
 
-            <!-- Quick Recommendation Search Box & Relocated Navigation Button -->
-            <form @submit.prevent="handleQuickRecommendation" class="pt-1">
-              <div class="p-1.5 sm:p-2 rounded-2xl bg-white border border-[#CBD5E1] shadow-[0_4px_25px_rgba(30,58,109,0.08)] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 transition-all focus-within:border-[#4EA8DE] focus-within:ring-3 focus-within:ring-[#4EA8DE]/20">
-                <div class="relative flex-1 flex items-center pl-3">
-                  <svg class="w-4 h-4 text-[#4EA8DE] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
-                  </svg>
-                  <input
-                    v-model="quickJudul"
-                    type="text"
-                    placeholder="Ketik draf judul tugas akhir (misal: Deteksi Objek YOLOv8)..."
-                    class="w-full pl-2.5 pr-3 py-2 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#5A6A85] placeholder:opacity-50 bg-transparent focus:outline-none"
-                  />
-                </div>
-                
-                <button
-                  type="submit"
-                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold bg-[#1E3A6D] hover:bg-[#15294E] text-white transition-all shadow-xs cursor-pointer active:scale-98 shrink-0"
-                >
-                  <svg class="w-4 h-4 text-[#4EA8DE]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
-                  </svg>
-                  <span>Cari Rekomendasi Dosen</span>
-                </button>
-              </div>
-
-              <!-- Secondary Navigation Row -->
-              <div class="flex items-center justify-between text-xs text-[#5A6A85] px-1.5 pt-2">
-                <span class="text-[11px] sm:text-xs">💡 Evaluasi leksikal & semantik langsung dari judul penelitian.</span>
-                <router-link
-                  to="/dosen?mode=manual"
-                  class="text-[11px] sm:text-xs text-[#1E3A6D] hover:underline font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
-                >
-                  <span>Jelajahi Direktori Dosen Manual</span>
-                  <span>&rarr;</span>
-                </router-link>
-              </div>
-            </form>
-
             <!-- 3 Core Value Items (Unboxed Editorial List - Versi Lama) -->
             <div class="space-y-3 pt-3 border-t border-[#E2E8F0]">
               <div class="flex items-start gap-3">
@@ -111,19 +72,57 @@
             </div>
           </div>
 
-          <!-- RIGHT COLUMN: Visual Illustration Asset (Seamless Pure White Container) -->
-          <div class="lg:col-span-5 flex items-center justify-center">
+          <!-- RIGHT COLUMN: Visual Illustration Asset (Seamless Pure White Container) & Quick Recommendation Input Underneath -->
+          <div class="lg:col-span-5 flex flex-col items-center justify-center gap-3.5">
             <div class="w-full max-w-lg lg:max-w-none rounded-2xl bg-white p-3 sm:p-5 shadow-[0_4px_20px_rgba(30,58,109,0.06)] border border-[#E2E8F0] transition-all duration-300">
               <img
                 :src="heroIllustration"
                 alt="Ilustrasi Riset Dosen Hybrid NLP"
-                class="w-full h-auto object-contain rounded-xl max-h-[380px] sm:max-h-[440px] lg:max-h-[480px] mx-auto bg-white"
+                class="w-full h-auto object-contain rounded-xl max-h-[340px] sm:max-h-[380px] lg:max-h-[420px] mx-auto bg-white"
                 loading="eager"
               />
               <div class="text-[11px] text-[#5A6A85] text-center font-mono mt-2 pt-2 border-t border-slate-100">
                 Pencocokan Topik & Portofolio Dosen
               </div>
             </div>
+
+            <!-- Quick Recommendation Search Box (Under Illustration) -->
+            <form @submit.prevent="handleQuickRecommendation" class="w-full max-w-lg lg:max-w-none">
+              <div class="p-1.5 sm:p-2 rounded-2xl bg-white border border-[#CBD5E1] shadow-[0_4px_25px_rgba(30,58,109,0.08)] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 transition-all focus-within:border-[#4EA8DE] focus-within:ring-3 focus-within:ring-[#4EA8DE]/20">
+                <div class="relative flex-1 flex items-center pl-3">
+                  <svg class="w-4 h-4 text-[#4EA8DE] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                  </svg>
+                  <input
+                    v-model="quickJudul"
+                    type="text"
+                    placeholder="Ketik draf judul tugas akhir (misal: Deteksi Objek YOLOv8)..."
+                    class="w-full pl-2.5 pr-3 py-2 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#5A6A85] placeholder:opacity-50 bg-transparent focus:outline-none"
+                  />
+                </div>
+                
+                <button
+                  type="submit"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold bg-[#1E3A6D] hover:bg-[#15294E] text-white transition-all shadow-xs cursor-pointer active:scale-98 shrink-0"
+                >
+                  <svg class="w-4 h-4 text-[#4EA8DE]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+                  </svg>
+                  <span>Cari Rekomendasi Dosen</span>
+                </button>
+              </div>
+
+              <!-- Secondary Link to Manual Directory -->
+              <div class="flex items-center justify-between text-[11px] text-[#5A6A85] px-1.5 pt-1.5">
+                <span>💡 Rekomendasi otomatis tanpa abstrak</span>
+                <router-link
+                  to="/dosen?mode=manual"
+                  class="text-[#1E3A6D] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Jelajahi Direktori Manual &rarr;</span>
+                </router-link>
+              </div>
+            </form>
           </div>
 
         </div>
