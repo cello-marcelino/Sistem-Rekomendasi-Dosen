@@ -26,6 +26,13 @@
           >
             Beranda
           </router-link>
+          <router-link
+            to="/dosen"
+            class="hover:text-[#1E3A6D] transition-colors py-1"
+            :class="{ 'text-[#1E3A6D] font-bold': $route.path === '/dosen' }"
+          >
+            Dosen & Pembimbing
+          </router-link>
           <a
             href="#metodologi"
             @click.prevent="scrollTo('#metodologi')"
@@ -44,23 +51,10 @@
 
         <!-- Right Action Buttons -->
         <div class="flex items-center gap-2.5 sm:gap-3">
-          <!-- Single Navigation Button to DosenView (Primary: Deep Academic Navy) -->
-          <router-link
-            to="/dosen"
-            class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-xs"
-            :class="$route.path === '/dosen' ? 'bg-[#15294E] text-white ring-2 ring-[#4EA8DE]' : 'bg-[#1E3A6D] hover:bg-[#15294E] text-white'"
-          >
-            <!-- Flowbite Outline Icon Users -->
-            <svg class="w-4 h-4 text-[#4EA8DE]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            <span>Dosen & Pembimbing</span>
-          </router-link>
-
-          <!-- Button Masuk Portal (Secondary Variant: White with Border) -->
+          <!-- Button Masuk Portal -->
           <router-link
             to="/login"
-            class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-white hover:bg-[#F5F8FF] text-[#1E3A6D] transition-all border border-[#CBD5E1]"
+            class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-white hover:bg-[#F5F8FF] text-[#1E3A6D] hover:border-[#1E3A6D] transition-all border border-[#CBD5E1] shadow-2xs"
           >
             <!-- Flowbite Outline Icon Lock -->
             <svg class="w-4 h-4 text-[#1E3A6D]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

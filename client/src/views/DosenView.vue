@@ -973,11 +973,21 @@ const submitBimbinganRequest = () => {
 onMounted(() => {
   document.addEventListener('click', handleProdiDropdownClickOutside)
   fetchAllDosen()
+  
   // Check URL query param ?mode=rekomendasi or ?mode=manual
   if (route.query.mode === 'rekomendasi') {
     activeMode.value = 'rekomendasi'
   } else if (route.query.mode === 'manual') {
     activeMode.value = 'manual'
+  }
+
+  // Quick recommendation handling from Hero section
+  if (route.query.judul) {
+    activeMode.value = 'rekomendasi'
+    form.judul = String(route.query.judul)
+    setTimeout(() => {
+      handleSearchRecommendation()
+    }, 150)
   }
 })
 
