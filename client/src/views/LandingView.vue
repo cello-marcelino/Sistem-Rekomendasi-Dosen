@@ -5,17 +5,11 @@
 
     <!-- 2. Side-by-Side Hero Section with NLP Illustration Asset -->
     <section id="hero" class="relative pt-8 pb-14 sm:pt-12 sm:pb-18 overflow-hidden scroll-mt-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           <!-- LEFT COLUMN: Value Proposition & System Identity (Zero Navigation) -->
           <div class="lg:col-span-7 space-y-6">
-            <!-- Micro-Badge: System Philosophy -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-white/95 border border-[#E2E8F0] text-[#1E3A6D] shadow-2xs">
-              <span class="w-2 h-2 rounded-full bg-[#4EA8DE] animate-pulse"></span>
-              <span>Sistem Rekomendasi Akademik Cerdas</span>
-            </div>
-
             <!-- Main Headline -->
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#1E3A6D] leading-[1.15]">
               Pencocokan Tepat <br class="hidden sm:inline" />
@@ -99,7 +93,7 @@
 
     <!-- 3. Methodology Section: Dual-Engine Hybrid NLP (Side-by-Side: Diagram | Narasi) -->
     <section id="metodologi" class="py-12 sm:py-16 bg-white border-y border-[#E2E8F0] scroll-mt-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
+      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
         
         <!-- Section Header -->
         <div class="text-center max-w-2xl mx-auto space-y-1.5">
@@ -172,7 +166,7 @@
 
     <!-- 4. Three Roles Ecosystem Section -->
     <section id="ekosistem" class="py-16 scroll-mt-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div class="text-center max-w-2xl mx-auto space-y-2">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1E3A6D] tracking-tight">
             Ekosistem Terintegrasi Tiga Peran
@@ -196,7 +190,7 @@
 
           <!-- Role 2: Dosen -->
           <div class="p-6 rounded-xl border border-[#E2E8F0] bg-white shadow-[0_4px_20px_rgba(30,58,109,0.04)] space-y-3">
-            <div class="w-10 h-10 rounded-lg bg-[#EBF4FF] border border-[#CBD5E1] text-[#1E3A6D] flex items-center justify-center">
+            <div class="w-10 h-10 rounded-lg bg-[#EBF4FF] border border-[#CBD5E1] text-academic-navy flex items-center justify-center">
               <IconUsers customClass="w-5 h-5" />
             </div>
             <h3 class="text-base font-bold text-[#0F172A]">Dosen Pembimbing</h3>
@@ -221,7 +215,7 @@
 
     <!-- 5. Academic Footer -->
     <footer class="py-10 bg-white border-t border-[#E2E8F0]">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 text-center sm:text-left sm:flex sm:items-center sm:justify-between">
+      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 text-center sm:text-left sm:flex sm:items-center sm:justify-between">
         <div>
           <div class="text-sm font-bold text-[#1E3A6D]">SiReDo — Sistem Rekomendasi Dosen</div>
           <div class="text-xs text-[#5A6A85] mt-0.5">

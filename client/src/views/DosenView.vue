@@ -4,7 +4,7 @@
     <Navbar />
 
     <!-- Page Header Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
+    <main class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
       
       <!-- Breadcrumb & Header Title -->
       <div class="space-y-2">
@@ -277,106 +277,104 @@
       <!-- ========================================================================= -->
       <!-- MODE 2: CARI DOSEN REKOMENDASI TOP-K (Input Judul & Abstrak Proyek)       -->
       <!-- ========================================================================= -->
-      <section v-else-if="activeMode === 'rekomendasi'" class="space-y-6 animate-card-fade-in">
+      <section v-else-if="activeMode === 'rekomendasi'" class="space-y-8 animate-card-fade-in">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          <!-- LEFT FORM COLUMN: Input Proyek -->
-          <div class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-7 space-y-5">
-            <div class="border-b border-slate-100 pb-3">
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                <IconCpuChip customClass="w-5 h-5 text-teal-700" />
-                <span>Input Topik Proyek / Tugas Akhir</span>
-              </h2>
-              <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                Ketikkan draf judul dan uraian rencana penelitian. Mesin NLP akan mengevaluasi kecocokan istilah eksak dan makna semantik secara objektif.
-              </p>
-            </div>
+        <!-- BAGIAN ATAS: Formulir Input Topik Proyek (Full Width) -->
+        <div class="bg-white border border-[#E2E8F0] rounded-2xl p-5 sm:p-8 shadow-[0_4px_20px_rgba(30,58,109,0.04)] space-y-6">
+          <div class="border-b border-[#E2E8F0] pb-4">
+            <h2 class="text-base sm:text-lg font-bold text-[#1E3A6D] flex items-center gap-2">
+              <IconCpuChip customClass="w-5 h-5 text-[#1E3A6D]" />
+              <span>Input Topik Proyek / Tugas Akhir</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-[#5A6A85] mt-1 leading-relaxed">
+              Ketikkan draf judul dan uraian rencana penelitian. Mesin NLP akan mengevaluasi kecocokan istilah eksak dan makna semantik secara objektif.
+            </p>
+          </div>
 
-            <!-- Quick Sample Topics -->
+          <!-- Quick Sample Topics -->
+          <div class="space-y-2">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-[#5A6A85]">Contoh Topik Cepat:</span>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                v-for="(sample, idx) in sampleTopics"
+                :key="idx"
+                @click="applySampleTopic(sample)"
+                :class="[
+                  'px-3 py-1.5 text-xs rounded-lg border transition-all cursor-pointer text-left font-medium active:scale-95',
+                  form.judul === sample.judul
+                    ? 'border-[#1E3A6D] bg-[#1E3A6D] text-white font-semibold shadow-xs'
+                    : 'border-[#CBD5E1] bg-[#F5F8FF] hover:bg-[#EBF4FF] text-[#1E3A6D]'
+                ]"
+              >
+                {{ sample.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Input Form -->
+          <form @submit.prevent="handleSearchRecommendation" class="space-y-5">
+            <!-- Judul Input -->
             <div class="space-y-1.5">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Contoh Topik Cepat:</span>
-              <div class="flex flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  v-for="(sample, idx) in sampleTopics"
-                  :key="idx"
-                  @click="applySampleTopic(sample)"
-                  :class="[
-                    'px-2.5 py-1 text-xs rounded-md border transition-all cursor-pointer text-left font-medium active:scale-95',
-                    form.judul === sample.judul
-                      ? 'border-teal-600 bg-teal-50 text-teal-900 font-semibold shadow-xs'
-                      : 'border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 text-slate-700'
-                  ]"
-                >
-                  {{ sample.label }}
-                </button>
-              </div>
+              <label for="judul" class="block text-xs font-semibold text-[#0F172A]">
+                Judul Rencana Proyek
+              </label>
+              <input
+                id="judul"
+                v-model="form.judul"
+                type="text"
+                required
+                placeholder="Contoh: Implementasi Deep Learning untuk Deteksi Objek..."
+                class="w-full px-4 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
+              />
             </div>
 
-            <!-- Input Form -->
-            <form @submit.prevent="handleSearchRecommendation" class="space-y-4">
-              <!-- Judul Input -->
-              <div class="space-y-1">
-                <label for="judul" class="block text-xs font-semibold text-slate-700">
-                  Judul Rencana Proyek
-                </label>
-                <input
-                  id="judul"
-                  v-model="form.judul"
-                  type="text"
-                  required
-                  placeholder="Contoh: Implementasi Deep Learning untuk Deteksi Objek..."
-                  class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-700 transition-colors"
-                />
+            <!-- Abstrak Input -->
+            <div class="space-y-1.5">
+              <label for="abstrak" class="block text-xs font-semibold text-[#0F172A]">
+                Abstrak / Deskripsi Penelitian
+              </label>
+              <textarea
+                id="abstrak"
+                v-model="form.abstrak"
+                rows="5"
+                required
+                placeholder="Jelaskan latar belakang permasalahan, algoritma/metode yang diajukan, dataset, dan tujuan riset secara ringkas..."
+                class="w-full px-4 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors resize-y leading-relaxed"
+              ></textarea>
+            </div>
+
+            <!-- Row Pengaturan Parameter & Tombol Aksi -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end pt-1">
+              <div class="sm:col-span-3 space-y-1">
+                <label class="block text-[11px] font-semibold text-[#5A6A85]">Jumlah Rekomendasi:</label>
+                <select
+                  v-model="form.k_rank"
+                  class="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] cursor-pointer"
+                >
+                  <option :value="3">Top 3 Dosen</option>
+                  <option :value="5">Top 5 Dosen</option>
+                  <option :value="10">Top 10 Dosen</option>
+                </select>
               </div>
 
-              <!-- Abstrak Input -->
-              <div class="space-y-1">
-                <label for="abstrak" class="block text-xs font-semibold text-slate-700">
-                  Abstrak / Deskripsi Penelitian
-                </label>
-                <textarea
-                  id="abstrak"
-                  v-model="form.abstrak"
-                  rows="5"
-                  required
-                  placeholder="Jelaskan latar belakang permasalahan, algoritma/metode yang diajukan, dataset, dan tujuan riset secara ringkas..."
-                  class="w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-700 transition-colors resize-y"
-                ></textarea>
-              </div>
-
-              <!-- Pilihan Jumlah Top-K & Prodi (Opsional) -->
-              <div class="grid grid-cols-2 gap-3 pt-1">
-                <div class="space-y-1">
-                  <label class="block text-[11px] font-semibold text-[#5A6A85]">Jumlah Rekomendasi:</label>
-                  <select
-                    v-model="form.k_rank"
-                    class="w-full px-3 py-1.5 text-xs rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE]"
-                  >
-                    <option :value="3">Top 3 Dosen</option>
-                    <option :value="5">Top 5 Dosen</option>
-                    <option :value="10">Top 10 Dosen</option>
-                  </select>
-                </div>
-                <div class="space-y-1">
-                  <label class="block text-[11px] font-semibold text-[#5A6A85]">Saring Prodi (Opsional):</label>
-                  <select
-                    v-model="form.prodi"
-                    class="w-full px-3 py-1.5 text-xs rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE]"
-                  >
-                    <option value="">Semua Jurusan</option>
-                    <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
-                  </select>
-                </div>
+              <div class="sm:col-span-4 space-y-1">
+                <label class="block text-[11px] font-semibold text-[#5A6A85]">Saring Prodi (Opsional):</label>
+                <select
+                  v-model="form.prodi"
+                  class="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] cursor-pointer"
+                >
+                  <option value="">Semua Jurusan</option>
+                  <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
+                </select>
               </div>
 
               <!-- Action Button -->
-              <div class="pt-2">
+              <div class="sm:col-span-5">
                 <button
                   type="submit"
                   :disabled="isLoadingRec"
-                  class="w-full py-2.5 px-4 rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99] shadow-xs"
+                  class="w-full py-2.5 px-5 rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99] shadow-xs"
                 >
                   <template v-if="isLoadingRec">
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -391,105 +389,114 @@
                   </template>
                 </button>
               </div>
-            </form>
-
-            <!-- Error Message -->
-            <div v-if="recError" class="p-3 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-xs">
-              {{ recError }}
             </div>
+          </form>
+
+          <!-- Error Message -->
+          <div v-if="recError" class="p-3.5 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-xs">
+            {{ recError }}
+          </div>
+        </div>
+
+        <!-- BAGIAN BAWAH: Hasil Rekomendasi Top-K (Full Width) -->
+        <div id="recommendation-results" class="space-y-4 scroll-mt-24">
+          
+          <!-- Default Placeholder before search -->
+          <div
+            v-if="!recommendationResults && !isLoadingRec"
+            class="p-8 sm:p-12 rounded-2xl bg-white border border-[#E2E8F0] text-center space-y-3 shadow-[0_4px_20px_rgba(30,58,109,0.04)]"
+          >
+            <div class="w-12 h-12 rounded-2xl bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] flex items-center justify-center mx-auto">
+              <IconSearch customClass="w-6 h-6 text-[#1E3A6D]" />
+            </div>
+            <h3 class="text-base font-bold text-[#0F172A]">Menunggu Input Rencana Penelitian</h3>
+            <p class="text-xs sm:text-sm text-[#5A6A85] max-w-md mx-auto leading-relaxed">
+              Isi formulir judul dan abstrak di atas atau klik salah satu contoh topik untuk mengevaluasi rekomendasi dosen pembimbing terbaik.
+            </p>
           </div>
 
-          <!-- RIGHT RESULTS COLUMN: Top-K Lecturer Cards -->
-          <div class="lg:col-span-7 space-y-4">
-            
-            <!-- Default Placeholder before search -->
-            <div
-              v-if="!recommendationResults && !isLoadingRec"
-              class="p-8 sm:p-12 rounded-2xl bg-white border border-[#E2E8F0] text-center space-y-3 shadow-[0_4px_20px_rgba(30,58,109,0.04)]"
-            >
-              <div class="w-12 h-12 rounded-2xl bg-[#F5F8FF] border border-[#CBD5E1] text-[#1E3A6D] flex items-center justify-center mx-auto">
-                <IconSearch customClass="w-6 h-6 text-[#1E3A6D]" />
+          <!-- Empty Results Notice -->
+          <div
+            v-else-if="recommendationResults && recommendationResults.length === 0"
+            class="p-5 rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] text-[#92400E] text-xs space-y-1.5"
+          >
+            <div class="font-bold text-sm">Tidak Ada Dosen yang Memenuhi Ambang Batas</div>
+            <p class="leading-relaxed text-[#B45309]">
+              Kandidat tidak memiliki irisan kata kunci atau skor kecocokan berada di bawah ambang batas minimum. Cobalah menambahkan variasi istilah teknis pada judul atau abstrak penelitian Anda.
+            </p>
+          </div>
+
+          <!-- Staggered Results List -->
+          <div v-else-if="recommendationResults && recommendationResults.length > 0" class="space-y-4">
+            <div class="flex items-center justify-between pb-1">
+              <div class="flex items-center gap-2">
+                <IconCpuChip customClass="w-4 h-4 text-[#1E3A6D]" />
+                <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0F172A]">Hasil Rekomendasi Teratas:</span>
               </div>
-              <h3 class="text-base font-bold text-[#0F172A]">Menunggu Input Rencana Penelitian</h3>
-              <p class="text-xs sm:text-sm text-[#5A6A85] max-w-md mx-auto leading-relaxed">
-                Isi judul dan abstrak penelitian di formulir sebelah kiri atau klik salah satu contoh topik untuk mengevaluasi rekomendasi dosen pembimbing terbaik.
-              </p>
+              <span class="text-xs font-mono text-[#1E3A6D] font-bold bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#CBD5E1]">
+                {{ recommendationResults.length }} Dosen Cocok
+              </span>
             </div>
 
-            <!-- Empty Results Notice -->
-            <div
-              v-else-if="recommendationResults && recommendationResults.length === 0"
-              class="p-5 rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] text-[#92400E] text-xs space-y-1.5"
-            >
-              <div class="font-bold text-sm">Tidak Ada Dosen yang Memenuhi Ambang Batas</div>
-              <p class="leading-relaxed text-[#B45309]">
-                Kandidat tidak memiliki irisan kata kunci atau skor kecocokan berada di bawah ambang batas minimum. Cobalah menambahkan variasi istilah teknis pada judul atau abstrak penelitian Anda.
-              </p>
-            </div>
-
-            <!-- Staggered Results List -->
-            <div v-else-if="recommendationResults && recommendationResults.length > 0" class="space-y-3">
-              <div class="flex items-center justify-between pb-1">
-                <span class="text-xs font-bold uppercase tracking-wider text-[#0F172A]">Hasil Rekomendasi Teratas:</span>
-                <span class="text-xs font-mono text-[#1E3A6D] font-semibold">{{ recommendationResults.length }} Dosen Cocok</span>
-              </div>
-
-              <!-- Recommendation Cards -->
+            <!-- Recommendation Cards Grid (Responsive 2-column or 1-column) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div
                 v-for="(dosen, index) in recommendationResults"
                 :key="dosen.id || index"
-                class="animate-card-fade-in p-5 rounded-2xl border border-[#E2E8F0] bg-white hover:border-[#8E94F2] hover:shadow-[0_4px_20px_rgba(30,58,109,0.06)] transition-all duration-300 space-y-3"
+                class="animate-card-fade-in p-5 rounded-2xl border border-[#E2E8F0] bg-white hover:border-[#8E94F2] hover:shadow-[0_4px_20px_rgba(30,58,109,0.06)] transition-all duration-300 flex flex-col justify-between space-y-3"
                 :style="{ animationDelay: `${index * 80}ms` }"
               >
-                <div class="flex items-start justify-between gap-4">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                      <span class="w-6 h-6 rounded-full bg-[#1E3A6D] text-white text-xs font-bold flex items-center justify-center font-mono">
-                        {{ index + 1 }}
+                <div class="space-y-3">
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="space-y-1">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-[#1E3A6D] text-white text-xs font-bold flex items-center justify-center font-mono shrink-0">
+                          {{ index + 1 }}
+                        </span>
+                        <h3 class="text-sm sm:text-base font-bold text-[#0F172A]">
+                          {{ dosen.nama }}
+                        </h3>
+                      </div>
+                      <div class="text-xs text-[#5A6A85] font-mono flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                        <span>NIDN: {{ dosen.nidn || '—' }}</span>
+                        <span>•</span>
+                        <span>{{ dosen.program_studi }}</span>
+                        <span v-if="dosen.email">•</span>
+                        <span v-if="dosen.email" class="text-[#1E3A6D]">{{ dosen.email }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Skor Kecocokan Badge -->
+                    <div class="text-right shrink-0">
+                      <div class="text-base font-mono font-black text-[#1E3A6D]">
+                        {{ Math.round((dosen.skor_akhir || 0) * 100) }}%
+                      </div>
+                      <div class="text-[10px] text-[#5A6A85] uppercase tracking-tight font-medium">Kecocokan</div>
+                    </div>
+                  </div>
+
+                  <!-- Bidang Keahlian -->
+                  <div v-if="dosen.bidang_keahlian" class="text-xs text-[#0F172A]">
+                    <span class="text-[#5A6A85] font-medium">Keahlian:</span> {{ dosen.bidang_keahlian }}
+                  </div>
+
+                  <!-- Irisan Kata Kunci yang Cocok (NLP Badges) -->
+                  <div v-if="dosen.irisan_kata && dosen.irisan_kata.length > 0" class="space-y-1 pt-1 border-t border-slate-100">
+                    <div class="text-[11px] text-[#5A6A85] font-medium">Irisan Kata Kunci yang Cocok:</div>
+                    <div class="flex flex-wrap gap-1">
+                      <span
+                        v-for="(kata, kIdx) in dosen.irisan_kata.slice(0, 6)"
+                        :key="kIdx"
+                        class="px-2 py-0.5 rounded text-[11px] font-mono bg-[#E0F2FE] border border-[#BAE6FD] text-[#0369A1]"
+                      >
+                        {{ kata }}
                       </span>
-                      <h3 class="text-sm sm:text-base font-bold text-[#0F172A]">
-                        {{ dosen.nama }}
-                      </h3>
                     </div>
-                    <div class="text-xs text-[#5A6A85] font-mono flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                      <span>NIDN: {{ dosen.nidn || '—' }}</span>
-                      <span>•</span>
-                      <span>{{ dosen.program_studi }}</span>
-                      <span v-if="dosen.email">•</span>
-                      <span v-if="dosen.email" class="text-[#1E3A6D]">{{ dosen.email }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Skor Kecocokan Badge -->
-                  <div class="text-right shrink-0">
-                    <div class="text-base font-mono font-black text-[#1E3A6D]">
-                      {{ Math.round((dosen.skor_akhir || 0) * 100) }}%
-                    </div>
-                    <div class="text-[10px] text-[#5A6A85] uppercase tracking-tight font-medium">Kecocokan</div>
-                  </div>
-                </div>
-
-                <!-- Bidang Keahlian -->
-                <div v-if="dosen.bidang_keahlian" class="text-xs text-[#0F172A]">
-                  <span class="text-[#5A6A85] font-medium">Keahlian:</span> {{ dosen.bidang_keahlian }}
-                </div>
-
-                <!-- Irisan Kata Kunci yang Cocok (NLP Badges) -->
-                <div v-if="dosen.irisan_kata && dosen.irisan_kata.length > 0" class="space-y-1 pt-1 border-t border-slate-100">
-                  <div class="text-[11px] text-[#5A6A85] font-medium">Irisan Kata Kunci yang Cocok:</div>
-                  <div class="flex flex-wrap gap-1">
-                    <span
-                      v-for="(kata, kIdx) in dosen.irisan_kata.slice(0, 6)"
-                      :key="kIdx"
-                      class="px-2 py-0.5 rounded text-[11px] font-mono bg-[#E0F2FE] border border-[#BAE6FD] text-[#0369A1]"
-                    >
-                      {{ kata }}
-                    </span>
                   </div>
                 </div>
 
                 <!-- CTA Action Button -->
-                <div class="pt-2 flex justify-end">
+                <div class="pt-2 flex justify-end border-t border-slate-100">
                   <button
                     type="button"
                     @click="openBimbinganModal(dosen)"
@@ -501,7 +508,6 @@
                 </div>
               </div>
             </div>
-
           </div>
 
         </div>
@@ -809,6 +815,12 @@ const handleSearchRecommendation = async () => {
           irisan_kata: irisan
         }
       })
+
+      // Smooth scroll ke area hasil rekomendasi di bawah
+      setTimeout(() => {
+        const el = document.getElementById('recommendation-results')
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
     } else {
       recError.value = res.message || 'Tidak ada rekomendasi yang ditemukan untuk topik ini.'
     }

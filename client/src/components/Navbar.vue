@@ -1,6 +1,6 @@
 <template>
   <header class="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-[#E2E8F0] transition-colors shadow-2xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <!-- Brand & Campus Emblem -->
         <router-link to="/" class="flex items-center gap-3 group">
