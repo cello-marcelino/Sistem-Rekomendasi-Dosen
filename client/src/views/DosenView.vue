@@ -76,7 +76,7 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Cari nama dosen, keahlian, atau prodi..."
-                class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
+                class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] placeholder:opacity-50 focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
               />
               <button
                 v-if="searchQuery"
@@ -286,9 +286,6 @@
               <IconCpuChip customClass="w-5 h-5 text-[#1E3A6D]" />
               <span>Input Topik Proyek / Tugas Akhir</span>
             </h2>
-            <p class="text-xs sm:text-sm text-[#5A6A85] mt-1 leading-relaxed">
-              Ketikkan draf judul dan uraian rencana penelitian. Mesin NLP akan mengevaluasi kecocokan istilah eksak dan makna semantik secara objektif.
-            </p>
           </div>
 
           <!-- Quick Sample Topics -->
@@ -325,7 +322,7 @@
                 type="text"
                 required
                 placeholder="Contoh: Implementasi Deep Learning untuk Deteksi Objek..."
-                class="w-full px-4 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
+                class="w-full px-4 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] placeholder:opacity-50 focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors"
               />
             </div>
 
@@ -338,43 +335,48 @@
                 id="abstrak"
                 v-model="form.abstrak"
                 rows="5"
-                required
                 placeholder="Jelaskan latar belakang permasalahan, algoritma/metode yang diajukan, dataset, dan tujuan riset secara ringkas..."
-                class="w-full px-4 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors resize-y leading-relaxed"
+                class="w-full px-4 py-2.5 text-base sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] placeholder:text-[#5A6A85] placeholder:opacity-50 focus:outline-none focus:border-[#4EA8DE] focus:ring-2 focus:ring-[#4EA8DE]/20 transition-colors resize-y leading-relaxed"
               ></textarea>
             </div>
 
             <!-- Row Pengaturan Parameter & Tombol Aksi -->
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end pt-1">
-              <div class="sm:col-span-3 space-y-1">
-                <label class="block text-[11px] font-semibold text-[#5A6A85]">Jumlah Rekomendasi:</label>
-                <select
-                  v-model="form.k_rank"
-                  class="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] cursor-pointer"
-                >
-                  <option :value="3">Top 3 Dosen</option>
-                  <option :value="5">Top 5 Dosen</option>
-                  <option :value="10">Top 10 Dosen</option>
-                </select>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-[#E2E8F0]">
+              <!-- Parameter: Jumlah Rekomendasi (Segmented Control) -->
+              <div class="flex flex-wrap items-center gap-2.5">
+                <span class="text-xs font-semibold text-[#5A6A85] whitespace-nowrap">Jumlah Rekomendasi:</span>
+                <div class="inline-flex p-1 bg-[#F5F8FF] border border-[#CBD5E1] rounded-lg">
+                  <button
+                    type="button"
+                    v-for="k in [3, 5, 10]"
+                    :key="k"
+                    @click="form.k_rank = k"
+                    :class="[
+                      'px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer active:scale-95',
+                      form.k_rank === k
+                        ? 'bg-[#1E3A6D] text-white shadow-xs'
+                        : 'text-[#5A6A85] hover:text-[#1E3A6D] hover:bg-white/60'
+                    ]"
+                  >
+                    Top {{ k }} Dosen
+                  </button>
+                </div>
               </div>
 
-              <div class="sm:col-span-4 space-y-1">
-                <label class="block text-[11px] font-semibold text-[#5A6A85]">Saring Prodi (Opsional):</label>
-                <select
-                  v-model="form.prodi"
-                  class="w-full px-3 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] cursor-pointer"
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  @click="resetRecForm"
+                  title="Kosongkan form input dan hasil rekomendasi"
+                  class="px-4 py-2.5 rounded-lg border border-[#CBD5E1] bg-white hover:bg-[#F5F8FF] text-[#1E3A6D] font-semibold text-xs sm:text-sm transition-colors cursor-pointer active:scale-95 shrink-0"
                 >
-                  <option value="">Semua Jurusan</option>
-                  <option v-for="p in prodiOptions" :key="p" :value="p">{{ p }}</option>
-                </select>
-              </div>
-
-              <!-- Action Button -->
-              <div class="sm:col-span-5">
+                  Reset
+                </button>
                 <button
                   type="submit"
                   :disabled="isLoadingRec"
-                  class="w-full py-2.5 px-5 rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99] shadow-xs"
+                  class="flex-1 sm:flex-initial py-2.5 px-6 rounded-lg bg-[#1E3A6D] hover:bg-[#15294E] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99] shadow-xs"
                 >
                   <template v-if="isLoadingRec">
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -747,13 +749,20 @@ const fetchAllDosen = async () => {
 const form = reactive({
   judul: '',
   abstrak: '',
-  k_rank: 5,
-  prodi: ''
+  k_rank: 5
 })
 
 const isLoadingRec = ref(false)
 const recError = ref('')
 const recommendationResults = ref(null)
+
+const resetRecForm = () => {
+  form.judul = ''
+  form.abstrak = ''
+  form.k_rank = 5
+  recError.value = ''
+  recommendationResults.value = null
+}
 
 const sampleTopics = [
   {
@@ -780,8 +789,8 @@ const applySampleTopic = (sample) => {
 }
 
 const handleSearchRecommendation = async () => {
-  if (!form.judul.trim() || !form.abstrak.trim()) {
-    recError.value = 'Harap isi judul dan abstrak penelitian terlebih dahulu.'
+  if (!form.judul.trim() && !form.abstrak.trim()) {
+    recError.value = 'Harap isi setidaknya judul atau uraian rencana penelitian.'
     return
   }
 
@@ -793,8 +802,7 @@ const handleSearchRecommendation = async () => {
     const res = await recommendationService.getSingleRecommendation({
       judul: form.judul,
       abstrak: form.abstrak,
-      k_rank: form.k_rank,
-      prodi: form.prodi || undefined
+      k_rank: form.k_rank
     })
 
     if (res.success && res.data) {
