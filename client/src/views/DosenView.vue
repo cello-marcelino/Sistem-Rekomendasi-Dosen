@@ -87,19 +87,91 @@
               </button>
             </div>
 
-            <!-- Prodi Dropdown Filter -->
-            <div class="flex items-center gap-2">
-              <label for="prodiFilter" class="text-xs font-semibold text-[#5A6A85] whitespace-nowrap">Program Studi:</label>
-              <select
-                id="prodiFilter"
-                v-model="selectedProdi"
-                class="px-3 py-2 text-xs sm:text-sm rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] focus:outline-none focus:border-[#4EA8DE] cursor-pointer"
+            <!-- Flowbite Prodi Dropdown Filter Component -->
+            <div class="relative w-full sm:w-auto" ref="prodiDropdownRef">
+              <button
+                id="dropdownProdiButton"
+                type="button"
+                @click="isProdiDropdownOpen = !isProdiDropdownOpen"
+                class="w-full sm:w-auto text-[#0F172A] bg-white hover:bg-[#F5F8FF] hover:border-[#1E3A6D] border border-[#CBD5E1] focus:ring-2 focus:ring-[#4EA8DE]/20 focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-3.5 py-2 text-center inline-flex items-center justify-between gap-2.5 transition-all cursor-pointer shadow-xs min-w-[200px]"
+                :aria-expanded="isProdiDropdownOpen"
               >
-                <option value="all">Semua Program Studi</option>
-                <option v-for="prodi in prodiOptions" :key="prodi" :value="prodi">
-                  {{ prodi }}
-                </option>
-              </select>
+                <span class="flex items-center gap-1.5 truncate">
+                  <span class="text-[#5A6A85] text-xs font-normal">Prodi:</span>
+                  <span class="font-semibold text-[#1E3A6D] truncate">
+                    {{ selectedProdi === 'all' ? 'Semua Program Studi' : selectedProdi }}
+                  </span>
+                </span>
+                <svg
+                  :class="['w-2.5 h-2.5 text-[#5A6A85] transition-transform duration-200 shrink-0', isProdiDropdownOpen ? 'rotate-180' : '']"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                </svg>
+              </button>
+
+              <!-- Flowbite Dropdown Menu Popover -->
+              <Transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <div
+                  v-if="isProdiDropdownOpen"
+                  id="dropdownProdiMenu"
+                  class="absolute left-0 sm:left-auto sm:right-0 z-30 mt-1.5 w-full sm:w-64 bg-white divide-y divide-[#E2E8F0] rounded-xl shadow-[0_10px_25px_rgba(30,58,109,0.1)] border border-[#E2E8F0] focus:outline-none overflow-hidden"
+                >
+                  <div class="px-3.5 py-2 bg-[#F5F8FF] border-b border-[#E2E8F0] flex items-center justify-between">
+                    <span class="text-[11px] font-semibold text-[#5A6A85] uppercase tracking-wider">Pilih Program Studi</span>
+                    <button
+                      v-if="selectedProdi !== 'all'"
+                      type="button"
+                      @click="selectProdi('all')"
+                      class="text-[11px] text-[#1E3A6D] hover:underline cursor-pointer font-medium"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                  <ul class="py-1 text-xs text-[#0F172A] max-h-60 overflow-y-auto" aria-labelledby="dropdownProdiButton">
+                    <li>
+                      <button
+                        type="button"
+                        @click="selectProdi('all')"
+                        :class="[
+                          'w-full text-left px-3.5 py-2 flex items-center justify-between transition-colors cursor-pointer',
+                          selectedProdi === 'all'
+                            ? 'bg-[#F5F8FF] text-[#1E3A6D] font-bold'
+                            : 'text-[#0F172A] hover:bg-[#F5F8FF]'
+                        ]"
+                      >
+                        <span>Semua Program Studi</span>
+                        <span v-if="selectedProdi === 'all'" class="text-[#1E3A6D] font-bold">✓</span>
+                      </button>
+                    </li>
+                    <li v-for="prodi in prodiOptions" :key="prodi">
+                      <button
+                        type="button"
+                        @click="selectProdi(prodi)"
+                        :class="[
+                          'w-full text-left px-3.5 py-2 flex items-center justify-between transition-colors cursor-pointer',
+                          selectedProdi === prodi
+                            ? 'bg-[#F5F8FF] text-[#1E3A6D] font-bold'
+                            : 'text-[#0F172A] hover:bg-[#F5F8FF]'
+                        ]"
+                      >
+                        <span class="truncate">{{ prodi }}</span>
+                        <span v-if="selectedProdi === prodi" class="text-[#1E3A6D] font-bold shrink-0">✓</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </Transition>
             </div>
           </div>
 
@@ -640,7 +712,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '../components/Navbar.vue'
 import IconUsers from '../components/icons/IconUsers.vue'
@@ -665,15 +737,34 @@ const selectedProdi = ref('all')
 const currentPage = ref(1)
 const pageSize = 15
 
-// IT Domains Definition for Filtering
+// Flowbite Prodi Dropdown State
+const isProdiDropdownOpen = ref(false)
+const prodiDropdownRef = ref(null)
+
+const selectProdi = (val) => {
+  selectedProdi.value = val
+  currentPage.value = 1
+  isProdiDropdownOpen.value = false
+}
+
+const handleProdiDropdownClickOutside = (e) => {
+  if (prodiDropdownRef.value && !prodiDropdownRef.value.contains(e.target)) {
+    isProdiDropdownOpen.value = false
+  }
+}
+
+// IT Domains Definition for Filtering (Domain-domain Tunggal)
 const itDomains = [
   { id: 'all', label: 'Semua Domain IT', keywords: [] },
-  { id: 'rpl', label: 'Rekayasa Perangkat Lunak', keywords: ['software', 'perangkat lunak', 'web', 'mobile', 'agile', 'sdlc', 'devops', 'testing', 'aplikasi'] },
-  { id: 'ai', label: 'Kecerdasan Buatan & Data', keywords: ['artificial intelligence', 'machine learning', 'deep learning', 'computer vision', 'nlp', 'data mining', 'spk', 'decision support', 'intelligence', 'biometrik'] },
-  { id: 'cyber', label: 'Keamanan Siber & Jaringan', keywords: ['security', 'keamanan', 'jaringan', 'network', 'kriptografi', 'operating system', 'cloud', 'infrastruktur', 'active directory'] },
-  { id: 'iot', label: 'IoT & Sistem Tertanam', keywords: ['internet of things', 'iot', 'embedded', 'hardware', 'sensor', 'esp32', 'nodemcu', 'mikrokontroler', 'robotika', 'elektronika'] },
-  { id: 'multimedia', label: 'Multimedia & Game', keywords: ['multimedia', 'game', 'grafik', 'animasi', 'vr', 'ar', 'visual', '3d', 'video', 'desain'] },
-  { id: 'si', label: 'Sistem Informasi & Bisnis', keywords: ['sistem informasi', 'database', 'basis data', 'erp', 'e-government', 'manajemen', 'bisnis', 'informasi'] }
+  { id: 'rpl', label: 'Rekayasa Perangkat Lunak', keywords: ['software', 'perangkat lunak', 'rpl', 'web', 'mobile', 'aplikasi', 'programming', 'agile', 'devops', 'testing', 'sdlc', 'frontend', 'backend'] },
+  { id: 'ai', label: 'Kecerdasan Buatan', keywords: ['artificial intelligence', 'ai', 'machine learning', 'deep learning', 'computer vision', 'nlp', 'biometrik', 'decision support', 'expert system', 'intelligent system', 'spk'] },
+  { id: 'data', label: 'Sains Data', keywords: ['data science', 'data mining', 'big data', 'database', 'basis data', 'analytics', 'forecasting'] },
+  { id: 'cyber', label: 'Keamanan Siber', keywords: ['security', 'keamanan', 'siber', 'kriptografi', 'penetration testing', 'offensive security', 'penetration', 'app security', 'web security', 'data security'] },
+  { id: 'jaringan', label: 'Jaringan Komputer', keywords: ['network', 'jaringan', 'networking', 'telecommunication', 'operating system', 'infrastruktur', 'cloud'] },
+  { id: 'iot', label: 'Internet of Things', keywords: ['iot', 'internet of things', 'embedded', 'sensor', 'hardware technology', 'mikrokontroler', 'robotika', 'elektronika', 'esp32', 'nodemcu'] },
+  { id: 'game', label: 'Game', keywords: ['game', 'game design', 'game development', 'gamification', 'game ui/ux'] },
+  { id: 'animasi', label: 'Animasi', keywords: ['animasi', 'animation', 'rigging', '3d animation', 'render', 'compositing', '2d skeletal animation'] },
+  { id: 'si', label: 'Sistem Informasi', keywords: ['sistem informasi', 'information system', 'it governance', 'e-government', 'erp', 'manajemen informasi'] }
 ]
 
 const prodiOptions = computed(() => {
@@ -727,6 +818,7 @@ const resetFilters = () => {
   selectedDomain.value = 'all'
   selectedProdi.value = 'all'
   currentPage.value = 1
+  isProdiDropdownOpen.value = false
 }
 
 const fetchAllDosen = async () => {
@@ -879,6 +971,7 @@ const submitBimbinganRequest = () => {
 }
 
 onMounted(() => {
+  document.addEventListener('click', handleProdiDropdownClickOutside)
   fetchAllDosen()
   // Check URL query param ?mode=rekomendasi or ?mode=manual
   if (route.query.mode === 'rekomendasi') {
@@ -886,5 +979,9 @@ onMounted(() => {
   } else if (route.query.mode === 'manual') {
     activeMode.value = 'manual'
   }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleProdiDropdownClickOutside)
 })
 </script>
