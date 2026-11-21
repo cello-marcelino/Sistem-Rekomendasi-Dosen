@@ -145,12 +145,12 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-[#F5F8FF] border-b border-[#E2E8F0] text-[11px] font-bold uppercase tracking-wider text-[#1E3A6D]">
-                  <th scope="col" class="py-3 px-4 w-12 text-center font-mono">No</th>
-                  <th scope="col" class="py-3 px-4 min-w-[200px]">Dosen & NIDN</th>
-                  <th scope="col" class="py-3 px-4 min-w-[180px]">Email Institusi</th>
-                  <th scope="col" class="py-3 px-4 min-w-[160px]">Program Studi</th>
+                  <th scope="col" class="py-3 px-4 w-12 text-center font-mono whitespace-nowrap">No</th>
+                  <th scope="col" class="py-3 px-4 min-w-[200px] whitespace-nowrap">Dosen & NIDN</th>
+                  <th scope="col" class="py-3 px-4 min-w-[180px] whitespace-nowrap">Email Institusi</th>
+                  <th scope="col" class="py-3 px-4 min-w-[160px] whitespace-nowrap">Program Studi</th>
                   <th scope="col" class="py-3 px-4 min-w-[260px]">Bidang Keahlian</th>
-                  <th scope="col" class="py-3 px-4 w-44 text-right">Aksi Cepat</th>
+                  <th scope="col" class="py-3 px-4 w-44 text-right whitespace-nowrap">Aksi Cepat</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 text-xs">
@@ -191,46 +191,46 @@
                   class="hover:bg-[#F5F8FF]/80 transition-colors cursor-pointer group"
                 >
                   <!-- No -->
-                  <td class="py-3 px-4 text-center font-mono text-[#5A6A85] text-xs">
+                  <td class="py-3 px-4 text-center font-mono text-[#5A6A85] text-xs whitespace-nowrap">
                     {{ (currentPage - 1) * pageSize + idx + 1 }}
                   </td>
 
-                  <!-- Nama & NIDN -->
-                  <td class="py-3 px-4">
-                    <div class="font-bold text-[#0F172A] group-hover:text-[#1E3A6D] transition-colors">
+                  <!-- Nama & NIDN (Nowrap) -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <div class="font-bold text-[#0F172A] group-hover:text-[#1E3A6D] transition-colors whitespace-nowrap">
                       {{ dosen.nama }}
                     </div>
-                    <div class="text-[11px] font-mono text-[#5A6A85] mt-0.5">
+                    <div class="text-[11px] font-mono text-[#5A6A85] mt-0.5 whitespace-nowrap">
                       NIDN: {{ dosen.nidn || '—' }}
                     </div>
                   </td>
 
-                  <!-- Email Institusi -->
-                  <td class="py-3 px-4 font-mono text-xs">
-                    <span v-if="dosen.email" class="text-[#0F172A]">
+                  <!-- Email Institusi (Nowrap) -->
+                  <td class="py-3 px-4 font-mono text-xs whitespace-nowrap">
+                    <span v-if="dosen.email" class="text-[#0F172A] whitespace-nowrap">
                       {{ dosen.email }}
                     </span>
-                    <span v-else class="text-[#5A6A85] italic text-[11px]">
+                    <span v-else class="text-[#5A6A85] italic text-[11px] whitespace-nowrap">
                       —
                     </span>
                   </td>
 
-                  <!-- Program Studi -->
-                  <td class="py-3 px-4 text-[#5A6A85]">
-                    <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#F5F8FF] text-[#1E3A6D] border border-[#E2E8F0]">
+                  <!-- Program Studi (Nowrap) -->
+                  <td class="py-3 px-4 text-[#5A6A85] whitespace-nowrap">
+                    <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#F5F8FF] text-[#1E3A6D] border border-[#E2E8F0] whitespace-nowrap">
                       {{ dosen.program_studi || 'Informatika' }}
                     </span>
                   </td>
 
-                  <!-- Bidang Keahlian -->
-                  <td class="py-3 px-4 text-[#0F172A]">
-                    <div class="line-clamp-2 text-xs leading-relaxed" :title="dosen.bidang_keahlian">
+                  <!-- Bidang Keahlian (Boleh Wrap) -->
+                  <td class="py-3 px-4 text-[#0F172A] min-w-[260px]">
+                    <div class="text-xs leading-relaxed" :title="dosen.bidang_keahlian">
                       {{ dosen.bidang_keahlian || 'Keahlian Umum Informatika' }}
                     </div>
                   </td>
 
-                  <!-- Aksi Cepat: > Ajukan Pembimbing -->
-                  <td class="py-3 px-4 text-right">
+                  <!-- Aksi Cepat: > Ajukan Pembimbing (Nowrap) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap">
                     <button
                       type="button"
                       @click.stop="openBimbinganModal(dosen)"
