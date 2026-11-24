@@ -81,11 +81,8 @@
             <div
               class="w-full max-w-lg lg:max-w-none rounded-2xl bg-white p-3 sm:p-5 shadow-card border border-border-mist transition-all duration-300">
               <img :src="heroIllustration" alt="Ilustrasi Riset Dosen Hybrid NLP"
-                class="w-full h-auto object-contain rounded-xl max-h-[340px] sm:max-h-[380px] lg:max-h-[420px] mx-auto bg-white"
+                class="w-full h-auto object-contain rounded-xl max-h-85ax-h-[380px] lg:max-h-105 mx-auto bg-white"
                 loading="eager" />
-              <div class="text-[11px] text-text-muted text-center font-mono mt-2 pt-2 border-t border-slate-100">
-                Pencocokan Topik & Portofolio Dosen
-              </div>
             </div>
 
             <!-- Quick Recommendation Search Box (Under Illustration) -->
@@ -140,10 +137,7 @@
           <div class="lg:col-span-7 space-y-2">
             <div class="rounded-xl border border-border-mist overflow-hidden bg-bg-subtle/50 p-2 sm:p-3">
               <img :src="diagramImg" alt="Diagram Alur BM25, SBERT, dan Hybrid"
-                class="w-full h-auto object-contain mx-auto max-h-[280px] sm:max-h-[320px]" loading="lazy" />
-            </div>
-            <div class="text-[11px] text-text-muted text-center font-mono">
-              Diagram Alur BM25 Leksikal, SBERT Semantik, dan Penggabungan Skor
+                class="w-full h-auto object-contain mx-auto max-h-70 sm:max-h-80" loading="lazy" />
             </div>
           </div>
 

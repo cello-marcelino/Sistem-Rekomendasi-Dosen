@@ -93,7 +93,7 @@
                 id="dropdownProdiButton"
                 type="button"
                 @click="isProdiDropdownOpen = !isProdiDropdownOpen"
-                class="w-full sm:w-auto text-text-dark bg-white hover:bg-bg-subtle hover:border-academic-navy border border-border-subtle focus:ring-2 focus:ring-accent-cyan/20 focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-3.5 py-2 text-center inline-flex items-center justify-between gap-2.5 transition-all cursor-pointer shadow-xs min-w-[200px]"
+                class="w-full sm:w-auto text-text-dark bg-white hover:bg-bg-subtle hover:border-academic-navy border border-border-subtle focus:ring-2 focus:ring-accent-cyan/20 focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-3.5 py-2 text-center inline-flex items-center justify-between gap-2.5 transition-all cursor-pointer shadow-xs min-w-50"
                 :aria-expanded="isProdiDropdownOpen"
               >
                 <span class="flex items-center gap-1.5 truncate">
@@ -218,10 +218,10 @@
               <thead>
                 <tr class="bg-bg-subtle border-b border-border-mist text-[11px] font-bold uppercase tracking-wider text-academic-navy">
                   <th scope="col" class="py-3 px-4 w-12 text-center font-mono whitespace-nowrap">No</th>
-                  <th scope="col" class="py-3 px-4 min-w-[200px] whitespace-nowrap">Dosen & NIDN</th>
-                  <th scope="col" class="py-3 px-4 min-w-[180px] whitespace-nowrap">Email Institusi</th>
-                  <th scope="col" class="py-3 px-4 min-w-[160px] whitespace-nowrap">Program Studi</th>
-                  <th scope="col" class="py-3 px-4 min-w-[260px]">Bidang Keahlian</th>
+                  <th scope="col" class="py-3 px-4 min-w-50 whitespace-nowrap">Dosen & NIDN</th>
+                  <th scope="col" class="py-3 px-4 min-w-45 whitespace-nowrap">Email Institusi</th>
+                  <th scope="col" class="py-3 px-4 min-w-40 whitespace-nowrap">Program Studi</th>
+                  <th scope="col" class="py-3 px-4 min-w-65">Bidang Keahlian</th>
                   <th scope="col" class="py-3 px-4 w-44 text-right whitespace-nowrap">Aksi Cepat</th>
                 </tr>
               </thead>
@@ -295,7 +295,7 @@
                   </td>
 
                   <!-- Bidang Keahlian (Boleh Wrap) -->
-                  <td class="py-3 px-4 text-text-dark min-w-[260px]">
+                  <td class="py-3 px-4 text-text-dark min-w-65">
                     <div class="text-xs leading-relaxed" :title="dosen.bidang_keahlian">
                       {{ dosen.bidang_keahlian || 'Keahlian Umum Informatika' }}
                     </div>
